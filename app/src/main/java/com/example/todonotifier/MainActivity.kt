@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
             },
             currentYear,
             currentMonth,
-            currentDay
+            currentDay,
         )
 
         // source: https://stackoverflow.com/a/33996958
@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
             },
             currentHour,
             currentMinute,
-            true
+            true,
         )
         timePickerDialog.show()
     }
