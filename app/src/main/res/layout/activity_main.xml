@@ -58,7 +58,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="TextView"
-            android:textSize="25sp" />
+            android:textSize="21sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -92,7 +92,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="TextView"
-            android:textSize="25sp" />
+            android:textSize="21sp" />
     </LinearLayout>
 
 
@@ -126,8 +126,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="TextView"
-            android:textSize="25sp" />
+            android:text="Every 4 months"
+            android:textSize="21sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -161,6 +161,6 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="TextView"
-            android:textSize="25sp" />
+            android:textSize="21sp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

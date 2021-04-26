@@ -3,21 +3,21 @@
     <string-array name="repeat_values">
         <item>None</item>
         <item>Hourly</item>
-        <item>Daily (every 24 hours)</item>
-        <item>Weekly (every 7 days)</item>
-        <item>Monthly (every 30 days)</item>
-        <item>Yearly (every 365 days)</item>
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly (30 days)</item>
+        <item>Yearly (365 days)</item>
         <item>Every 2 hours</item>
         <item>Every 3 hours</item>
         <item>Every 4 hours</item>
         <item>Every 2 days</item>
         <item>Every 3 days</item>
-        <item>Every 2 weeks (14 days)</item>
-        <item>Every 3 weeks (21 days)</item>
-        <item>Every 4 weeks (28 days)</item>
-        <item>Every 2 months (60 days)</item>
-        <item>Every 3 months (90 days)</item>
-        <item>Every 4 months (120 days)</item>
+        <item>Every 2 weeks</item>
+        <item>Every 3 weeks</item>
+        <item>Every 4 weeks</item>
+        <item>Every 2 months</item>
+        <item>Every 3 months</item>
+        <item>Every 4 months</item>
         <item>Every minute</item>
         <item>Every 5 minutes</item>
         <item>Every 10 minutes</item>
@@ -27,11 +27,11 @@
     </string-array>
     <string-array name="stop_after_values">
         <item>Never Stop</item>
-        <item>2 times sent</item>
-        <item>3 times sent</item>
-        <item>4 times sent</item>
-        <item>5 times sent</item>
-        <item>6 times sent</item>
-        <item>7 times sent</item>
+        <item>sent 2 times</item>
+        <item>sent 3 times</item>
+        <item>sent 4 times</item>
+        <item>sent 5 times</item>
+        <item>sent 6 times</item>
+        <item>sent 7 times</item>
     </string-array>
 </resources>

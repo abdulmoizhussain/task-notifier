@@ -22,10 +22,20 @@ class MainActivity : AppCompatActivity() {
     private var selectedMinute: Int = 0
     private var selectedRepeat: Int = 0
     private var selectedStopAfter: Int = 0
+    private lateinit var repeatValues: Array<String>
+    private lateinit var stopAfterValues: Array<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        repeatValues = resources.getStringArray(R.array.repeat_values)
+        stopAfterValues = resources.getStringArray(R.array.stop_after_values)
+
+        setSelectedDate()
+        setSelectedTime()
+        setSelectedRepeat()
+        setSelectedStopAfter()
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -43,14 +53,7 @@ class MainActivity : AppCompatActivity() {
                 selectedMonth = monthOfYear
                 selectedDate = dayOfMonth
 
-                val calendarSelected = Calendar.getInstance()
-                calendarSelected.set(year, monthOfYear, dayOfMonth)
-
-                val textViewDate: TextView = findViewById(R.id.textViewDate)
-                textViewDate.text = SimpleDateFormat(
-                    "EEE, dd MMM, yyyy",
-                    Locale.getDefault(),
-                ).format(calendarSelected.time)
+                setSelectedDate()
             },
             currentYear,
             currentMonth,
@@ -74,13 +77,10 @@ class MainActivity : AppCompatActivity() {
             this,
 //            { view, hourOfDay, minute ->
             { _, hourOfDay, minute ->
-
                 selectedHour = hourOfDay
                 selectedMinute = minute
 
-                val textViewTime: TextView = findViewById(R.id.textViewTime)
-                textViewTime.text = ""
-                textViewTime.append("$hourOfDay:$minute")
+                setSelectedTime()
             },
             currentHour,
             currentMinute,
@@ -92,13 +92,12 @@ class MainActivity : AppCompatActivity() {
     @Suppress("UNUSED_PARAMETER")
     fun onClickSelectRepeat(view: View) {
         // source: https://www.youtube.com/watch?v=Em7LJddHAbQ
-        val data = resources.getStringArray(R.array.repeat_values)
         val listView = ListView(this)
         val builder = AlertDialog.Builder(this)
         val arrayAdapter = ArrayAdapter(
             this,
             android.R.layout.simple_selectable_list_item,
-            data,
+            repeatValues,
         )
 
         listView.adapter = arrayAdapter
@@ -112,7 +111,7 @@ class MainActivity : AppCompatActivity() {
 //        listView.setOnItemClickListener { parent, view, position, id ->
         listView.setOnItemClickListener { _, _, position, _ ->
             selectedRepeat = position
-            Toast.makeText(this, position.toString(), Toast.LENGTH_LONG).show()
+            setSelectedRepeat()
             alertDialog.dismiss()
         }
 
@@ -121,13 +120,12 @@ class MainActivity : AppCompatActivity() {
 
     @Suppress("UNUSED_PARAMETER")
     fun onClickSelectStopAfter(view: View) {
-        val data = resources.getStringArray(R.array.stop_after_values)
         val listView = ListView(this)
         val builder = AlertDialog.Builder(this)
         val arrayAdapter = ArrayAdapter(
             this,
             android.R.layout.simple_selectable_list_item,
-            data,
+            stopAfterValues,
         )
 
         listView.adapter = arrayAdapter
@@ -141,10 +139,50 @@ class MainActivity : AppCompatActivity() {
 //        listView.setOnItemClickListener { parent, view, position, id ->
         listView.setOnItemClickListener { _, _, position, _ ->
             selectedStopAfter = position
-            Toast.makeText(this, position.toString(), Toast.LENGTH_LONG).show()
+            setSelectedStopAfter()
             alertDialog.dismiss()
         }
 
         alertDialog.show()
+    }
+
+    private fun enableStopAfterControl(enable: Boolean = true) {
+        findViewById<TextView>(R.id.textView8).isEnabled = enable
+        findViewById<TextView>(R.id.textViewStopAfter).isEnabled = enable
+        findViewById<View>(R.id.linearLayout4).isClickable = enable
+    }
+
+    private fun setSelectedDate() {
+        val calendarSelected = Calendar.getInstance()
+        calendarSelected.set(selectedYear, selectedMonth, selectedDate)
+
+        val textViewDate = findViewById<TextView>(R.id.textViewDate)
+        textViewDate.text = SimpleDateFormat(
+            "EEE, dd MMM, yyyy",
+            Locale.getDefault(),
+        ).format(calendarSelected.time)
+    }
+
+    private fun setSelectedTime() {
+        val calendarSelected = Calendar.getInstance()
+        calendarSelected.set(Calendar.HOUR_OF_DAY, selectedHour)
+        calendarSelected.set(Calendar.MINUTE, selectedMinute)
+
+        val textViewTime = findViewById<TextView>(R.id.textViewTime)
+        textViewTime.text = SimpleDateFormat(
+            "HH:mm",
+            Locale.getDefault(),
+        ).format(calendarSelected.time)
+    }
+
+    private fun setSelectedRepeat() {
+        val textViewRepeat = findViewById<TextView>(R.id.textViewRepeat)
+        textViewRepeat.text = repeatValues[selectedRepeat]
+        enableStopAfterControl(selectedRepeat != 0)
+    }
+
+    private fun setSelectedStopAfter() {
+        val textViewStopAfter = findViewById<TextView>(R.id.textViewStopAfter)
+        textViewStopAfter.text = stopAfterValues[selectedStopAfter]
     }
 }
