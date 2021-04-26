@@ -37,6 +37,16 @@ class MainActivity : AppCompatActivity() {
             selectedMinute = calendar.get(Calendar.MINUTE)
         }
 
+        run {
+            // set Today's date
+            val dateToday = SimpleDateFormat(
+                "EEE, dd MMM, yyyy",
+                Locale.getDefault(),
+            ).format(Date())
+            val text = "Today is $dateToday"
+            findViewById<TextView>(R.id.textViewDateToday).text = text
+        }
+
         setSelectedDate()
         setSelectedTime()
         setSelectedRepeat()
