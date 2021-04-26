@@ -8,7 +8,6 @@ import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.*
@@ -153,36 +152,32 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setSelectedDate() {
-        val calendarSelected = Calendar.getInstance()
-        calendarSelected.set(selectedYear, selectedMonth, selectedDate)
+        val calendar = Calendar.getInstance()
+        calendar.set(selectedYear, selectedMonth, selectedDate)
 
-        val textViewDate = findViewById<TextView>(R.id.textViewDate)
-        textViewDate.text = SimpleDateFormat(
+        findViewById<TextView>(R.id.textViewDate).text = SimpleDateFormat(
             "EEE, dd MMM, yyyy",
             Locale.getDefault(),
-        ).format(calendarSelected.time)
+        ).format(calendar.time)
     }
 
     private fun setSelectedTime() {
-        val calendarSelected = Calendar.getInstance()
-        calendarSelected.set(Calendar.HOUR_OF_DAY, selectedHour)
-        calendarSelected.set(Calendar.MINUTE, selectedMinute)
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, selectedHour)
+        calendar.set(Calendar.MINUTE, selectedMinute)
 
-        val textViewTime = findViewById<TextView>(R.id.textViewTime)
-        textViewTime.text = SimpleDateFormat(
+        findViewById<TextView>(R.id.textViewTime).text = SimpleDateFormat(
             "HH:mm",
             Locale.getDefault(),
-        ).format(calendarSelected.time)
+        ).format(calendar.time)
     }
 
     private fun setSelectedRepeat() {
-        val textViewRepeat = findViewById<TextView>(R.id.textViewRepeat)
-        textViewRepeat.text = repeatValues[selectedRepeat]
+        findViewById<TextView>(R.id.textViewRepeat).text = repeatValues[selectedRepeat]
         enableStopAfterControl(selectedRepeat != 0)
     }
 
     private fun setSelectedStopAfter() {
-        val textViewStopAfter = findViewById<TextView>(R.id.textViewStopAfter)
-        textViewStopAfter.text = stopAfterValues[selectedStopAfter]
+        findViewById<TextView>(R.id.textViewStopAfter).text = stopAfterValues[selectedStopAfter]
     }
 }
