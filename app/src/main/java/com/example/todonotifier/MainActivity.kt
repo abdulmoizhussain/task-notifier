@@ -21,15 +21,15 @@ class MainActivity : AppCompatActivity() {
     private var selectedMinute: Int = 0
     private var selectedRepeat: Int = 0
     private var selectedStopAfter: Int = 0
-    private lateinit var repeatValues: Array<String>
-    private lateinit var stopAfterValues: Array<String>
+    private lateinit var repeatValues: List<String>
+    private lateinit var stopAfterValues: List<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        repeatValues = resources.getStringArray(R.array.repeat_values)
-        stopAfterValues = resources.getStringArray(R.array.stop_after_values)
+        repeatValues = resources.getStringArray(R.array.repeat_values).toList()
+        stopAfterValues = resources.getStringArray(R.array.stop_after_values).toList()
 
         setSelectedDate()
         setSelectedTime()
