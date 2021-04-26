@@ -21,15 +21,21 @@ class MainActivity : AppCompatActivity() {
     private var selectedMinute: Int = 0
     private var selectedRepeat: Int = 0
     private var selectedStopAfter: Int = 0
-    private lateinit var repeatValues: List<String>
-    private lateinit var stopAfterValues: List<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        repeatValues = resources.getStringArray(R.array.repeat_values).toList()
-        stopAfterValues = resources.getStringArray(R.array.stop_after_values).toList()
+        run {
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.HOUR_OF_DAY, 1)
+
+            selectedYear = calendar.get(Calendar.YEAR)
+            selectedMonth = calendar.get(Calendar.MONTH)
+            selectedDate = calendar.get(Calendar.DAY_OF_MONTH)
+            selectedHour = calendar.get(Calendar.HOUR_OF_DAY)
+            selectedMinute = calendar.get(Calendar.MINUTE)
+        }
 
         setSelectedDate()
         setSelectedTime()
@@ -96,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         val arrayAdapter = ArrayAdapter(
             this,
             android.R.layout.simple_selectable_list_item,
-            repeatValues,
+            getRepeatValues(),
         )
 
         listView.adapter = arrayAdapter
@@ -124,7 +130,7 @@ class MainActivity : AppCompatActivity() {
         val arrayAdapter = ArrayAdapter(
             this,
             android.R.layout.simple_selectable_list_item,
-            stopAfterValues,
+            getStopAfterValues(),
         )
 
         listView.adapter = arrayAdapter
@@ -173,11 +179,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setSelectedRepeat() {
-        findViewById<TextView>(R.id.textViewRepeat).text = repeatValues[selectedRepeat]
+        findViewById<TextView>(R.id.textViewRepeat).text = getRepeatValues()[selectedRepeat]
         enableStopAfterControl(selectedRepeat != 0)
     }
 
     private fun setSelectedStopAfter() {
-        findViewById<TextView>(R.id.textViewStopAfter).text = stopAfterValues[selectedStopAfter]
+        findViewById<TextView>(R.id.textViewStopAfter).text = getStopAfterValues()[selectedStopAfter]
+    }
+
+    private fun getRepeatValues(): Array<String> {
+        return resources.getStringArray(R.array.repeat_values)
+    }
+
+    private fun getStopAfterValues(): Array<String> {
+        return resources.getStringArray(R.array.stop_after_values)
     }
 }
