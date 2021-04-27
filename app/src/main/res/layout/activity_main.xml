@@ -200,20 +200,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <TextView
+        <!-- source:
+        https://developer.android.com/guide/topics/ui/controls/button.html#Borderless
+        https://stackoverflow.com/questions/8855791/how-to-create-standard-borderless-buttons-like-in-the-design-guideline-mentione
+        -->
+        <Button
+            style="?android:attr/borderlessButtonStyle"
             android:layout_width="0px"
             android:layout_height="match_parent"
             android:layout_marginEnd="2dp"
             android:layout_marginRight="2dp"
             android:layout_weight="1"
-            android:background="#747474"
-            android:gravity="center"
             android:text="On"
-            android:textColor="#fff"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textSize="18sp"
+            app:backgroundTint="#aaaaaa" />
 
-        <TextView
+        <Button
             android:layout_width="0px"
             android:layout_height="match_parent"
             android:layout_marginStart="1dp"
@@ -221,25 +223,20 @@
             android:layout_marginEnd="1dp"
             android:layout_marginRight="1dp"
             android:layout_weight="1"
-            android:background="#747474"
-            android:gravity="center"
             android:text="Off"
-            android:textColor="#fff"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textSize="18sp"
+            app:backgroundTint="#aaaaaa" />
 
-        <TextView
+        <Button
             android:layout_width="0px"
             android:layout_height="match_parent"
             android:layout_marginStart="2dp"
             android:layout_marginLeft="2dp"
             android:layout_weight="1"
-            android:background="#747474"
-            android:gravity="center"
+            android:enabled="false"
             android:text="Delete"
-            android:textColor="#fff"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textSize="18sp"
+            app:backgroundTint="#aaaaaa" />
 
     </LinearLayout>
 
