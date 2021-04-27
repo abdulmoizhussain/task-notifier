@@ -27,11 +27,11 @@
     </string-array>
     <string-array name="stop_after_values">
         <item>Never Stop</item>
-        <item>sent 2 times</item>
-        <item>sent 3 times</item>
-        <item>sent 4 times</item>
-        <item>sent 5 times</item>
-        <item>sent 6 times</item>
-        <item>sent 7 times</item>
+        <item>Sent 2 times</item>
+        <item>Sent 3 times</item>
+        <item>Sent 4 times</item>
+        <item>Sent 5 times</item>
+        <item>Sent 6 times</item>
+        <item>Sent 7 times</item>
     </string-array>
 </resources>

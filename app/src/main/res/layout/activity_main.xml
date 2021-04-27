@@ -201,10 +201,45 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="0px"
             android:layout_height="match_parent"
+            android:layout_marginEnd="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_weight="1"
+            android:background="#747474"
             android:gravity="center"
-            android:text="abcd" />
+            android:text="On"
+            android:textColor="#fff"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_marginStart="1dp"
+            android:layout_marginLeft="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginRight="1dp"
+            android:layout_weight="1"
+            android:background="#747474"
+            android:gravity="center"
+            android:text="Off"
+            android:textColor="#fff"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_marginStart="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_weight="1"
+            android:background="#747474"
+            android:gravity="center"
+            android:text="Delete"
+            android:textColor="#fff"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
