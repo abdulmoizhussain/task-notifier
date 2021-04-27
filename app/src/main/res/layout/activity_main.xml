@@ -7,173 +7,204 @@
     tools:context=".MainActivity"
     tools:ignore="HardcodedText">
 
-    <EditText
-        android:id="@+id/editTextDescription"
-        android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
-        android:autofillHints="@string/app_name"
-        android:background="@drawable/border_sharp_4x4"
-        android:ems="10"
-        android:gravity="start|top"
-        android:hint="Write Description"
-        android:inputType="textMultiLine"
-        android:padding="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textViewDateToday"
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="..."
-        android:textSize="18sp"
-        android:textStyle="bold"
+        android:layout_marginBottom="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextDescription" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:context=".MainActivity"
+            tools:ignore="HardcodedText">
+
+            <EditText
+                android:id="@+id/editTextDescription"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:autofillHints="@string/app_name"
+                android:background="@drawable/border_sharp_4x4"
+                android:ems="10"
+                android:gravity="start|top"
+                android:hint="Write Description"
+                android:inputType="textMultiLine"
+                android:padding="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textViewDateToday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="..."
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editTextDescription" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/border_round_4x4"
+                android:onClick="onClickSelectDate"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewDateToday">
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="Date"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:id="@+id/textViewDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="TextView"
+                    android:textSize="21sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/border_round_4x4"
+                android:onClick="onClickSelectTime"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="Time"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:id="@+id/textViewTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="TextView"
+                    android:textSize="21sp" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/linearLayout3"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/border_round_4x4"
+                android:onClick="onClickSelectRepeat"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="Repeat"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:id="@+id/textViewRepeat"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="Every 4 months"
+                    android:textSize="21sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout4"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/border_round_4x4"
+                android:onClick="onClickSelectStopAfter"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+
+                <TextView
+                    android:id="@+id/textView8"
+                    android:layout_width="150dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="Stop After"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:id="@+id/textViewStopAfter"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="TextView"
+                    android:textSize="21sp" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/linearLayout5"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
-        android:background="@drawable/border_round_4x4"
-        android:onClick="onClickSelectDate"
+        android:layout_height="80dp"
         android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewDateToday">
+        app:layout_constraintStart_toStartOf="parent"></LinearLayout>
 
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="Date"
-            android:textSize="25sp" />
-
-        <TextView
-            android:id="@+id/textViewDate"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="TextView"
-            android:textSize="21sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout2"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
-        android:background="@drawable/border_round_4x4"
-        android:onClick="onClickSelectTime"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="Time"
-            android:textSize="25sp" />
-
-        <TextView
-            android:id="@+id/textViewTime"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="TextView"
-            android:textSize="21sp" />
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:id="@+id/linearLayout3"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
-        android:background="@drawable/border_round_4x4"
-        android:onClick="onClickSelectRepeat"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
-
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="Repeat"
-            android:textSize="25sp" />
-
-        <TextView
-            android:id="@+id/textViewRepeat"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="Every 4 months"
-            android:textSize="21sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout4"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginRight="20dp"
-        android:background="@drawable/border_round_4x4"
-        android:onClick="onClickSelectStopAfter"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
-
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="Stop After"
-            android:textSize="25sp" />
-
-        <TextView
-            android:id="@+id/textViewStopAfter"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="TextView"
-            android:textSize="21sp" />
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
