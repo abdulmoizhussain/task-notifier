@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ToDo Notifier</string>
+    <string name="app_name">Task Notifier</string>
     <string-array name="repeat_values">
         <item>None</item>
         <item>Hourly</item>

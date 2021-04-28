@@ -1,4 +1,4 @@
-package com.example.todonotifier
+package com.example.tasknotifier
 
 import org.junit.Test
 

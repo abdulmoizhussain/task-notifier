@@ -1,19 +1,19 @@
-package com.example.todonotifier
+package com.example.tasknotifier
 
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.widget.TextView
+import java.text.SimpleDateFormat
+import java.util.*
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.graphics.Rect
-import android.os.Bundle
 import android.view.View
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import java.text.SimpleDateFormat
-import java.util.*
 
-
-class MainActivity : AppCompatActivity() {
+class ActivityAddTask : AppCompatActivity() {
     private var selectedYear: Int = 0
     private var selectedMonth: Int = 0
     private var selectedDate: Int = 0
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_add_task)
 
         applySoftKeyboardVirtualKeyboardListener()
 
@@ -196,7 +196,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setSelectedStopAfter() {
-        findViewById<TextView>(R.id.textViewStopAfter).text = getStopAfterValues()[selectedStopAfter]
+        findViewById<TextView>(R.id.textViewStopAfter).text =
+            getStopAfterValues()[selectedStopAfter]
     }
 
     private fun getRepeatValues(): Array<String> {
@@ -218,7 +219,8 @@ class MainActivity : AppCompatActivity() {
             val screenHeight: Int = constraintLayout.rootView.height
             val keypadHeight: Int = screenHeight - rect.bottom
 
-            findViewById<LinearLayout>(R.id.linearLayoutBottomBar).visibility = if (keypadHeight > screenHeight * 0.15) View.GONE else View.VISIBLE
+            findViewById<LinearLayout>(R.id.linearLayoutBottomBar).visibility =
+                if (keypadHeight > screenHeight * 0.15) View.GONE else View.VISIBLE
         }
     }
 }
