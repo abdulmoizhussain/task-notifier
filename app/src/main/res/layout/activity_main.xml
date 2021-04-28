@@ -7,12 +7,14 @@
     tools:context=".MainActivity">
 
     <ScrollView
+        android:id="@+id/scrollView1"
         android:layout_width="match_parent"
         android:layout_height="0px"
         android:fillViewport="true"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/linearLayoutBottomBar"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -200,12 +202,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <!-- source:
-        https://developer.android.com/guide/topics/ui/controls/button.html#Borderless
-        https://stackoverflow.com/questions/8855791/how-to-create-standard-borderless-buttons-like-in-the-design-guideline-mentione
-        -->
         <Button
-            style="?android:attr/borderlessButtonStyle"
+            style="@style/Widget.AppCompat.Button"
             android:layout_width="0px"
             android:layout_height="match_parent"
             android:layout_marginEnd="2dp"
@@ -216,6 +214,7 @@
             app:backgroundTint="#aaaaaa" />
 
         <Button
+            style="@style/Widget.AppCompat.Button"
             android:layout_width="0px"
             android:layout_height="match_parent"
             android:layout_marginStart="1dp"
@@ -228,6 +227,7 @@
             app:backgroundTint="#aaaaaa" />
 
         <Button
+            style="@style/Widget.AppCompat.Button"
             android:layout_width="0px"
             android:layout_height="match_parent"
             android:layout_marginStart="2dp"
