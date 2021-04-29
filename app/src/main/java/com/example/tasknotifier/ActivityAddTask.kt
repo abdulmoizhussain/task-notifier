@@ -1,17 +1,16 @@
 package com.example.tasknotifier
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import android.widget.TextView
-import java.text.SimpleDateFormat
-import java.util.*
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.graphics.Rect
+import android.os.Bundle
 import android.view.View
-import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ActivityAddTask : AppCompatActivity() {
     private var selectedYear: Int = 0
@@ -25,8 +24,6 @@ class ActivityAddTask : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
-
-        applySoftKeyboardVirtualKeyboardListener()
 
         run {
             val calendar = Calendar.getInstance()
@@ -208,19 +205,19 @@ class ActivityAddTask : AppCompatActivity() {
         return resources.getStringArray(R.array.stop_after_values)
     }
 
-    private fun applySoftKeyboardVirtualKeyboardListener() {
-        // source:
-        // https://stackoverflow.com/a/25681196
-        // https://www.tutorialspoint.com/how-to-write-a-softkeyboard-open-and-close-listener-in-an-activity-in-android
-        val constraintLayout: ConstraintLayout = findViewById(R.id.constraintLayoutRootView)
-        constraintLayout.viewTreeObserver.addOnGlobalLayoutListener {
-            val rect = Rect()
-            constraintLayout.getWindowVisibleDisplayFrame(rect)
-            val screenHeight: Int = constraintLayout.rootView.height
-            val keypadHeight: Int = screenHeight - rect.bottom
-
-            findViewById<LinearLayout>(R.id.linearLayoutBottomBar).visibility =
-                if (keypadHeight > screenHeight * 0.15) View.GONE else View.VISIBLE
-        }
-    }
+//    private fun applySoftKeyboardVirtualKeyboardListener() {
+//        // source:
+//        // https://stackoverflow.com/a/25681196
+//        // https://www.tutorialspoint.com/how-to-write-a-softkeyboard-open-and-close-listener-in-an-activity-in-android
+//        val rootLayout = findViewById<LinearLayout>(R.id.linearLayoutRootView)
+//        rootLayout.viewTreeObserver.addOnGlobalLayoutListener {
+//            val rect = Rect()
+//            rootLayout.getWindowVisibleDisplayFrame(rect)
+//            val screenHeight: Int = rootLayout.rootView.height
+//            val keypadHeight: Int = screenHeight - rect.bottom
+//
+//            findViewById<LinearLayout>(R.id.linearLayoutBottomBar).visibility =
+//                if (keypadHeight > screenHeight * 0.15) View.GONE else View.VISIBLE
+//        }
+//    }
 }

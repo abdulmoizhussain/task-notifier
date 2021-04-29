@@ -11,7 +11,7 @@
         android:theme="@style/Theme.TaskNotifier">
         <activity
             android:name=".ActivityAddTask"
-            android:windowSoftInputMode="adjustResize"></activity>
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
