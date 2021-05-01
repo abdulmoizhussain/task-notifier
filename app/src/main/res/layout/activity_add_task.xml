@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/constraintLayoutRootView"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ActivityAddTask">
@@ -26,7 +26,8 @@
             <EditText
                 android:id="@+id/editTextDescription"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="wrap_content"
+                android:lines="7"
                 android:layout_marginStart="20dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="24dp"
@@ -36,9 +37,10 @@
                 android:background="@drawable/border_sharp_4x4"
                 android:ems="10"
                 android:gravity="start|top"
-                android:hint="Write Description"
-                android:inputType="textMultiLine"
+                android:hint="Description"
+                android:inputType="text|textMultiLine"
                 android:padding="10dp"
+                android:scrollbars="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -197,7 +199,7 @@
     <LinearLayout
         android:id="@+id/linearLayoutBottomBar"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -3,9 +3,11 @@ package com.example.tasknotifier
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -25,16 +27,7 @@ class ActivityAddTask : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
 
-        run {
-            val calendar = Calendar.getInstance()
-            calendar.add(Calendar.HOUR_OF_DAY, 1)
-
-            selectedYear = calendar.get(Calendar.YEAR)
-            selectedMonth = calendar.get(Calendar.MONTH)
-            selectedDate = calendar.get(Calendar.DAY_OF_MONTH)
-            selectedHour = calendar.get(Calendar.HOUR_OF_DAY)
-            selectedMinute = calendar.get(Calendar.MINUTE)
-        }
+        applySoftKeyboardVirtualKeyboardListener()
 
         run {
             // set Today's date
@@ -44,6 +37,17 @@ class ActivityAddTask : AppCompatActivity() {
             ).format(Date())
             val text = "Today is $dateToday"
             findViewById<TextView>(R.id.textViewDateToday).text = text
+        }
+
+        run {
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.HOUR_OF_DAY, 1)
+
+            selectedYear = calendar.get(Calendar.YEAR)
+            selectedMonth = calendar.get(Calendar.MONTH)
+            selectedDate = calendar.get(Calendar.DAY_OF_MONTH)
+            selectedHour = calendar.get(Calendar.HOUR_OF_DAY)
+            selectedMinute = calendar.get(Calendar.MINUTE)
         }
 
         setSelectedDate()
@@ -205,19 +209,19 @@ class ActivityAddTask : AppCompatActivity() {
         return resources.getStringArray(R.array.stop_after_values)
     }
 
-//    private fun applySoftKeyboardVirtualKeyboardListener() {
-//        // source:
-//        // https://stackoverflow.com/a/25681196
-//        // https://www.tutorialspoint.com/how-to-write-a-softkeyboard-open-and-close-listener-in-an-activity-in-android
-//        val rootLayout = findViewById<LinearLayout>(R.id.linearLayoutRootView)
-//        rootLayout.viewTreeObserver.addOnGlobalLayoutListener {
-//            val rect = Rect()
-//            rootLayout.getWindowVisibleDisplayFrame(rect)
-//            val screenHeight: Int = rootLayout.rootView.height
-//            val keypadHeight: Int = screenHeight - rect.bottom
-//
-//            findViewById<LinearLayout>(R.id.linearLayoutBottomBar).visibility =
-//                if (keypadHeight > screenHeight * 0.15) View.GONE else View.VISIBLE
-//        }
-//    }
+    private fun applySoftKeyboardVirtualKeyboardListener() {
+        // source:
+        // https://stackoverflow.com/a/25681196
+        // https://www.tutorialspoint.com/how-to-write-a-softkeyboard-open-and-close-listener-in-an-activity-in-android
+        val rootLayout = findViewById<View>(R.id.rootLayout)
+        rootLayout.viewTreeObserver.addOnGlobalLayoutListener {
+            val rect = Rect()
+            rootLayout.getWindowVisibleDisplayFrame(rect)
+            val screenHeight: Int = rootLayout.rootView.height
+            val keypadHeight: Int = screenHeight - rect.bottom
+
+            findViewById<LinearLayout>(R.id.linearLayoutBottomBar).visibility =
+                if (keypadHeight > screenHeight * 0.15) View.GONE else View.VISIBLE
+        }
+    }
 }
