@@ -11,6 +11,9 @@ import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.example.tasknotifier.data.User
+import com.example.tasknotifier.data.UserViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -22,6 +25,7 @@ class ActivityAddTask : AppCompatActivity() {
     private var selectedMinute: Int = 0
     private var selectedRepeat: Int = 0
     private var selectedStopAfter: Int = 0
+    private lateinit var userViewModel: UserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +58,13 @@ class ActivityAddTask : AppCompatActivity() {
         setSelectedTime()
         setSelectedRepeat()
         setSelectedStopAfter()
+
+        userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+    }
+
+    fun onAddUser(view: View) {
+        val user = User(0, "first name", "last name", 2)
+        userViewModel.addUser(user)
     }
 
     @Suppress("UNUSED_PARAMETER")
