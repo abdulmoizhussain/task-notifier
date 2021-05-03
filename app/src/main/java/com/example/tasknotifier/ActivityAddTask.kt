@@ -62,6 +62,7 @@ class ActivityAddTask : AppCompatActivity() {
         userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun onAddUser(view: View) {
         val user = User(0, "first name", "last name", 2)
         userViewModel.addUser(user)
