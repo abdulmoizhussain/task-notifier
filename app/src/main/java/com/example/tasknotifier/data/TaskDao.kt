@@ -7,9 +7,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-interface UserDao {
+interface TaskDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun addUser(task: Task)
+    suspend fun addTask(task: Task)
 
     @Query("SELECT * FROM task_table ORDER BY id ASC")
     fun readAllData(): LiveData<List<Task>>

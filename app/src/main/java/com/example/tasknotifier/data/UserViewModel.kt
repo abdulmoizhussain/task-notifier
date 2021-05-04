@@ -12,14 +12,14 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: UserRepository
 
     init {
-        val userDao = AppDatabase.getDatabase(application).userDao()
-        repository = UserRepository(userDao)
+        val taskDao = AppDatabase.getDatabase(application).taskDao()
+        repository = UserRepository(taskDao)
         readAllData = repository.readAllData
     }
 
-    fun addUser(task: Task) {
+    fun addTask(task: Task) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.addUser(task)
+            repository.addTask(task)
         }
     }
 }

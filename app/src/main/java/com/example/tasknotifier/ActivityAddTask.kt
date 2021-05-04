@@ -63,9 +63,9 @@ class ActivityAddTask : AppCompatActivity() {
     }
 
     @Suppress("UNUSED_PARAMETER")
-    fun onAddUser(view: View) {
+    fun onAddTask(view: View) {
         val task = Task(0, "first name", "last name", 2)
-        userViewModel.addUser(task)
+        userViewModel.addTask(task)
     }
 
     @Suppress("UNUSED_PARAMETER")

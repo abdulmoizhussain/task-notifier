@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 @Database(entities = [Task::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun userDao(): UserDao
+    abstract fun taskDao(): TaskDao
 
     companion object {
         @Volatile
@@ -23,7 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "user_database",
+                    "task_notifier_database",
                 ).build()
                 INSTANCE = instance
                 return instance
