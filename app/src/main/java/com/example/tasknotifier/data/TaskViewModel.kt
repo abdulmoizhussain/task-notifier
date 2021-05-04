@@ -7,13 +7,13 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class UserViewModel(application: Application) : AndroidViewModel(application) {
+class TaskViewModel(application: Application) : AndroidViewModel(application) {
     val readAllData: LiveData<List<Task>>
-    private val repository: UserRepository
+    private val repository: TaskRepository
 
     init {
         val taskDao = AppDatabase.getDatabase(application).taskDao()
-        repository = UserRepository(taskDao)
+        repository = TaskRepository(taskDao)
         readAllData = repository.readAllData
     }
 

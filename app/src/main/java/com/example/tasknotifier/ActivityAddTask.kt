@@ -13,7 +13,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.tasknotifier.data.Task
-import com.example.tasknotifier.data.UserViewModel
+import com.example.tasknotifier.data.TaskViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -25,7 +25,7 @@ class ActivityAddTask : AppCompatActivity() {
     private var selectedMinute: Int = 0
     private var selectedRepeat: Int = 0
     private var selectedStopAfter: Int = 0
-    private lateinit var userViewModel: UserViewModel
+    private lateinit var taskViewModel: TaskViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,13 +59,13 @@ class ActivityAddTask : AppCompatActivity() {
         setSelectedRepeat()
         setSelectedStopAfter()
 
-        userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+        taskViewModel = ViewModelProvider(this).get(TaskViewModel::class.java)
     }
 
     @Suppress("UNUSED_PARAMETER")
     fun onAddTask(view: View) {
         val task = Task(0, "first name", "last name", 2)
-        userViewModel.addTask(task)
+        taskViewModel.addTask(task)
     }
 
     @Suppress("UNUSED_PARAMETER")

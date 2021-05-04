@@ -9,10 +9,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasknotifier.data.ListAdapter
-import com.example.tasknotifier.data.UserViewModel
+import com.example.tasknotifier.data.TaskViewModel
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var userViewModel: UserViewModel
+    private lateinit var taskViewModel: TaskViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,8 +25,8 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // ViewModel
-        userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
-        userViewModel.readAllData.observe(this, Observer { tasks ->
+        taskViewModel = ViewModelProvider(this).get(TaskViewModel::class.java)
+        taskViewModel.readAllData.observe(this, Observer { tasks ->
             recyclerViewListAdapter.setData(tasks)
         })
 
