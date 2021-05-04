@@ -32,7 +32,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    @Suppress("UNUSED_PARAMETER")
     fun onCliCkGoToAddUser(view: View) {
         startActivity(Intent(this, ActivityAddTask::class.java))
     }
