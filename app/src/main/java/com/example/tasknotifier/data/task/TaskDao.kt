@@ -1,4 +1,4 @@
-package com.example.tasknotifier.data
+package com.example.tasknotifier.data.task
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
@@ -13,5 +13,4 @@ interface TaskDao {
 
     @Query("SELECT * FROM task_table ORDER BY id ASC")
     fun readAllData(): LiveData<List<Task>>
-
 }

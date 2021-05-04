@@ -12,8 +12,8 @@ import android.widget.ListView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.tasknotifier.data.Task
-import com.example.tasknotifier.data.TaskViewModel
+import com.example.tasknotifier.data.task.Task
+import com.example.tasknotifier.viewmodels.TaskViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -64,7 +64,7 @@ class ActivityAddTask : AppCompatActivity() {
 
     @Suppress("UNUSED_PARAMETER")
     fun onAddTask(view: View) {
-        val task = Task(0, "first name", "last name", 2)
+        val task = Task("first name", (2.5).toFloat(), 2, 2)
         taskViewModel.addTask(task)
     }
 

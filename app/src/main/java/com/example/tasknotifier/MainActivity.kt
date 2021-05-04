@@ -8,8 +8,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tasknotifier.data.ListAdapter
-import com.example.tasknotifier.data.TaskViewModel
+import com.example.tasknotifier.listadapters.ListAdapter
+import com.example.tasknotifier.viewmodels.TaskViewModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var taskViewModel: TaskViewModel

@@ -1,10 +1,11 @@
-package com.example.tasknotifier.data
+package com.example.tasknotifier.listadapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasknotifier.R
+import com.example.tasknotifier.data.task.Task
 import kotlinx.android.synthetic.main.row_recyclerview_all_tasks.view.*
 
 class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
@@ -23,8 +24,8 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val currentItem = taskList[position]
-        holder.itemView.textView.text = currentItem.firstName
+        val currentItem: Task = taskList[position]
+        holder.itemView.textView.text = currentItem.description
     }
 
     fun setData(taskList: List<Task>) {

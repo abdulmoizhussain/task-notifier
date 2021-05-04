@@ -1,6 +1,8 @@
-package com.example.tasknotifier.data
+package com.example.tasknotifier.repositories
 
 import androidx.lifecycle.LiveData
+import com.example.tasknotifier.data.task.Task
+import com.example.tasknotifier.data.task.TaskDao
 
 class TaskRepository(private val taskDao: TaskDao) {
 
