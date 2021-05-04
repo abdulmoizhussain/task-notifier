@@ -2,6 +2,7 @@ package com.example.tasknotifier.data.task
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.tasknotifier.common.TaskStatusEnum
 
 @Entity(tableName = "task_table")
 data class Task(
@@ -12,4 +13,6 @@ data class Task(
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
+    var sentCount: Int = 0
+    var status: TaskStatusEnum = TaskStatusEnum.On
 }
