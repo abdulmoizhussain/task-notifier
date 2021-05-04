@@ -26,8 +26,8 @@ class MainActivity : AppCompatActivity() {
 
         // ViewModel
         userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
-        userViewModel.readAllData.observe(this, Observer { users ->
-            recyclerViewListAdapter.setData(users)
+        userViewModel.readAllData.observe(this, Observer { tasks ->
+            recyclerViewListAdapter.setData(tasks)
         })
 
     }

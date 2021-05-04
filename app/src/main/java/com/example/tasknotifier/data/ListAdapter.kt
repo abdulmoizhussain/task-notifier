@@ -9,7 +9,7 @@ import kotlinx.android.synthetic.main.row_recyclerview_all_tasks.view.*
 
 class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
-    private var userList = emptyList<User>()
+    private var taskList = emptyList<Task>()
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
@@ -19,16 +19,16 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
     }
 
     override fun getItemCount(): Int {
-        return userList.size
+        return taskList.size
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val currentItem = userList[position]
+        val currentItem = taskList[position]
         holder.itemView.textView.text = currentItem.firstName
     }
 
-    fun setData(userList: List<User>) {
-        this.userList = userList
+    fun setData(taskList: List<Task>) {
+        this.taskList = taskList
         notifyDataSetChanged()
     }
 }

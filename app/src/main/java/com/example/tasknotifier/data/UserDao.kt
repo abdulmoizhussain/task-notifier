@@ -9,9 +9,9 @@ import androidx.room.Query
 @Dao
 interface UserDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun addUser(user: User)
+    suspend fun addUser(task: Task)
 
-    @Query("SELECT * FROM user_table ORDER BY id ASC")
-    fun readAllData(): LiveData<List<User>>
+    @Query("SELECT * FROM task_table ORDER BY id ASC")
+    fun readAllData(): LiveData<List<Task>>
 
 }
