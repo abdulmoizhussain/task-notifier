@@ -3,6 +3,7 @@ package com.example.tasknotifier.listadapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasknotifier.R
 import com.example.tasknotifier.data.task.Task
@@ -25,7 +26,18 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val currentItem: Task = taskList[position]
-        holder.itemView.textView.text = currentItem.description
+        val itemView: View = holder.itemView
+        itemView.textViewDbId.text = currentItem.id.toString()
+        itemView.textViewTaskDescription.text = currentItem.description
+
+        val date = currentItem.dateTime
+        itemView.textViewDateTime.text = date.toString()
+
+        // source: https://stackoverflow.com/a/49712696
+        itemView.setOnLongClickListener { onClickItemView ->
+            Toast.makeText(onClickItemView.context, "asdf: long click listener", Toast.LENGTH_LONG).show()
+            true
+        }
     }
 
     fun setData(taskList: List<Task>) {

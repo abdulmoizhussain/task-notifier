@@ -20,9 +20,11 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         readAllData = repository.readAllData
     }
 
-    fun addTask(task: Task) {
+    fun addTask(task: Task): Long {
+        var taskId: Long = 0
         viewModelScope.launch(Dispatchers.IO) {
-            repository.addTask(task)
+            taskId = repository.addTask(task)
         }
+        return taskId
     }
 }

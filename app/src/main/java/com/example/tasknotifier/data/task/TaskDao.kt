@@ -9,7 +9,7 @@ import androidx.room.Query
 @Dao
 interface TaskDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun addTask(task: Task)
+    suspend fun addTask(task: Task): Long
 
     @Query("SELECT * FROM task_table ORDER BY id ASC")
     fun readAllData(): LiveData<List<Task>>

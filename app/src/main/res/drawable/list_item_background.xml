@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- source: https://stackoverflow.com/a/25296814 -->
+    <!-- source: https://stackoverflow.com/a/13634298 -->
+    <item android:drawable="@drawable/button_pressed" android:state_pressed="true" />
+    <item android:drawable="@drawable/button_pressed" android:state_focused="true" />
+    <item android:drawable="@drawable/border_bottom" />
+</selector>
