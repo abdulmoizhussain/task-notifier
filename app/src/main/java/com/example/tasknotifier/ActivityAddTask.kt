@@ -1,10 +1,10 @@
 package com.example.tasknotifier
 
-import android.app.*
-import android.content.Context
+import android.app.AlertDialog
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.graphics.Rect
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_add_task.*
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,6 +25,7 @@ class ActivityAddTask : AppCompatActivity() {
     private var selectedMinute: Int = 0
     private var selectedRepeat: Int = 0
     private var selectedStopAfter: Int = 0
+    private var checkboxSetExact: Boolean = false
     private lateinit var taskViewModel: TaskViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,19 +80,21 @@ class ActivityAddTask : AppCompatActivity() {
 
         // TODO testing in progress
 
-
         val triggerAtMillis = calendar.timeInMillis
         val description = editTextDescription.text.toString()
         val taskIdLong = taskViewModel.addTask(Task(description, triggerAtMillis, selectedRepeat, selectedStopAfter))
         val taskIdInt = taskIdLong.toInt()
-
 
         Intent(applicationContext, SendNotificationBroadcastReceiver::class.java).let { intent ->
             intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskIdInt)
             intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, description)
             intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, triggerAtMillis)
 
-            MyAlarmManager.setAlarm(this, taskIdInt, intent, triggerAtMillis)
+            if (checkboxSetExact) {
+                MyAlarmManager.setExact(this, taskIdInt, intent, triggerAtMillis)
+            } else {
+                MyAlarmManager.setInexact(this, taskIdInt, intent, triggerAtMillis)
+            }
         }
         finish()
         // TODO testing in progress
@@ -98,7 +102,24 @@ class ActivityAddTask : AppCompatActivity() {
 
     @Suppress("UNUSED_PARAMETER")
     fun onClickSelectDate(view: View) {
-        val calendar = Calendar.getInstance()
+        var calendar: Calendar
+
+        try {
+            calendar = Calendar.getInstance().apply {
+
+                val date: Date? = SimpleDateFormat("EEE, dd MMM, yyyy", Locale.getDefault())
+                    .parse(view.findViewById<TextView>(R.id.textViewDate).text.toString())
+
+                if (date == null) {
+                    throw ParseException("ParseException", 0)
+                }
+                timeInMillis = date.time
+            }
+        } catch (_: ParseException) {
+            calendar = Calendar.getInstance()
+        }
+
+
         val currentYear = calendar.get(Calendar.YEAR)
         val currentMonth = calendar.get(Calendar.MONTH)
         val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
@@ -125,9 +146,23 @@ class ActivityAddTask : AppCompatActivity() {
         datePickerDialog.show()
     }
 
-    @Suppress("UNUSED_PARAMETER")
     fun onClickSelectTime(view: View) {
-        val calendar = Calendar.getInstance()
+        var calendar: Calendar
+
+        try {
+            calendar = Calendar.getInstance().apply {
+                val date: Date? = SimpleDateFormat("HH:mm", Locale.getDefault())
+                    .parse(view.findViewById<TextView>(R.id.textViewTime).text.toString())
+
+                if (date == null) {
+                    throw ParseException("ParseException", 0)
+                }
+                timeInMillis = date.time
+            }
+        } catch (_: ParseException) {
+            calendar = Calendar.getInstance()
+        }
+
         val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
         val currentMinute = calendar.get(Calendar.MINUTE)
 
@@ -263,5 +298,9 @@ class ActivityAddTask : AppCompatActivity() {
             findViewById<LinearLayout>(R.id.linearLayoutBottomBar).visibility =
                 if (keypadHeight > screenHeight * 0.15) View.GONE else View.VISIBLE
         }
+    }
+
+    fun onClickCheckboxSetExact(view: View) {
+        checkboxSetExact = (view as CheckBox).isChecked
     }
 }
