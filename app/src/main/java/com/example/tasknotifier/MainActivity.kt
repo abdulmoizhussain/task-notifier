@@ -1,8 +1,5 @@
 package com.example.tasknotifier
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -11,7 +8,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.listadapters.ListAdapter
 import com.example.tasknotifier.viewmodels.TaskViewModel
 

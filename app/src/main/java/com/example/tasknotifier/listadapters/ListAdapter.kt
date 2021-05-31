@@ -41,7 +41,7 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         itemView.setOnLongClickListener { onClickItemView ->
             val context = onClickItemView.context
             MyAlarmManager.cancelByRequestCode(context, taskId)
-            Toast.makeText(context, "Cancelled the alarm with request code: $taskId", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Cancelled the alarm with request code: $taskId", Toast.LENGTH_SHORT).show()
             true
         }
     }

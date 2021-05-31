@@ -85,17 +85,17 @@ class ActivityAddTask : AppCompatActivity() {
         val taskIdLong = taskViewModel.addTask(Task(description, triggerAtMillis, selectedRepeat, selectedStopAfter))
         val taskIdInt = taskIdLong.toInt()
 
-        Intent(applicationContext, SendNotificationBroadcastReceiver::class.java).let { intent ->
-            intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskIdInt)
-            intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, description)
-            intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, triggerAtMillis)
+        val intent = Intent(applicationContext, SendNotificationBroadcastReceiver::class.java)
+        intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskIdInt)
+        intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, description)
+        intent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, triggerAtMillis)
 
-            if (checkboxSetExact) {
-                MyAlarmManager.setExact(this, taskIdInt, intent, triggerAtMillis)
-            } else {
-                MyAlarmManager.setInexact(this, taskIdInt, intent, triggerAtMillis)
-            }
+        if (checkboxSetExact) {
+            MyAlarmManager.setExact(this, taskIdInt, intent, triggerAtMillis)
+        } else {
+            MyAlarmManager.setInexact(this, taskIdInt, intent, triggerAtMillis)
         }
+
         finish()
         // TODO testing in progress
     }
