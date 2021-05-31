@@ -82,8 +82,8 @@ class ActivityAddTask : AppCompatActivity() {
 
         val triggerAtMillis = calendar.timeInMillis
         val description = editTextDescription.text.toString()
-        val taskIdLong = taskViewModel.addTask(Task(description, triggerAtMillis, selectedRepeat, selectedStopAfter))
-        val taskIdInt = taskIdLong.toInt()
+        val taskIdInt = MyPreferenceManager(this).getNextTaskId()
+        taskViewModel.addTask(Task(taskIdInt, description, triggerAtMillis, selectedRepeat, selectedStopAfter))
 
         val intent = Intent(applicationContext, SendNotificationBroadcastReceiver::class.java)
         intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskIdInt)
