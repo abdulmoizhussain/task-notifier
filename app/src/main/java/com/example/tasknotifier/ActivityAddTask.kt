@@ -1,27 +1,26 @@
 package com.example.tasknotifier
 
-import android.app.AlertDialog
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
+import android.app.*
+import android.content.Context
+import android.content.Intent
 import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.LinearLayout
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.viewmodels.TaskViewModel
+import kotlinx.android.synthetic.main.activity_add_task.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 class ActivityAddTask : AppCompatActivity() {
     private var selectedYear: Int = 0
     private var selectedMonth: Int = 0
-    private var selectedDate: Int = 0
-    private var selectedHour: Int = 0
+    private var selectedDayOfMonth: Int = 0
+    private var selectedHourOfDay: Int = 0
     private var selectedMinute: Int = 0
     private var selectedRepeat: Int = 0
     private var selectedStopAfter: Int = 0
@@ -49,8 +48,8 @@ class ActivityAddTask : AppCompatActivity() {
 
             selectedYear = calendar.get(Calendar.YEAR)
             selectedMonth = calendar.get(Calendar.MONTH)
-            selectedDate = calendar.get(Calendar.DAY_OF_MONTH)
-            selectedHour = calendar.get(Calendar.HOUR_OF_DAY)
+            selectedDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+            selectedHourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
             selectedMinute = calendar.get(Calendar.MINUTE)
         }
 
@@ -64,8 +63,37 @@ class ActivityAddTask : AppCompatActivity() {
 
     @Suppress("UNUSED_PARAMETER")
     fun onAddTask(view: View) {
-        val task = Task("first name", (2.5).toFloat(), 2, 2)
-        taskViewModel.addTask(task)
+
+        val calendar: Calendar = Calendar.getInstance().apply {
+//            timeInMillis = System.currentTimeMillis()
+
+            set(Calendar.YEAR, selectedYear)
+            set(Calendar.MONTH, selectedMonth)
+            set(Calendar.DAY_OF_MONTH, selectedDayOfMonth)
+            set(Calendar.HOUR_OF_DAY, selectedHourOfDay)
+            set(Calendar.MINUTE, selectedMinute)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        // TODO testing in progress
+
+
+        val triggerAtMillis = calendar.timeInMillis
+        val description = editTextDescription.text.toString()
+        val taskIdLong = taskViewModel.addTask(Task(description, triggerAtMillis, selectedRepeat, selectedStopAfter))
+        val taskIdInt = taskIdLong.toInt()
+
+
+        Intent(applicationContext, SendNotificationBroadcastReceiver::class.java).let { intent ->
+            intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskIdInt)
+            intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, description)
+            intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, triggerAtMillis)
+
+            MyAlarmManager.setAlarm(this, taskIdInt, intent, triggerAtMillis)
+        }
+        finish()
+        // TODO testing in progress
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -81,7 +109,7 @@ class ActivityAddTask : AppCompatActivity() {
             { _, year, monthOfYear, dayOfMonth ->
                 selectedYear = year
                 selectedMonth = monthOfYear
-                selectedDate = dayOfMonth
+                selectedDayOfMonth = dayOfMonth
 
                 setSelectedDate()
             },
@@ -107,7 +135,7 @@ class ActivityAddTask : AppCompatActivity() {
             this,
 //            { view, hourOfDay, minute ->
             { _, hourOfDay, minute ->
-                selectedHour = hourOfDay
+                selectedHourOfDay = hourOfDay
                 selectedMinute = minute
 
                 setSelectedTime()
@@ -184,7 +212,7 @@ class ActivityAddTask : AppCompatActivity() {
 
     private fun setSelectedDate() {
         val calendar = Calendar.getInstance()
-        calendar.set(selectedYear, selectedMonth, selectedDate)
+        calendar.set(selectedYear, selectedMonth, selectedDayOfMonth)
 
         findViewById<TextView>(R.id.textViewDate).text = SimpleDateFormat(
             "EEE, dd MMM, yyyy",
@@ -194,7 +222,7 @@ class ActivityAddTask : AppCompatActivity() {
 
     private fun setSelectedTime() {
         val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, selectedHour)
+        calendar.set(Calendar.HOUR_OF_DAY, selectedHourOfDay)
         calendar.set(Calendar.MINUTE, selectedMinute)
 
         findViewById<TextView>(R.id.textViewTime).text = SimpleDateFormat(

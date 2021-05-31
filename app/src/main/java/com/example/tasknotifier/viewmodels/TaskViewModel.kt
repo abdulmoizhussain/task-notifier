@@ -27,4 +27,8 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         }
         return taskId
     }
+
+    fun deleteOne(task: Task) {
+        repository.deleteOne(task)
+    }
 }

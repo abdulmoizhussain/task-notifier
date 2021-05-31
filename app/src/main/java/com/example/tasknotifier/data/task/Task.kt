@@ -7,7 +7,7 @@ import com.example.tasknotifier.common.TaskStatusEnum
 @Entity(tableName = "task_table")
 data class Task(
     val description: String,
-    val dateTime: Float,
+    val dateTime: Long,
     val repeat: Int,
     val stopAfter: Int,
 ) {

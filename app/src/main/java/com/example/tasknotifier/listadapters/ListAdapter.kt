@@ -5,9 +5,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.example.tasknotifier.MyAlarmManager
 import com.example.tasknotifier.R
 import com.example.tasknotifier.data.task.Task
 import kotlinx.android.synthetic.main.row_recyclerview_all_tasks.view.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
@@ -25,17 +28,20 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val currentItem: Task = taskList[position]
+        val currentTaskItem: Task = taskList[position]
+        val taskId = currentTaskItem.id
         val itemView: View = holder.itemView
-        itemView.textViewDbId.text = currentItem.id.toString()
-        itemView.textViewTaskDescription.text = currentItem.description
+        itemView.textViewDbId.text = currentTaskItem.id.toString()
+        itemView.textViewTaskDescription.text = currentTaskItem.description
 
-        val date = currentItem.dateTime
-        itemView.textViewDateTime.text = date.toString()
+        itemView.textViewDateTime.text = SimpleDateFormat("dd/MMM/yyyy HH:mm:ss", Locale.getDefault())
+            .format(currentTaskItem.dateTime)
 
         // source: https://stackoverflow.com/a/49712696
         itemView.setOnLongClickListener { onClickItemView ->
-            Toast.makeText(onClickItemView.context, "asdf: long click listener", Toast.LENGTH_LONG).show()
+            val context = onClickItemView.context
+            MyAlarmManager.cancelByRequestCode(context, taskId)
+            Toast.makeText(context, "Cancelled the alarm with request code: $taskId", Toast.LENGTH_LONG).show()
             true
         }
     }
