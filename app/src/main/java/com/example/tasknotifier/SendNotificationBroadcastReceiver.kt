@@ -12,12 +12,13 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
         val description = intent.getStringExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION)
         val setWhen = intent.getLongExtra(Constants.INTENT_EXTRA_SET_WHEN, 0)
 
-        MyNotificationManager.publishNotification(
+        MyNotificationManager.notify(
             context,
             taskId,
             SimpleDateFormat("dd/MMM HH:mm", Locale.getDefault()).format(setWhen),
             description,
-            setWhen
+            setWhen,
+            false
         )
     }
 }
