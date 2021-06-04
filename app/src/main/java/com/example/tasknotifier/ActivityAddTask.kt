@@ -13,6 +13,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_add_task.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -26,13 +29,12 @@ class ActivityAddTask : AppCompatActivity() {
     private var selectedRepeat: Int = 0
     private var selectedStopAfter: Int = 0
     private var checkboxSetExact: Boolean = false
+    private var taskDbId: Int = 0
     private lateinit var taskViewModel: TaskViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
-
-        applySoftKeyboardVirtualKeyboardListener()
 
         run {
             // set Today's date
@@ -44,31 +46,66 @@ class ActivityAddTask : AppCompatActivity() {
             findViewById<TextView>(R.id.textViewDateToday).text = text
         }
 
-        run {
-            val calendar = Calendar.getInstance()
-            calendar.add(Calendar.HOUR_OF_DAY, 1)
+        taskViewModel = ViewModelProvider(this).get(TaskViewModel::class.java)
 
-            selectedYear = calendar.get(Calendar.YEAR)
-            selectedMonth = calendar.get(Calendar.MONTH)
-            selectedDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-            selectedHourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
-            selectedMinute = calendar.get(Calendar.MINUTE)
+        applySoftKeyboardVirtualKeyboardListener()
+
+        taskDbId = intent.getIntExtra(Constants.INTENT_EXTRA_TASK_ID, 0)
+
+        if (taskDbId > 0) {
+            val liveDataGetOneById = taskViewModel.getOneById(taskDbId)
+
+            val getOneByIdObserver = { task: Task? ->
+                if (task == null) {
+                    Toast.makeText(this@ActivityAddTask, "Task with id: $taskDbId not found.", Toast.LENGTH_LONG).show()
+                    setOneHourLaterDateTime()
+                } else {
+                    findViewById<EditText>(R.id.editTextDescription).setText(task.description)
+
+                    val calendar = Calendar.getInstance().apply { timeInMillis = task.dateTime }
+
+                    selectedRepeat = task.repeat
+                    selectedStopAfter = task.stopAfter
+                    selectedYear = calendar.get(Calendar.YEAR)
+                    selectedMonth = calendar.get(Calendar.MONTH)
+                    selectedDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+                    selectedHourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
+                    selectedMinute = calendar.get(Calendar.MINUTE)
+                }
+
+                restOfTheWork()
+                liveDataGetOneById.removeObservers(this)
+            }
+
+            liveDataGetOneById.observe(this, getOneByIdObserver)
+            findViewById<Button>(R.id.buttonDeleteTask).isEnabled = true
+        } else {
+            setOneHourLaterDateTime()
+            restOfTheWork()
         }
+    }
 
+    private fun restOfTheWork() {
         setSelectedDate()
         setSelectedTime()
         setSelectedRepeat()
         setSelectedStopAfter()
+    }
 
-        taskViewModel = ViewModelProvider(this).get(TaskViewModel::class.java)
+    private fun setOneHourLaterDateTime() {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.HOUR_OF_DAY, 1)
+
+        selectedYear = calendar.get(Calendar.YEAR)
+        selectedMonth = calendar.get(Calendar.MONTH)
+        selectedDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+        selectedHourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
+        selectedMinute = calendar.get(Calendar.MINUTE)
     }
 
     @Suppress("UNUSED_PARAMETER")
     fun onAddTask(view: View) {
-
         val calendar: Calendar = Calendar.getInstance().apply {
-//            timeInMillis = System.currentTimeMillis()
-
             set(Calendar.YEAR, selectedYear)
             set(Calendar.MONTH, selectedMonth)
             set(Calendar.DAY_OF_MONTH, selectedDayOfMonth)
@@ -78,26 +115,30 @@ class ActivityAddTask : AppCompatActivity() {
             set(Calendar.MILLISECOND, 0)
         }
 
-        // TODO testing in progress
+        runBlocking {
+            GlobalScope.launch {
+                val triggerAtMillis = calendar.timeInMillis
+                val description = editTextDescription.text.toString()
 
-        val triggerAtMillis = calendar.timeInMillis
-        val description = editTextDescription.text.toString()
-        val taskIdInt = MyPreferenceManager(this).getNextTaskId()
-        taskViewModel.addTask(Task(taskIdInt, description, triggerAtMillis, selectedRepeat, selectedStopAfter))
+//              val taskIdInt = MyPreferenceManager(this).getNextTaskId()
+                val taskIdInt = taskViewModel.addOneAsync(
+                    Task(description, triggerAtMillis, selectedRepeat, selectedStopAfter)
+                ).toInt()
 
-        val intent = Intent(applicationContext, SendNotificationBroadcastReceiver::class.java)
-        intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskIdInt)
-        intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, description)
-        intent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, triggerAtMillis)
+                val intent = Intent(applicationContext, SendNotificationBroadcastReceiver::class.java)
+                intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskIdInt)
+                intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, description)
+                intent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, triggerAtMillis)
 
-        if (checkboxSetExact) {
-            MyAlarmManager.setExact(this, taskIdInt, intent, triggerAtMillis)
-        } else {
-            MyAlarmManager.setInexact(this, taskIdInt, intent, triggerAtMillis)
+                if (checkboxSetExact) {
+                    MyAlarmManager.setExact(this@ActivityAddTask, taskIdInt, intent, triggerAtMillis)
+                } else {
+                    MyAlarmManager.setInexact(this@ActivityAddTask, taskIdInt, intent, triggerAtMillis)
+                }
+
+                finish()
+            }
         }
-
-        finish()
-        // TODO testing in progress
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -107,12 +148,9 @@ class ActivityAddTask : AppCompatActivity() {
         try {
             calendar = Calendar.getInstance().apply {
 
-                val date: Date? = SimpleDateFormat("EEE, dd MMM, yyyy", Locale.getDefault())
-                    .parse(view.findViewById<TextView>(R.id.textViewDate).text.toString())
+                val date: Date = SimpleDateFormat("EEE, dd MMM, yyyy", Locale.getDefault())
+                    .parse(view.findViewById<TextView>(R.id.textViewDate).text.toString()) ?: throw ParseException("ParseException", 0)
 
-                if (date == null) {
-                    throw ParseException("ParseException", 0)
-                }
                 timeInMillis = date.time
             }
         } catch (_: ParseException) {
@@ -151,12 +189,8 @@ class ActivityAddTask : AppCompatActivity() {
 
         try {
             calendar = Calendar.getInstance().apply {
-                val date: Date? = SimpleDateFormat("HH:mm", Locale.getDefault())
-                    .parse(view.findViewById<TextView>(R.id.textViewTime).text.toString())
-
-                if (date == null) {
-                    throw ParseException("ParseException", 0)
-                }
+                val date: Date = SimpleDateFormat("HH:mm", Locale.getDefault())
+                    .parse(view.findViewById<TextView>(R.id.textViewTime).text.toString()) ?: throw ParseException("ParseException", 0)
                 timeInMillis = date.time
             }
         } catch (_: ParseException) {
@@ -302,5 +336,16 @@ class ActivityAddTask : AppCompatActivity() {
 
     fun onClickCheckboxSetExact(view: View) {
         checkboxSetExact = (view as CheckBox).isChecked
+    }
+
+    @Suppress("UNUSED_PARAMETER")
+    fun onClickDeleteTask(view: View) {
+        runBlocking {
+            GlobalScope.launch {
+                MyAlarmManager.cancelByRequestCode(this@ActivityAddTask, taskDbId)
+                taskViewModel.deleteOneByIdAsync(taskDbId)
+                finish()
+            }
+        }
     }
 }

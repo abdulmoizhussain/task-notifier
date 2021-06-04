@@ -8,11 +8,15 @@ class TaskRepository(private val taskDao: TaskDao) {
 
     val readAllData: LiveData<List<Task>> = taskDao.readAllData()
 
-    suspend fun addTask(task: Task): Long {
-        return taskDao.addTask(task)
+    fun getOneById(id: Int): LiveData<Task> {
+        return taskDao.getOneById(id)
     }
 
-    fun deleteOne(task: Task) {
-        taskDao.deleteOne(task)
+    suspend fun addOneAsync(task: Task): Long {
+        return taskDao.addOneAsync(task)
+    }
+
+    suspend fun deleteOneByIdAsync(id: Int) {
+        taskDao.deleteOneByIdAsync(id)
     }
 }

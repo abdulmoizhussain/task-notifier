@@ -29,13 +29,6 @@ class MainActivity : AppCompatActivity() {
         taskViewModel.readAllData.observe(this, Observer { tasks ->
             recyclerViewListAdapter.setData(tasks)
         })
-
-        // TODO testing in progress
-//        for (i in 1..12) {
-//            val task = Task("first name", (2.5).toFloat(), 2, 2)
-//            taskViewModel.addTask(task)
-//        }
-        // TODO testing in progress
     }
 
     @Suppress("UNUSED_PARAMETER")

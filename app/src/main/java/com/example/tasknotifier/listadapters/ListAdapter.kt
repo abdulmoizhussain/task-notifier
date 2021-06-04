@@ -1,10 +1,13 @@
 package com.example.tasknotifier.listadapters
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.example.tasknotifier.ActivityAddTask
+import com.example.tasknotifier.Constants
 import com.example.tasknotifier.MyAlarmManager
 import com.example.tasknotifier.R
 import com.example.tasknotifier.data.task.Task
@@ -29,13 +32,20 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val currentTaskItem: Task = taskList[position]
-        val taskId = currentTaskItem.taskId
+        val taskId = currentTaskItem.id
         val itemView: View = holder.itemView
-        itemView.textViewDbId.text = currentTaskItem.taskId.toString()
+        itemView.textViewDbId.text = taskId.toString()
         itemView.textViewTaskDescription.text = currentTaskItem.description
 
         itemView.textViewDateTime.text = SimpleDateFormat("dd/MMM/yyyy HH:mm:ss", Locale.getDefault())
             .format(currentTaskItem.dateTime)
+
+        itemView.setOnClickListener { onClickItemView ->
+            val context = onClickItemView.context
+            val intent = Intent(context, ActivityAddTask::class.java)
+            intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskId)
+            context.startActivity(intent)
+        }
 
         // source: https://stackoverflow.com/a/49712696
         itemView.setOnLongClickListener { onClickItemView ->

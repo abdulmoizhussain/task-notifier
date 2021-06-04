@@ -3,12 +3,9 @@ package com.example.tasknotifier.viewmodels
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
 import com.example.tasknotifier.data.AppDatabase
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.repositories.TaskRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class TaskViewModel(application: Application) : AndroidViewModel(application) {
     val readAllData: LiveData<List<Task>>
@@ -20,15 +17,15 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         readAllData = repository.readAllData
     }
 
-    fun addTask(task: Task): Long {
-        var taskId: Long = 0
-        viewModelScope.launch(Dispatchers.IO) {
-            taskId = repository.addTask(task)
-        }
-        return taskId
+    suspend fun addOneAsync(task: Task): Long {
+        return repository.addOneAsync(task)
     }
 
-    fun deleteOne(task: Task) {
-        repository.deleteOne(task)
+    suspend fun deleteOneByIdAsync(id: Int) {
+        repository.deleteOneByIdAsync(id)
+    }
+
+    fun getOneById(id: Int): LiveData<Task> {
+        return repository.getOneById(id)
     }
 }
