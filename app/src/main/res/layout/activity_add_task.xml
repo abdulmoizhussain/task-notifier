@@ -49,7 +49,7 @@
                 android:id="@+id/textViewDateToday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:text="TextView"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -63,7 +63,7 @@
                 android:layout_height="50dp"
                 android:layout_marginStart="20dp"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginRight="20dp"
                 android:background="@drawable/border_round_4x4"
@@ -72,15 +72,15 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textViewDateToday">
+                app:layout_constraintTop_toBottomOf="@+id/checkBoxSetExactTime">
 
                 <TextView
                     android:id="@+id/textView2"
-                    android:layout_width="150dp"
+                    android:layout_width="120dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="Date"
-                    android:textSize="25sp" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/textViewDate"
@@ -88,7 +88,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="TextView"
-                    android:textSize="21sp" />
+                    android:textSize="18sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -110,11 +110,11 @@
 
                 <TextView
                     android:id="@+id/textView4"
-                    android:layout_width="150dp"
+                    android:layout_width="120dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="Time"
-                    android:textSize="25sp" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/textViewTime"
@@ -122,7 +122,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="TextView"
-                    android:textSize="21sp" />
+                    android:textSize="18sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -144,11 +144,11 @@
 
                 <TextView
                     android:id="@+id/textView6"
-                    android:layout_width="150dp"
+                    android:layout_width="120dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="Repeat"
-                    android:textSize="25sp" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/textViewRepeat"
@@ -156,7 +156,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="TextView"
-                    android:textSize="21sp" />
+                    android:textSize="18sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -178,11 +178,11 @@
 
                 <TextView
                     android:id="@+id/textView8"
-                    android:layout_width="150dp"
+                    android:layout_width="120dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="Stop After"
-                    android:textSize="25sp" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/textViewStopAfter"
@@ -190,8 +190,23 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="TextView"
-                    android:textSize="21sp" />
+                    android:textSize="18sp" />
             </LinearLayout>
+
+            <CheckBox
+                android:id="@+id/checkBoxSetExactTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginRight="20dp"
+                android:onClick="onClickCheckboxSetExact"
+                android:text="Set Exact"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewDateToday" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
@@ -199,7 +214,7 @@
     <LinearLayout
         android:id="@+id/linearLayoutBottomBar"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -214,8 +229,7 @@
             android:layout_weight="1"
             android:onClick="onAddTask"
             android:text="On"
-            android:textSize="18sp"
-            app:backgroundTint="#aaaaaa" />
+            android:textSize="18sp" />
 
         <Button
             style="@style/Widget.AppCompat.Button"
@@ -227,8 +241,7 @@
             android:layout_marginRight="1dp"
             android:layout_weight="1"
             android:text="Off"
-            android:textSize="18sp"
-            app:backgroundTint="#aaaaaa" />
+            android:textSize="18sp" />
 
         <Button
             style="@style/Widget.AppCompat.Button"
@@ -239,8 +252,7 @@
             android:layout_weight="1"
             android:enabled="false"
             android:text="Delete"
-            android:textSize="18sp"
-            app:backgroundTint="#aaaaaa" />
+            android:textSize="18sp" />
 
     </LinearLayout>
 

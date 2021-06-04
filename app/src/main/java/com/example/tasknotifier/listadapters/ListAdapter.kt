@@ -29,9 +29,9 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val currentTaskItem: Task = taskList[position]
-        val taskId = currentTaskItem.id
+        val taskId = currentTaskItem.taskId
         val itemView: View = holder.itemView
-        itemView.textViewDbId.text = currentTaskItem.id.toString()
+        itemView.textViewDbId.text = currentTaskItem.taskId.toString()
         itemView.textViewTaskDescription.text = currentTaskItem.description
 
         itemView.textViewDateTime.text = SimpleDateFormat("dd/MMM/yyyy HH:mm:ss", Locale.getDefault())
@@ -41,7 +41,7 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         itemView.setOnLongClickListener { onClickItemView ->
             val context = onClickItemView.context
             MyAlarmManager.cancelByRequestCode(context, taskId)
-            Toast.makeText(context, "Cancelled the alarm with request code: $taskId", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Cancelled the alarm with request code: $taskId", Toast.LENGTH_SHORT).show()
             true
         }
     }
