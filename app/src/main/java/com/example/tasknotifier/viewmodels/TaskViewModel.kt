@@ -24,8 +24,10 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         return repository.addOneAsync(task)
     }
 
-    suspend fun deleteOneByIdAsync(id: Int) {
-        repository.deleteOneByIdAsync(id)
+    fun deleteOneById(id: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteOneByIdAsync(id)
+        }
     }
 
     fun updateOne(task: Task) {

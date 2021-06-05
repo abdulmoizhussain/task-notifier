@@ -362,13 +362,9 @@ class ActivityAddTask : AppCompatActivity() {
     }
 
     private fun onClickDeleteTask() {
-        runBlocking {
-            GlobalScope.launch {
-                MyAlarmManager.cancelByRequestCode(this@ActivityAddTask, taskDbId)
-                taskViewModel.deleteOneByIdAsync(taskDbId)
-                finish()
-            }
-        }
+        MyAlarmManager.cancelByRequestCode(this@ActivityAddTask, taskDbId)
+        taskViewModel.deleteOneById(taskDbId)
+        finish()
     }
 
     private fun onClickTurnOffTask() {
