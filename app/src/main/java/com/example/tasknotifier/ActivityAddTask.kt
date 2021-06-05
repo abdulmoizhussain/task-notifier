@@ -369,5 +369,6 @@ class ActivityAddTask : AppCompatActivity() {
 
     private fun onClickTurnOffTask() {
         Toast.makeText(this, "off button", Toast.LENGTH_SHORT).show()
+        // TODO turn off alarm manager for this task.
     }
 }
