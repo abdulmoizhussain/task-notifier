@@ -1,10 +1,7 @@
 package com.example.tasknotifier.data.task
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
 interface TaskDao {
@@ -13,6 +10,9 @@ interface TaskDao {
 
     @Query("DELETE FROM task_table WHERE id=:id")
     suspend fun deleteOneByIdAsync(id: Int)
+
+    @Update
+    fun updateOne(task: Task)
 
     @Query("SELECT * FROM task_table WHERE id=:id")
     fun getOneById(id: Int): LiveData<Task>

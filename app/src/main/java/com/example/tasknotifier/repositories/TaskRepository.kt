@@ -19,4 +19,8 @@ class TaskRepository(private val taskDao: TaskDao) {
     suspend fun deleteOneByIdAsync(id: Int) {
         taskDao.deleteOneByIdAsync(id)
     }
+
+    fun updateOne(task: Task) {
+        taskDao.updateOne(task)
+    }
 }

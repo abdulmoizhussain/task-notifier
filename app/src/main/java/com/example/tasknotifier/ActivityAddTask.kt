@@ -13,9 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_add_task.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -119,7 +117,7 @@ class ActivityAddTask : AppCompatActivity() {
         selectedMinute = calendar.get(Calendar.MINUTE)
     }
 
-    private fun onClickAddOrUpdateTask() {
+    private fun createTaskToAddOrUpdate(): Task {
         val calendar: Calendar = Calendar.getInstance().apply {
             set(Calendar.YEAR, selectedYear)
             set(Calendar.MONTH, selectedMonth)
@@ -130,25 +128,38 @@ class ActivityAddTask : AppCompatActivity() {
             set(Calendar.MILLISECOND, 0)
         }
 
+        val triggerAtMillis = calendar.timeInMillis
+        val description = editTextDescription.text.toString()
+
+        return Task(description, triggerAtMillis, selectedRepeat, selectedStopAfter)
+    }
+
+    private fun onClickAddOrUpdateTask() {
+        if (taskDbId > 0) { // do not create new task, update and reschedule existing one.
+            val taskToUpdate = createTaskToAddOrUpdate()
+            taskToUpdate.id = taskDbId
+            taskViewModel.updateOne(taskToUpdate)
+            // TODO update alarm manager as well
+            finish()
+            return
+        }
+
+        // add and schedule new Task
+        val task = createTaskToAddOrUpdate()
+
         runBlocking {
             GlobalScope.launch {
-                val triggerAtMillis = calendar.timeInMillis
-                val description = editTextDescription.text.toString()
-
-//              val taskIdInt = MyPreferenceManager(this).getNextTaskId()
-                val taskIdInt = taskViewModel.addOneAsync(
-                    Task(description, triggerAtMillis, selectedRepeat, selectedStopAfter)
-                ).toInt()
+                val taskIdInt = taskViewModel.addOneAsync(task).toInt()
 
                 val intent = Intent(applicationContext, SendNotificationBroadcastReceiver::class.java)
                 intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskIdInt)
-                intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, description)
-                intent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, triggerAtMillis)
+                intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, task.description)
+                intent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, task.dateTime)
 
                 if (checkboxSetExact) {
-                    MyAlarmManager.setExact(this@ActivityAddTask, taskIdInt, intent, triggerAtMillis)
+                    MyAlarmManager.setExact(this@ActivityAddTask, taskIdInt, intent, task.dateTime)
                 } else {
-                    MyAlarmManager.setInexact(this@ActivityAddTask, taskIdInt, intent, triggerAtMillis)
+                    MyAlarmManager.setInexact(this@ActivityAddTask, taskIdInt, intent, task.dateTime)
                 }
 
                 finish()
