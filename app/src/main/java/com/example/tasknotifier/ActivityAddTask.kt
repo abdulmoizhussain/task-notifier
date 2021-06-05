@@ -36,6 +36,21 @@ class ActivityAddTask : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
 
+        findViewById<LinearLayout>(R.id.linearLayoutDate).setOnClickListener { onClickSelectDate() }
+        findViewById<LinearLayout>(R.id.linearLayoutTime).setOnClickListener { onClickSelectTime() }
+        findViewById<LinearLayout>(R.id.linearLayoutRepeat).setOnClickListener { onClickSelectRepeat() }
+        findViewById<LinearLayout>(R.id.linearLayoutStopAfter).setOnClickListener { onClickSelectStopAfter() }
+
+        findViewById<Button>(R.id.checkBoxSetExactTime).setOnClickListener(::onClickSetExactCheckbox)
+
+        val buttonTurnOnOrUpdateTask = findViewById<Button>(R.id.buttonTurnOnOrUpdateTask)
+        val buttonDeleteTask = findViewById<Button>(R.id.buttonDeleteTask)
+        val buttonTurnOffTask = findViewById<Button>(R.id.buttonTurnOffTask)
+
+        buttonTurnOnOrUpdateTask.setOnClickListener { onClickAddOrUpdateTask() }
+        buttonDeleteTask.setOnClickListener { onClickDeleteTask() }
+        buttonTurnOffTask.setOnClickListener { onClickTurnOffTask() }
+
         run {
             // set Today's date
             val dateToday = SimpleDateFormat(
@@ -78,7 +93,10 @@ class ActivityAddTask : AppCompatActivity() {
             }
 
             liveDataGetOneById.observe(this, getOneByIdObserver)
-            findViewById<Button>(R.id.buttonDeleteTask).isEnabled = true
+            buttonDeleteTask.isEnabled = true
+            buttonTurnOffTask.isEnabled = true
+            val update = "Update"
+            buttonTurnOnOrUpdateTask.text = update
         } else {
             setOneHourLaterDateTime()
             restOfTheWork()
@@ -103,8 +121,7 @@ class ActivityAddTask : AppCompatActivity() {
         selectedMinute = calendar.get(Calendar.MINUTE)
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun onAddTask(view: View) {
+    private fun onClickAddOrUpdateTask() {
         val calendar: Calendar = Calendar.getInstance().apply {
             set(Calendar.YEAR, selectedYear)
             set(Calendar.MONTH, selectedMonth)
@@ -141,15 +158,14 @@ class ActivityAddTask : AppCompatActivity() {
         }
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun onClickSelectDate(view: View) {
+    private fun onClickSelectDate() {
         var calendar: Calendar
 
         try {
             calendar = Calendar.getInstance().apply {
 
                 val date: Date = SimpleDateFormat("EEE, dd MMM, yyyy", Locale.getDefault())
-                    .parse(view.findViewById<TextView>(R.id.textViewDate).text.toString()) ?: throw ParseException("ParseException", 0)
+                    .parse(findViewById<TextView>(R.id.textViewDate).text.toString()) ?: throw ParseException("ParseException", 0)
 
                 timeInMillis = date.time
             }
@@ -184,13 +200,13 @@ class ActivityAddTask : AppCompatActivity() {
         datePickerDialog.show()
     }
 
-    fun onClickSelectTime(view: View) {
+    private fun onClickSelectTime() {
         var calendar: Calendar
 
         try {
             calendar = Calendar.getInstance().apply {
                 val date: Date = SimpleDateFormat("HH:mm", Locale.getDefault())
-                    .parse(view.findViewById<TextView>(R.id.textViewTime).text.toString()) ?: throw ParseException("ParseException", 0)
+                    .parse(findViewById<TextView>(R.id.textViewTime).text.toString()) ?: throw ParseException("ParseException", 0)
                 timeInMillis = date.time
             }
         } catch (_: ParseException) {
@@ -216,8 +232,7 @@ class ActivityAddTask : AppCompatActivity() {
         timePickerDialog.show()
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun onClickSelectRepeat(view: View) {
+    private fun onClickSelectRepeat() {
         // source: https://www.youtube.com/watch?v=Em7LJddHAbQ
         val listView = ListView(this)
         val builder = AlertDialog.Builder(this)
@@ -245,8 +260,7 @@ class ActivityAddTask : AppCompatActivity() {
         alertDialog.show()
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun onClickSelectStopAfter(view: View) {
+    private fun onClickSelectStopAfter() {
         val listView = ListView(this)
         val builder = AlertDialog.Builder(this)
         val arrayAdapter = ArrayAdapter(
@@ -276,7 +290,7 @@ class ActivityAddTask : AppCompatActivity() {
     private fun enableStopAfterControl(enable: Boolean = true) {
         findViewById<TextView>(R.id.textView8).isEnabled = enable
         findViewById<TextView>(R.id.textViewStopAfter).isEnabled = enable
-        findViewById<View>(R.id.linearLayout4).isClickable = enable
+        findViewById<View>(R.id.linearLayoutStopAfter).isClickable = enable
     }
 
     private fun setSelectedDate() {
@@ -334,12 +348,11 @@ class ActivityAddTask : AppCompatActivity() {
         }
     }
 
-    fun onClickCheckboxSetExact(view: View) {
+    private fun onClickSetExactCheckbox(view: View) {
         checkboxSetExact = (view as CheckBox).isChecked
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun onClickDeleteTask(view: View) {
+    private fun onClickDeleteTask() {
         runBlocking {
             GlobalScope.launch {
                 MyAlarmManager.cancelByRequestCode(this@ActivityAddTask, taskDbId)
@@ -347,5 +360,9 @@ class ActivityAddTask : AppCompatActivity() {
                 finish()
             }
         }
+    }
+
+    private fun onClickTurnOffTask() {
+        Toast.makeText(this, "off button", Toast.LENGTH_SHORT).show()
     }
 }

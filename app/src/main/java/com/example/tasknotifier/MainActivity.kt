@@ -2,9 +2,8 @@ package com.example.tasknotifier
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,13 +25,12 @@ class MainActivity : AppCompatActivity() {
 
         // ViewModel
         taskViewModel = ViewModelProvider(this).get(TaskViewModel::class.java)
-        taskViewModel.readAllData.observe(this, Observer { tasks ->
-            recyclerViewListAdapter.setData(tasks)
-        })
+        taskViewModel.readAllData.observe(this, { tasks -> recyclerViewListAdapter.setData(tasks) })
+
+        findViewById<Button>(R.id.buttonAddNewTask).setOnClickListener { onCliCkGoToAddUser() }
     }
 
-    @Suppress("UNUSED_PARAMETER")
-    fun onCliCkGoToAddUser(view: View) {
+    private fun onCliCkGoToAddUser() {
         startActivity(Intent(this, ActivityAddTask::class.java))
     }
 }
