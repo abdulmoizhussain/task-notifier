@@ -19,8 +19,8 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
     private var taskList = emptyList<Task>()
 
-    class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    }
+    class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+//    class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         return MyViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.row_recyclerview_all_tasks, parent, false))
@@ -34,7 +34,6 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         val currentTaskItem: Task = taskList[position]
         val taskId = currentTaskItem.id
         val itemView: View = holder.itemView
-        itemView.textViewDbId.text = taskId.toString()
         itemView.textViewTaskDescription.text = currentTaskItem.description
 
         itemView.textViewDateTime.text = SimpleDateFormat("dd/MMM/yyyy HH:mm:ss", Locale.getDefault())

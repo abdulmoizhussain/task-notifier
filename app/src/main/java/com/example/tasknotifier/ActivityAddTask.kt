@@ -57,8 +57,7 @@ class ActivityAddTask : AppCompatActivity() {
                 "EEE, dd MMM, yyyy",
                 Locale.getDefault(),
             ).format(Date())
-            val text = "Today is $dateToday"
-            findViewById<TextView>(R.id.textViewDateToday).text = text
+            findViewById<TextView>(R.id.textViewDateToday).text = resources.getString(R.string.text_date_today, dateToday)
         }
 
         taskViewModel = ViewModelProvider(this).get(TaskViewModel::class.java)
@@ -95,8 +94,7 @@ class ActivityAddTask : AppCompatActivity() {
             liveDataGetOneById.observe(this, getOneByIdObserver)
             buttonDeleteTask.isEnabled = true
             buttonTurnOffTask.isEnabled = true
-            val update = "Update"
-            buttonTurnOnOrUpdateTask.text = update
+            buttonTurnOnOrUpdateTask.text = resources.getString(R.string.label_button_update)
         } else {
             setOneHourLaterDateTime()
             restOfTheWork()

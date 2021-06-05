@@ -1,5 +1,18 @@
 <resources>
     <string name="app_name">Task Notifier</string>
+    <string name="label_null">null</string>
+    <string name="label_button_on">On</string>
+    <string name="label_button_off">Off</string>
+    <string name="label_button_delete">Delete</string>
+    <string name="label_button_update">Update</string>
+    <string name="label_date">Date</string>
+    <string name="label_time">Time</string>
+    <string name="label_repeat">Repeat</string>
+    <string name="label_stop_after">Stop After</string>
+    <string name="label_add_new_task">Add New Task</string>
+    <string name="label_set_exact">Set Exact</string>
+    <string name="hint_description">Description</string>
+    <string name="text_date_today">Today is %1$s</string>
     <string-array name="repeat_values">
         <item>None</item>
         <item>Hourly</item>
