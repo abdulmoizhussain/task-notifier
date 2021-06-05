@@ -39,6 +39,7 @@ class ActivityAddTask : AppCompatActivity() {
         findViewById<LinearLayout>(R.id.linearLayoutRepeat).setOnClickListener { onClickSelectRepeat() }
         findViewById<LinearLayout>(R.id.linearLayoutStopAfter).setOnClickListener { onClickSelectStopAfter() }
 
+        // TODO remove checkBoxSetExactTime when all the dev and testing is complete.
         findViewById<Button>(R.id.checkBoxSetExactTime).setOnClickListener(::onClickSetExactCheckbox)
 
         val buttonTurnOnOrUpdateTask = findViewById<Button>(R.id.buttonTurnOnOrUpdateTask)
@@ -255,7 +256,7 @@ class ActivityAddTask : AppCompatActivity() {
 
         builder.setCancelable(true)
         builder.setView(listView)
-        builder.setTitle("Select Repeat Duration")
+        builder.setTitle(resources.getString(R.string.label_select_repeat_duration))
 
         val alertDialog = builder.create()
 
@@ -282,7 +283,7 @@ class ActivityAddTask : AppCompatActivity() {
 
         builder.setCancelable(true)
         builder.setView(listView)
-        builder.setTitle("Stop After")
+        builder.setTitle(resources.getString(R.string.label_stop_after))
 
         val alertDialog = builder.create()
 

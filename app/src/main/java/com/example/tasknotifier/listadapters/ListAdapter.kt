@@ -36,7 +36,10 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         val itemView: View = holder.itemView
         itemView.textViewTaskDescription.text = currentTaskItem.description
 
-        itemView.textViewDateTime.text = SimpleDateFormat("dd/MMM/yyyy HH:mm:ss", Locale.getDefault())
+        // TODO:
+        // remove :ss when all the dev and testing is complete
+        // recheck all the date formats whether they are valid or not.
+        itemView.textViewDateTime.text = SimpleDateFormat("EEE, dd/MMM/yyyy  HH:mm:ss", Locale.getDefault())
             .format(currentTaskItem.dateTime)
 
         itemView.setOnClickListener { onClickItemView ->
