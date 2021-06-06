@@ -41,7 +41,6 @@ class ActivityAddTask : AppCompatActivity() {
         findViewById<LinearLayout>(R.id.linearLayoutRepeat).setOnClickListener { onClickSelectRepeat() }
         findViewById<LinearLayout>(R.id.linearLayoutStopAfter).setOnClickListener { onClickSelectStopAfter() }
 
-        // TODO add status info in task list.
         // TODO remove checkBoxSetExactTime when all the dev and testing is complete.
         findViewById<Button>(R.id.checkBoxSetExactTime).setOnClickListener(::onClickSetExactCheckbox)
 

@@ -42,6 +42,8 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         itemView.textViewDateTime.text = SimpleDateFormat("EEE, dd/MMM/yyyy  HH:mm:ss", Locale.getDefault())
             .format(currentTaskItem.dateTime)
 
+        itemView.textViewStatus.text = currentTaskItem.status.toString()
+
         itemView.setOnClickListener { onClickItemView ->
             val context = onClickItemView.context
             val intent = Intent(context, ActivityAddTask::class.java)
