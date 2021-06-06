@@ -3,6 +3,7 @@ package com.example.tasknotifier
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.example.tasknotifier.common.TaskStatusEnum
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_add_task.*
@@ -39,6 +41,7 @@ class ActivityAddTask : AppCompatActivity() {
         findViewById<LinearLayout>(R.id.linearLayoutRepeat).setOnClickListener { onClickSelectRepeat() }
         findViewById<LinearLayout>(R.id.linearLayoutStopAfter).setOnClickListener { onClickSelectStopAfter() }
 
+        // TODO add status info in task list.
         // TODO remove checkBoxSetExactTime when all the dev and testing is complete.
         findViewById<Button>(R.id.checkBoxSetExactTime).setOnClickListener(::onClickSetExactCheckbox)
 
@@ -70,7 +73,7 @@ class ActivityAddTask : AppCompatActivity() {
 
             val getOneByIdObserver = { task: Task? ->
                 if (task == null) {
-                    Toast.makeText(this@ActivityAddTask, "Task with id: $taskDbId not found.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Task with id: $taskDbId not found.", Toast.LENGTH_LONG).show()
                     setOneHourLaterDateTime()
                 } else {
                     findViewById<EditText>(R.id.editTextDescription).setText(task.description)
@@ -84,6 +87,10 @@ class ActivityAddTask : AppCompatActivity() {
                     selectedDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
                     selectedHourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
                     selectedMinute = calendar.get(Calendar.MINUTE)
+
+                    if (task.status == TaskStatusEnum.On) {
+                        buttonTurnOffTask.isEnabled = true
+                    }
                 }
 
                 restOfTheWork()
@@ -92,7 +99,6 @@ class ActivityAddTask : AppCompatActivity() {
 
             liveDataGetOneById.observe(this, getOneByIdObserver)
             buttonDeleteTask.isEnabled = true
-            buttonTurnOffTask.isEnabled = true
             buttonTurnOnOrUpdateTask.text = resources.getString(R.string.label_button_update)
         } else {
             setOneHourLaterDateTime()
@@ -142,7 +148,7 @@ class ActivityAddTask : AppCompatActivity() {
 
             taskViewModel.updateOne(taskToUpdate)
 
-            createIntentAndSetAlarmManager(taskDbId, taskToUpdate)
+            createIntentAndSetAlarmManager(this, taskDbId, taskToUpdate)
 
             finish()
             return
@@ -155,23 +161,23 @@ class ActivityAddTask : AppCompatActivity() {
             GlobalScope.launch {
                 val taskIdInt = taskViewModel.addOneAsync(task).toInt()
 
-                createIntentAndSetAlarmManager(taskIdInt, task)
+                createIntentAndSetAlarmManager(this@ActivityAddTask, taskIdInt, task)
 
                 finish()
             }
         }
     }
 
-    private fun createIntentAndSetAlarmManager(taskIdInt: Int, task: Task) {
+    private fun createIntentAndSetAlarmManager(context: Context, taskIdInt: Int, task: Task) {
         val intent = Intent(applicationContext, SendNotificationBroadcastReceiver::class.java)
         intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskIdInt)
         intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, task.description)
         intent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, task.dateTime)
 
         if (checkboxSetExact) {
-            MyAlarmManager.setExact(this@ActivityAddTask, taskIdInt, intent, task.dateTime)
+            MyAlarmManager.setExact(context, taskIdInt, intent, task.dateTime)
         } else {
-            MyAlarmManager.setInexact(this@ActivityAddTask, taskIdInt, intent, task.dateTime)
+            MyAlarmManager.setInexact(context, taskIdInt, intent, task.dateTime)
         }
     }
 
@@ -370,13 +376,30 @@ class ActivityAddTask : AppCompatActivity() {
     }
 
     private fun onClickDeleteTask() {
-        MyAlarmManager.cancelByRequestCode(this@ActivityAddTask, taskDbId)
+        MyAlarmManager.cancelByRequestCode(this, taskDbId)
         taskViewModel.deleteOneById(taskDbId)
         finish()
     }
 
     private fun onClickTurnOffTask() {
-        Toast.makeText(this, "off button", Toast.LENGTH_SHORT).show()
-        // TODO turn off alarm manager for this task.
+        val getOneByIdLiveData = taskViewModel.getOneById(taskDbId)
+        val getOneByIdObserver = { task: Task? ->
+
+            if (task == null) {
+                Toast.makeText(this, "Task with id: $taskDbId not found.", Toast.LENGTH_LONG).show()
+            } else {
+                task.status = TaskStatusEnum.Off
+
+                taskViewModel.updateOne(task)
+
+                MyAlarmManager.cancelByRequestCode(this, taskDbId)
+
+                finish()
+            }
+
+            getOneByIdLiveData.removeObservers(this)
+        }
+
+        getOneByIdLiveData.observe(this, getOneByIdObserver)
     }
 }
