@@ -14,9 +14,6 @@ interface TaskDao {
     @Update
     suspend fun updateOneAsync(task: Task)
 
-    @Query("SELECT * FROM task_table WHERE id=:id")
-    fun getOneById(id: Int): LiveData<Task>
-
     @Query("SELECT * FROM task_table where id=:id")
     suspend fun getOneByIdAsync(id: Int): Task?
 

@@ -68,37 +68,37 @@ class ActivityAddTask : AppCompatActivity() {
         taskDbId = intent.getIntExtra(Constants.INTENT_EXTRA_TASK_ID, 0)
 
         if (taskDbId > 0) {
-            val liveDataGetOneById = taskViewModel.getOneById(taskDbId)
+            runBlocking {
+                // GlobalScope.launch will prevent us to make UI changes
+                launch {
+                    val task = taskViewModel.getOneByIdAsync(taskDbId)
 
-            val getOneByIdObserver = { task: Task? ->
-                if (task == null) {
-                    Toast.makeText(this, "Task with id: $taskDbId not found.", Toast.LENGTH_LONG).show()
-                    setOneHourLaterDateTime()
-                } else {
-                    findViewById<EditText>(R.id.editTextDescription).setText(task.description)
+                    if (task == null) {
+                        Toast.makeText(this@ActivityAddTask, "Task with id: $taskDbId not found.", Toast.LENGTH_LONG).show()
+                        setOneHourLaterDateTime()
+                    } else {
+                        findViewById<EditText>(R.id.editTextDescription).setText(task.description)
 
-                    val calendar = Calendar.getInstance().apply { timeInMillis = task.dateTime }
+                        val calendar = Calendar.getInstance().apply { timeInMillis = task.dateTime }
 
-                    selectedRepeat = task.repeat
-                    selectedStopAfter = task.stopAfter
-                    selectedYear = calendar.get(Calendar.YEAR)
-                    selectedMonth = calendar.get(Calendar.MONTH)
-                    selectedDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-                    selectedHourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
-                    selectedMinute = calendar.get(Calendar.MINUTE)
+                        selectedRepeat = task.repeat
+                        selectedStopAfter = task.stopAfter
+                        selectedYear = calendar.get(Calendar.YEAR)
+                        selectedMonth = calendar.get(Calendar.MONTH)
+                        selectedDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+                        selectedHourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
+                        selectedMinute = calendar.get(Calendar.MINUTE)
 
-                    if (task.status == TaskStatusEnum.On) {
-                        buttonTurnOffTask.isEnabled = true
+                        if (task.status == TaskStatusEnum.On) {
+                            buttonTurnOffTask.isEnabled = true
+                        }
                     }
+                    restOfTheWork()
+
+                    buttonDeleteTask.isEnabled = true
+                    buttonTurnOnOrUpdateTask.text = resources.getString(R.string.label_button_update)
                 }
-
-                restOfTheWork()
-                liveDataGetOneById.removeObservers(this)
             }
-
-            liveDataGetOneById.observe(this, getOneByIdObserver)
-            buttonDeleteTask.isEnabled = true
-            buttonTurnOnOrUpdateTask.text = resources.getString(R.string.label_button_update)
         } else {
             setOneHourLaterDateTime()
             restOfTheWork()
@@ -381,24 +381,22 @@ class ActivityAddTask : AppCompatActivity() {
     }
 
     private fun onClickTurnOffTask() {
-        val getOneByIdLiveData = taskViewModel.getOneById(taskDbId)
-        val getOneByIdObserver = { task: Task? ->
+        runBlocking {
+            launch {
+                val task = taskViewModel.getOneByIdAsync(taskDbId)
 
-            if (task == null) {
-                Toast.makeText(this, "Task with id: $taskDbId not found.", Toast.LENGTH_LONG).show()
-            } else {
-                task.status = TaskStatusEnum.Off
+                if (task == null) {
+                    Toast.makeText(this@ActivityAddTask, "Task with id: $taskDbId not found.", Toast.LENGTH_LONG).show()
+                } else {
+                    task.status = TaskStatusEnum.Off
 
-                taskViewModel.updateOne(task)
+                    taskViewModel.updateOne(task)
 
-                MyAlarmManager.cancelByRequestCode(this, taskDbId)
+                    MyAlarmManager.cancelByRequestCode(this@ActivityAddTask, taskDbId)
 
-                finish()
+                    finish()
+                }
             }
-
-            getOneByIdLiveData.removeObservers(this)
         }
-
-        getOneByIdLiveData.observe(this, getOneByIdObserver)
     }
 }

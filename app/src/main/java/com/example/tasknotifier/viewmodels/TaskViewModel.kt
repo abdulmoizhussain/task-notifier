@@ -36,7 +36,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getOneById(id: Int): LiveData<Task> {
-        return taskRepository.getOneById(id)
+    suspend fun getOneByIdAsync(id: Int): Task? {
+        return taskRepository.getOneByIdAsync(id)
     }
 }
