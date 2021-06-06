@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasknotifier.ActivityAddTask
-import com.example.tasknotifier.Constants
+import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.MyAlarmManager
 import com.example.tasknotifier.R
 import com.example.tasknotifier.data.task.Task

@@ -1,4 +1,4 @@
-package com.example.tasknotifier
+package com.example.tasknotifier.common
 
 object Constants {
     const val INTENT_EXTRA_TASK_DESCRIPTION = "INTENT_EXTRA_TASK_DESCRIPTION"
