@@ -11,8 +11,10 @@
         android:id="@+id/scrollView1"
         android:layout_width="match_parent"
         android:layout_height="0px"
+        android:fadeScrollbars="false"
         android:fillViewport="true"
         android:orientation="vertical"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@+id/linearLayoutBottomBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,7 +23,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingVertical="24dp">
 
             <EditText
                 android:id="@+id/editTextDescription"
@@ -29,7 +32,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginLeft="20dp"
-                android:layout_marginTop="24dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginRight="20dp"
                 android:autofillHints="@string/app_name"
