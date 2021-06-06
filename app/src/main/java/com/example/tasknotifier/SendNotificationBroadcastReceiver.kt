@@ -33,9 +33,10 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
             GlobalScope.launch {
                 val task = taskService.getOneByIdAsync(taskId)
 
-                task.status = TaskStatusEnum.Expired
-
-                taskService.updateOneAsync(task)
+                if (task != null) {
+                    task.status = TaskStatusEnum.Expired
+                    taskService.updateOneAsync(task)
+                }
             }
         }
     }

@@ -18,7 +18,7 @@ interface TaskDao {
     fun getOneById(id: Int): LiveData<Task>
 
     @Query("SELECT * FROM task_table where id=:id")
-    suspend fun getOneByIdAsync(id: Int): Task
+    suspend fun getOneByIdAsync(id: Int): Task?
 
     @Query("SELECT * FROM task_table ORDER BY id DESC")
     fun readAllData(): LiveData<List<Task>>

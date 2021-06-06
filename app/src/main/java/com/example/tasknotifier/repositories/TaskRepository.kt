@@ -12,7 +12,7 @@ class TaskRepository(private val taskDao: TaskDao) {
         return taskDao.getOneById(id)
     }
 
-    suspend fun getOneByIdAsync(id: Int): Task {
+    suspend fun getOneByIdAsync(id: Int): Task? {
         return taskDao.getOneByIdAsync(id)
     }
 
