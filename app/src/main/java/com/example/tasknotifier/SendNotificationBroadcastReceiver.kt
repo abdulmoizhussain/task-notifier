@@ -18,13 +18,19 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
         val description = intent.getStringExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION)
         val setWhen = intent.getLongExtra(Constants.INTENT_EXTRA_SET_WHEN, 0)
 
+        // TODO maybe temporary :P
+        val simpleDateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        val hourThen = simpleDateFormat.format(setWhen)
+        val hourNow = simpleDateFormat.format(Date())
+        val contentTitle = "$hourThen -> $hourNow"
+
         MyNotificationManager.notify(
             context,
             taskId,
-            SimpleDateFormat("dd/MMM HH:mm", Locale.getDefault()).format(setWhen),
+            contentTitle,
             description,
             setWhen,
-            false
+            true
         )
 
         // expire this task now.
@@ -32,12 +38,10 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
         val taskService = TaskService(context)
         runBlocking {
             GlobalScope.launch {
-                val task = taskService.getOneByIdAsync(taskId)
+                val task = taskService.getOneByIdAsync(taskId) ?: return@launch
 
-                if (task != null) {
-                    task.status = TaskStatusEnum.Expired
-                    taskService.updateOneAsync(task)
-                }
+                task.status = TaskStatusEnum.Expired
+                taskService.updateOneAsync(task)
             }
         }
     }

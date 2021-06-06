@@ -29,7 +29,7 @@ class ActivityAddTask : AppCompatActivity() {
     private var selectedMinute: Int = 0
     private var selectedRepeat: Int = 0
     private var selectedStopAfter: Int = 0
-    private var checkboxSetExact: Boolean = false
+    private var checkboxSetExact: Boolean = true
     private var taskDbId: Int = 0
     private lateinit var taskViewModel: TaskViewModel
 

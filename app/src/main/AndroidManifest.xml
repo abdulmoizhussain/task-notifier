@@ -11,6 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TaskNotifier">
+        <activity android:name=".ActivityViewTask" />
+
         <receiver
             android:name=".SendNotificationBroadcastReceiver"
             android:enabled="true"

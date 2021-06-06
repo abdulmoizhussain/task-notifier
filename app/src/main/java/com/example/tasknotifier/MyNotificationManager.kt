@@ -19,7 +19,11 @@ class MyNotificationManager {
             setWhen: Long,
             onGoing: Boolean
         ) {
-            val pendingIntent: PendingIntent = Intent(context, MainActivity::class.java).let { intentMainActivity ->
+            val pendingIntent: PendingIntent = Intent(context, ActivityViewTask::class.java).let { intentMainActivity ->
+
+                // TODO PUT EXTRAS DYNAMICALLY...
+                intentMainActivity.putExtra(Constants.INTENT_EXTRA_TASK_ID, notificationId)
+
                 val taskStackBuilder = TaskStackBuilder.create(context)
                 taskStackBuilder.addParentStack(MainActivity::class.java)
                 taskStackBuilder.addNextIntent(intentMainActivity)
@@ -36,14 +40,22 @@ class MyNotificationManager {
             builder.setContentIntent(pendingIntent)
             builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             builder.priority = NotificationCompat.PRIORITY_HIGH
-            builder.setAutoCancel(true)
-            builder.setOngoing(onGoing)
+
+            if (onGoing) {
+                builder.setOngoing(onGoing)
+                builder.setAutoCancel(false)
+            }
+
             builder.setWhen(setWhen)
             builder.setShowWhen(true)
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(notificationId, builder.build())
         }
 
+        fun cancelById(context: Context, notificationId: Int) {
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.cancel(notificationId)
+        }
     }
 
 }
