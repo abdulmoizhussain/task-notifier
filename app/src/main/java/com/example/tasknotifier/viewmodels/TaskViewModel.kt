@@ -12,31 +12,31 @@ import kotlinx.coroutines.launch
 
 class TaskViewModel(application: Application) : AndroidViewModel(application) {
     val readAllData: LiveData<List<Task>>
-    private val repository: TaskRepository
+    private val taskRepository: TaskRepository
 
     init {
         val taskDao = AppDatabase.getDatabase(application).taskDao()
-        repository = TaskRepository(taskDao)
-        readAllData = repository.readAllData
+        taskRepository = TaskRepository(taskDao)
+        readAllData = taskRepository.readAllData
     }
 
     suspend fun addOneAsync(task: Task): Long {
-        return repository.addOneAsync(task)
+        return taskRepository.addOneAsync(task)
     }
 
     fun deleteOneById(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteOneByIdAsync(id)
+            taskRepository.deleteOneByIdAsync(id)
         }
     }
 
     fun updateOne(task: Task) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateOne(task)
+            taskRepository.updateOneAsync(task)
         }
     }
 
     fun getOneById(id: Int): LiveData<Task> {
-        return repository.getOneById(id)
+        return taskRepository.getOneById(id)
     }
 }

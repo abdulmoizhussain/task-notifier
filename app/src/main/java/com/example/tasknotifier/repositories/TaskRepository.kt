@@ -12,6 +12,10 @@ class TaskRepository(private val taskDao: TaskDao) {
         return taskDao.getOneById(id)
     }
 
+    suspend fun getOneByIdAsync(id: Int): Task {
+        return taskDao.getOneByIdAsync(id)
+    }
+
     suspend fun addOneAsync(task: Task): Long {
         return taskDao.addOneAsync(task)
     }
@@ -20,7 +24,7 @@ class TaskRepository(private val taskDao: TaskDao) {
         taskDao.deleteOneByIdAsync(id)
     }
 
-    fun updateOne(task: Task) {
-        taskDao.updateOne(task)
+    suspend fun updateOneAsync(task: Task) {
+        taskDao.updateOneAsync(task)
     }
 }

@@ -3,6 +3,11 @@ package com.example.tasknotifier
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.example.tasknotifier.common.TaskStatusEnum
+import com.example.tasknotifier.services.TaskService
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -20,5 +25,18 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
             setWhen,
             false
         )
+
+        // expire this task now.
+        // TODO but before that, apply repetition logic when this task is repeatable.
+        val taskService = TaskService(context)
+        runBlocking {
+            GlobalScope.launch {
+                val task = taskService.getOneByIdAsync(taskId)
+
+                task.status = TaskStatusEnum.Expired
+
+                taskService.updateOneAsync(task)
+            }
+        }
     }
 }
