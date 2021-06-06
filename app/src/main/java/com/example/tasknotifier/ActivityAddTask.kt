@@ -139,8 +139,11 @@ class ActivityAddTask : AppCompatActivity() {
         if (taskDbId > 0) { // do not create new task, update and reschedule existing one.
             val taskToUpdate = createTaskToAddOrUpdate()
             taskToUpdate.id = taskDbId
+
             taskViewModel.updateOne(taskToUpdate)
-            // TODO update alarm manager as well
+
+            createIntentAndSetAlarmManager(taskDbId, taskToUpdate)
+
             finish()
             return
         }
@@ -152,19 +155,23 @@ class ActivityAddTask : AppCompatActivity() {
             GlobalScope.launch {
                 val taskIdInt = taskViewModel.addOneAsync(task).toInt()
 
-                val intent = Intent(applicationContext, SendNotificationBroadcastReceiver::class.java)
-                intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskIdInt)
-                intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, task.description)
-                intent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, task.dateTime)
-
-                if (checkboxSetExact) {
-                    MyAlarmManager.setExact(this@ActivityAddTask, taskIdInt, intent, task.dateTime)
-                } else {
-                    MyAlarmManager.setInexact(this@ActivityAddTask, taskIdInt, intent, task.dateTime)
-                }
+                createIntentAndSetAlarmManager(taskIdInt, task)
 
                 finish()
             }
+        }
+    }
+
+    private fun createIntentAndSetAlarmManager(taskIdInt: Int, task: Task) {
+        val intent = Intent(applicationContext, SendNotificationBroadcastReceiver::class.java)
+        intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskIdInt)
+        intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, task.description)
+        intent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, task.dateTime)
+
+        if (checkboxSetExact) {
+            MyAlarmManager.setExact(this@ActivityAddTask, taskIdInt, intent, task.dateTime)
+        } else {
+            MyAlarmManager.setInexact(this@ActivityAddTask, taskIdInt, intent, task.dateTime)
         }
     }
 

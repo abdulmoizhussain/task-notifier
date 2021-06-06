@@ -17,6 +17,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // TODO: reschedule all the active tasks after device restart/startup.
+
         // RecyclerView
         val recyclerViewListAdapter = ListAdapter()
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewAllTasks)
