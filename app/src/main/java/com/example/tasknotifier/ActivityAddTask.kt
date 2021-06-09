@@ -94,7 +94,7 @@ class ActivityAddTask : AppCompatActivity() {
                             buttonTurnOffTask.isEnabled = true
                         }
                     }
-                    restOfTheWork()
+                    restOfTheWorkOfOnCreate()
 
                     buttonDeleteTask.isEnabled = true
                     buttonTurnOnOrUpdateTask.text = resources.getString(R.string.label_button_update)
@@ -102,11 +102,11 @@ class ActivityAddTask : AppCompatActivity() {
             }
         } else {
             setOneHourLaterDateTime()
-            restOfTheWork()
+            restOfTheWorkOfOnCreate()
         }
     }
 
-    private fun restOfTheWork() {
+    private fun restOfTheWorkOfOnCreate() {
         setSelectedDate()
         setSelectedTime()
         setSelectedRepeat()
@@ -124,39 +124,52 @@ class ActivityAddTask : AppCompatActivity() {
         selectedMinute = calendar.get(Calendar.MINUTE)
     }
 
-    private fun createTaskToAddOrUpdate(): Task {
-        val calendar: Calendar = Calendar.getInstance().apply {
-            set(Calendar.YEAR, selectedYear)
-            set(Calendar.MONTH, selectedMonth)
-            set(Calendar.DAY_OF_MONTH, selectedDayOfMonth)
-            set(Calendar.HOUR_OF_DAY, selectedHourOfDay)
-            set(Calendar.MINUTE, selectedMinute)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
+    private fun onClickAddOrUpdateTask() {
+        val task: Task = let {
+            val calendar: Calendar = Calendar.getInstance().apply {
+                set(Calendar.YEAR, selectedYear)
+                set(Calendar.MONTH, selectedMonth)
+                set(Calendar.DAY_OF_MONTH, selectedDayOfMonth)
+                set(Calendar.HOUR_OF_DAY, selectedHourOfDay)
+                set(Calendar.MINUTE, selectedMinute)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            // TODO when date/time is in the past, don't proceed.
+            if (calendar.time.time < Date().time) {
+                val alertDialog = AlertDialog.Builder(this).create()
+//            alertDialog.setTitle("")
+                alertDialog.setMessage("Oops!\nThe scheduled time is in the past. Please choose a time in the future.")
+
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK") { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+                alertDialog.show()
+
+                return
+            }
+
+            val triggerAtMillis = calendar.timeInMillis
+            val description = editTextDescription.text.toString()
+
+            Task(description, triggerAtMillis, selectedRepeat, selectedStopAfter)
         }
 
-        val triggerAtMillis = calendar.timeInMillis
-        val description = editTextDescription.text.toString()
+        if (taskDbId > 0) { // Do not create a new task. Update and reschedule existing one.
 
-        return Task(description, triggerAtMillis, selectedRepeat, selectedStopAfter)
-    }
+            task.id = taskDbId
 
-    private fun onClickAddOrUpdateTask() {
-        if (taskDbId > 0) { // do not create new task, update and reschedule existing one.
-            val taskToUpdate = createTaskToAddOrUpdate()
-            taskToUpdate.id = taskDbId
+            taskViewModel.updateOne(task)
 
-            taskViewModel.updateOne(taskToUpdate)
-
-            createIntentAndSetAlarmManager(this, taskDbId, taskToUpdate)
+            createIntentAndSetAlarmManager(this, taskDbId, task)
 
             finish()
             return
         }
 
-        // add and schedule new Task
-        val task = createTaskToAddOrUpdate()
-
+        // Add and schedule new Task
         runBlocking {
             GlobalScope.launch {
                 val taskIdInt = taskViewModel.addOneAsync(task).toInt()

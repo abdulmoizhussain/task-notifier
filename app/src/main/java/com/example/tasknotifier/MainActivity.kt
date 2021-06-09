@@ -18,6 +18,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // TODO: reschedule all the active tasks after device restart/startup.
+        // TODO: export/import feature.
 
         // RecyclerView
         val recyclerViewListAdapter = ListAdapter()
