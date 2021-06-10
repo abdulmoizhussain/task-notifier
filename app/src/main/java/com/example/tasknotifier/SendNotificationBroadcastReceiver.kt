@@ -35,11 +35,16 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
         )
 
         // expire this task now.
-        // TODO but before that, apply repetition logic when this task is repeatable.
+        // TODO: but before that, apply repetition logic when this task is repeatable.
         val taskService = TaskService(context)
         runBlocking {
             GlobalScope.launch {
                 val task = taskService.getOneByIdAsync(taskId) ?: return@launch
+
+// TODO in progress
+//                if (task.repeat > 0) {
+//                    Constants.repeatDurationByIndex()
+//                }
 
                 task.status = TaskStatusEnum.Expired
                 taskService.updateOneAsync(task)
