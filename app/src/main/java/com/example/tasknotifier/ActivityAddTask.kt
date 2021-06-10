@@ -137,7 +137,7 @@ class ActivityAddTask : AppCompatActivity() {
                 set(Calendar.MILLISECOND, 0)
             }
 
-            // TODO when date/time is in the past, don't proceed.
+            // When date/time is in the past, don't proceed.
             if (calendar.time.time < Date().time) {
                 val alertDialog = AlertDialog.Builder(this).create()
                 alertDialog.setMessage("Oops!\nThe scheduled time is in the past. Please choose a time in the future.")
@@ -155,7 +155,8 @@ class ActivityAddTask : AppCompatActivity() {
             Task(description, triggerAtMillis, selectedRepeat, selectedStopAfter)
         }
 
-        if (taskDbId > 0) { // Do not create a new task. Update and reschedule existing one.
+        // Do not create a new task. Update and reschedule existing one.
+        if (taskDbId > 0) {
 
             task.id = taskDbId
 
