@@ -1,4 +1,4 @@
-package com.example.tasknotifier
+package com.example.tasknotifier.utils
 
 import android.app.Notification
 import android.app.NotificationManager
@@ -7,6 +7,9 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
+import com.example.tasknotifier.ActivityViewTask
+import com.example.tasknotifier.MainActivity
+import com.example.tasknotifier.R
 import com.example.tasknotifier.common.Constants
 
 class MyNotificationManager {

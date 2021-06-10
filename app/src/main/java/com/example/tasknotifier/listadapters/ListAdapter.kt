@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasknotifier.ActivityAddTask
 import com.example.tasknotifier.common.Constants
-import com.example.tasknotifier.MyAlarmManager
+import com.example.tasknotifier.utils.MyAlarmManager
 import com.example.tasknotifier.R
 import com.example.tasknotifier.data.task.Task
 import kotlinx.android.synthetic.main.row_recyclerview_all_tasks.view.*

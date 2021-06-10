@@ -1,4 +1,4 @@
-package com.example.tasknotifier
+package com.example.tasknotifier.utils
 
 import android.content.Context
 import android.content.SharedPreferences
