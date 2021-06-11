@@ -15,11 +15,11 @@ import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.common.TaskStatusEnum
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.utils.MyAlarmManager
+import com.example.tasknotifier.utils.MyDateFormat
 import com.example.tasknotifier.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_add_task.*
 import kotlinx.coroutines.*
 import java.text.ParseException
-import java.text.SimpleDateFormat
 import java.util.*
 
 class ActivityAddTask : AppCompatActivity() {
@@ -56,10 +56,7 @@ class ActivityAddTask : AppCompatActivity() {
 
         run {
             // set Today's date
-            val dateToday = SimpleDateFormat(
-                "EEE, dd MMM, yyyy",
-                Locale.getDefault(),
-            ).format(Date())
+            val dateToday = MyDateFormat.EEE_dd_MMM_yyyy.format(Date())
             findViewById<TextView>(R.id.textViewDateToday).text = resources.getString(R.string.text_date_today, dateToday)
         }
 
@@ -199,7 +196,7 @@ class ActivityAddTask : AppCompatActivity() {
         try {
             calendar = Calendar.getInstance().apply {
 
-                val date: Date = SimpleDateFormat("EEE, dd MMM, yyyy", Locale.getDefault())
+                val date: Date = MyDateFormat.EEE_dd_MMM_yyyy
                     .parse(findViewById<TextView>(R.id.textViewDate).text.toString()) ?: throw ParseException("ParseException", 0)
 
                 timeInMillis = date.time
@@ -240,7 +237,7 @@ class ActivityAddTask : AppCompatActivity() {
 
         try {
             calendar = Calendar.getInstance().apply {
-                val date: Date = SimpleDateFormat("HH:mm", Locale.getDefault())
+                val date: Date = MyDateFormat.HH_mm
                     .parse(findViewById<TextView>(R.id.textViewTime).text.toString()) ?: throw ParseException("ParseException", 0)
                 timeInMillis = date.time
             }
@@ -332,10 +329,7 @@ class ActivityAddTask : AppCompatActivity() {
         val calendar = Calendar.getInstance()
         calendar.set(selectedYear, selectedMonth, selectedDayOfMonth)
 
-        findViewById<TextView>(R.id.textViewDate).text = SimpleDateFormat(
-            "EEE, dd MMM, yyyy",
-            Locale.getDefault(),
-        ).format(calendar.time)
+        findViewById<TextView>(R.id.textViewDate).text = MyDateFormat.EEE_dd_MMM_yyyy.format(calendar.time)
     }
 
     private fun setSelectedTime() {
@@ -343,10 +337,7 @@ class ActivityAddTask : AppCompatActivity() {
         calendar.set(Calendar.HOUR_OF_DAY, selectedHourOfDay)
         calendar.set(Calendar.MINUTE, selectedMinute)
 
-        findViewById<TextView>(R.id.textViewTime).text = SimpleDateFormat(
-            "HH:mm",
-            Locale.getDefault(),
-        ).format(calendar.time)
+        findViewById<TextView>(R.id.textViewTime).text = MyDateFormat.HH_mm.format(calendar.time)
     }
 
     private fun setSelectedRepeat() {

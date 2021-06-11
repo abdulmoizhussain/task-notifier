@@ -7,10 +7,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.services.TaskService
+import com.example.tasknotifier.utils.MyDateFormat
 import com.example.tasknotifier.utils.MyNotificationManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.text.SimpleDateFormat
 import java.util.*
 
 class ActivityViewTask : AppCompatActivity() {
@@ -37,10 +37,10 @@ class ActivityViewTask : AppCompatActivity() {
                 findViewById<TextView>(R.id.textViewTaskDescription).text = task.description
 
                 // TODO use common practice for SimpleDateFormat...
-                val date = SimpleDateFormat("EEE, dd MMM, yyyy", Locale.getDefault()).format(task.dateTime)
+                val date = MyDateFormat.EEE_dd_MMM_yyyy.format(task.dateTime)
                 findViewById<TextView>(R.id.textViewDate).text = getString(R.string.show_date_with_label, date)
 
-                val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(task.dateTime)
+                val time = MyDateFormat.HH_mm.format(task.dateTime)
                 findViewById<TextView>(R.id.textViewTime).text = getString(R.string.show_time_with_label, time)
 
                 val repeat = resources.getStringArray(R.array.repeat_values)[task.repeat]

@@ -6,11 +6,11 @@ import android.content.Intent
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.common.TaskStatusEnum
 import com.example.tasknotifier.services.TaskService
+import com.example.tasknotifier.utils.MyDateFormat
 import com.example.tasknotifier.utils.MyNotificationManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.text.SimpleDateFormat
 import java.util.*
 
 class SendNotificationBroadcastReceiver : BroadcastReceiver() {
@@ -20,9 +20,8 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
         val setWhen = intent.getLongExtra(Constants.INTENT_EXTRA_SET_WHEN, 0)
 
         // TODO maybe temporary :P
-        val simpleDateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-        val hourThen = simpleDateFormat.format(setWhen)
-        val hourNow = simpleDateFormat.format(Date())
+        val hourThen = MyDateFormat.HH_mm_ss.format(setWhen)
+        val hourNow = MyDateFormat.HH_mm_ss.format(Date())
         val contentTitle = "$hourThen -> $hourNow"
 
         MyNotificationManager.notify(

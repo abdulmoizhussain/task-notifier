@@ -7,13 +7,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasknotifier.ActivityAddTask
-import com.example.tasknotifier.common.Constants
-import com.example.tasknotifier.utils.MyAlarmManager
 import com.example.tasknotifier.R
+import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.data.task.Task
+import com.example.tasknotifier.utils.MyAlarmManager
+import com.example.tasknotifier.utils.MyDateFormat
 import kotlinx.android.synthetic.main.row_recyclerview_all_tasks.view.*
-import java.text.SimpleDateFormat
-import java.util.*
 
 class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
@@ -39,8 +38,7 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         // TODO:
         // remove :ss when all the dev and testing is complete
         // recheck all the date formats whether they are valid or not.
-        itemView.textViewDateTime.text = SimpleDateFormat("EEE, dd/MMM/yyyy  HH:mm:ss", Locale.getDefault())
-            .format(currentTaskItem.dateTime)
+        itemView.textViewDateTime.text = MyDateFormat.EEE_dd_MMM_yyyy_HH_mm_ss.format(currentTaskItem.dateTime)
 
         itemView.textViewStatus.text = currentTaskItem.status.toString()
 
