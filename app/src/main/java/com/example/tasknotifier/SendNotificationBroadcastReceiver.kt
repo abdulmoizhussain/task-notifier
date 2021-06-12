@@ -22,6 +22,9 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
         // TODO maybe temporary :P
         val hourThen = MyDateFormat.HH_mm_ss.format(setWhen)
         val hourNow = MyDateFormat.HH_mm_ss.format(Date())
+
+        // TODO $sentCount
+//        val contentTitle = "($sentCount) $hourThen -> $hourNow"
         val contentTitle = "$hourThen -> $hourNow"
 
         MyNotificationManager.notify(
@@ -40,12 +43,30 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
             GlobalScope.launch {
                 val task = taskService.getOneByIdAsync(taskId) ?: return@launch
 
-// TODO in progress
-//                if (task.repeat > 0) {
-//                    Constants.repeatDurationByIndex()
-//                }
+                task.sentCount += 1
+
+                // TODO in progress
+                // Making sure task.repeat && task.stopAfter have the valid indices.
+                if (task.repeat < 0 || task.stopAfter < 0 || task.repeat >= Constants.repeatArray.size || task.stopAfter >= Constants.stopAfterArray.size) {
+                    // fail safe
+                    // just ignore
+                }
+                // When "Repeat: None" is selected.
+                else if (task.repeat == 0) {
+                    // "Repeat: None" logic here
+                }
+                // When a repeat duration is selected along with "Never Stop" option.
+                else if (task.repeat > 0 && task.stopAfter == 0) {
+                    // keep incrementing the sentCount and never stop sending.
+                    val calendar = Constants.getNextOccurrence(task.repeat)
+                }
+                // When a repeat duration is selected along with a "Stop After" option (other than Never Stop option).
+                else if (task.repeat > 0 && Constants.stopAfterArray[task.stopAfter] < task.sentCount) {
+                    val calendar = Constants.getNextOccurrence(task.repeat)
+                }
 
                 task.status = TaskStatusEnum.Expired
+
                 taskService.updateOneAsync(task)
             }
         }
