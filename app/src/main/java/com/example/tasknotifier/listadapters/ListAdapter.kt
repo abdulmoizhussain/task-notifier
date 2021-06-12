@@ -4,14 +4,12 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasknotifier.ActivityAddTask
 import com.example.tasknotifier.R
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.common.TaskStatusEnum
 import com.example.tasknotifier.data.task.Task
-import com.example.tasknotifier.utils.MyAlarmManager
 import com.example.tasknotifier.utils.MyDateFormat
 import kotlinx.android.synthetic.main.row_recyclerview_all_tasks.view.*
 
@@ -50,12 +48,12 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         }
 
         // source: https://stackoverflow.com/a/49712696
-        itemView.setOnLongClickListener { onClickItemView ->
-            val context = onClickItemView.context
-            MyAlarmManager.cancelByRequestCode(context, taskId)
-            Toast.makeText(context, "Cancelled the alarm with request code: $taskId", Toast.LENGTH_SHORT).show()
-            true
-        }
+        // itemView.setOnLongClickListener { onClickItemView ->
+        //     val context = onClickItemView.context
+        //     MyAlarmManager.cancelByRequestCode(context, taskId)
+        //     Toast.makeText(context, "Cancelled the alarm with request code: $taskId", Toast.LENGTH_SHORT).show()
+        //     true
+        // }
     }
 
     fun setData(taskList: List<Task>) {

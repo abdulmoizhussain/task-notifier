@@ -1,6 +1,7 @@
 package com.example.tasknotifier.repositories
 
 import androidx.lifecycle.LiveData
+import com.example.tasknotifier.common.TaskStatusEnum
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.data.task.TaskDao
 
@@ -22,5 +23,9 @@ class TaskRepository(private val taskDao: TaskDao) {
 
     suspend fun updateOneAsync(task: Task) {
         taskDao.updateOneAsync(task)
+    }
+
+    suspend fun fetchAllWhichAreDueAndOnAsync(): Array<Task> {
+        return taskDao.fetchAllByStatusWhichAreDueAsync(TaskStatusEnum.On, System.currentTimeMillis())
     }
 }

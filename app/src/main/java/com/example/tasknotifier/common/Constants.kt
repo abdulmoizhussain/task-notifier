@@ -1,10 +1,16 @@
 package com.example.tasknotifier.common
 
+import android.content.Intent
 import java.util.*
 
 object Constants {
     const val INTENT_EXTRA_TASK_ID = "INTENT_EXTRA_TASK_ID"
     const val NOTIFICATION_CHANNEL_DEFAULT = "NOTIFICATION_CHANNEL_DEFAULT"
+    val INTENT_ACTIONS_TO_RESCHEDULE_TASKS = listOf(
+        Intent.ACTION_BOOT_COMPLETED,
+        Intent.ACTION_TIME_CHANGED,
+        Intent.ACTION_TIMEZONE_CHANGED,
+    )
 
     val repeatArray = listOf<(calendar: Calendar) -> Unit>(
         {

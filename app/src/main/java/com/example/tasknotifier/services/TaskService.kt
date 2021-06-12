@@ -33,4 +33,8 @@ class TaskService(context: Context) {
     suspend fun updateOneAsync(task: Task) {
         taskRepository.updateOneAsync(task)
     }
+
+    suspend fun fetchAllWhichAreDueAndOnAsync(): Array<Task> {
+        return taskRepository.fetchAllWhichAreDueAndOnAsync()
+    }
 }

@@ -2,6 +2,7 @@ package com.example.tasknotifier.data.task
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.example.tasknotifier.common.TaskStatusEnum
 
 @Dao
 interface TaskDao {
@@ -19,4 +20,7 @@ interface TaskDao {
 
     @Query("SELECT * FROM task_table ORDER BY id DESC")
     fun readAllData(): LiveData<List<Task>>
+
+    @Query("SELECT * FROM task_table WHERE status=:status AND dateTime>=:dateTime")
+    suspend fun fetchAllByStatusWhichAreDueAsync(status: TaskStatusEnum, dateTime: Long): Array<Task>
 }

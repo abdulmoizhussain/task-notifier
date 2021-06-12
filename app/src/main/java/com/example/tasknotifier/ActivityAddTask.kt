@@ -51,7 +51,7 @@ class ActivityAddTask : AppCompatActivity() {
 
         run {
             // set Today's date
-            val dateToday = MyDateFormat.EEE_MMM_dd_yyyy.format(Date())
+            val dateToday = MyDateFormat.EEE_MMM_dd_yyyy.format(System.currentTimeMillis())
             findViewById<TextView>(R.id.textViewDateToday).text = resources.getString(R.string.text_date_today, dateToday)
         }
 
@@ -130,7 +130,7 @@ class ActivityAddTask : AppCompatActivity() {
             }
 
             // When date/time is in the past, don't proceed.
-            if (calendar.time.time < Date().time) {
+            if (calendar.timeInMillis < System.currentTimeMillis()) {
                 val alertDialog = AlertDialog.Builder(this).create()
                 alertDialog.setMessage("Oops!\nThe scheduled time is in the past. Please choose a time in the future.")
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "OK") { dialog, _ ->

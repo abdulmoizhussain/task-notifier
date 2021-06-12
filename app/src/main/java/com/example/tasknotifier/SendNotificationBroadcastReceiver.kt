@@ -39,7 +39,7 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
 
                 // TODO maybe temporary :P
                 val hourThen = MyDateFormat.HH_mm_ss.format(setWhen)
-                val hourNow = MyDateFormat.HH_mm_ss.format(Date())
+                val hourNow = MyDateFormat.HH_mm_ss.format(System.currentTimeMillis())
                 val contentTitle = "($sentCount) $hourThen -> $hourNow"
 
                 MyNotificationManager.notify(
@@ -77,7 +77,7 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
                     // OR
                     // When a repeat duration is selected along with a "Stop After" option (other than Never Stop option).
                     // Reschedule this task at its next occurrence.
-                    triggerAtMillis = Constants.getNextOccurrence(task.repeat).time.time
+                    triggerAtMillis = Constants.getNextOccurrence(task.repeat).timeInMillis
 
                     TaskService.createIntentAndSetExactAlarm(context, taskId, triggerAtMillis)
                 }
