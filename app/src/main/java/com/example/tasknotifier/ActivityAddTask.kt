@@ -18,7 +18,6 @@ import com.example.tasknotifier.utils.MyDateFormat
 import com.example.tasknotifier.viewmodels.TaskViewModel
 import kotlinx.android.synthetic.main.activity_add_task.*
 import kotlinx.coroutines.*
-import java.text.ParseException
 import java.util.*
 
 class ActivityAddTask : AppCompatActivity() {
@@ -174,25 +173,6 @@ class ActivityAddTask : AppCompatActivity() {
     }
 
     private fun onClickSelectDate() {
-        var calendar: Calendar
-
-        try {
-            calendar = Calendar.getInstance().apply {
-
-                val date: Date = MyDateFormat.EEE_MMM_dd_yyyy
-                    .parse(findViewById<TextView>(R.id.textViewDate).text.toString()) ?: throw ParseException("ParseException", 0)
-
-                timeInMillis = date.time
-            }
-        } catch (_: ParseException) {
-            calendar = Calendar.getInstance()
-        }
-
-
-        val currentYear = calendar.get(Calendar.YEAR)
-        val currentMonth = calendar.get(Calendar.MONTH)
-        val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
-
         val datePickerDialog = DatePickerDialog(
             this,
 //            { view, year, monthOfYear, dayOfMonth ->
@@ -203,9 +183,9 @@ class ActivityAddTask : AppCompatActivity() {
 
                 setSelectedDate()
             },
-            currentYear,
-            currentMonth,
-            currentDay,
+            selectedYear,
+            selectedMonth,
+            selectedDayOfMonth,
         )
 
         // source: https://stackoverflow.com/a/33996958
@@ -216,21 +196,6 @@ class ActivityAddTask : AppCompatActivity() {
     }
 
     private fun onClickSelectTime() {
-        var calendar: Calendar
-
-        try {
-            calendar = Calendar.getInstance().apply {
-                val date: Date = MyDateFormat.HH_mm
-                    .parse(findViewById<TextView>(R.id.textViewTime).text.toString()) ?: throw ParseException("ParseException", 0)
-                timeInMillis = date.time
-            }
-        } catch (_: ParseException) {
-            calendar = Calendar.getInstance()
-        }
-
-        val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
-        val currentMinute = calendar.get(Calendar.MINUTE)
-
         val timePickerDialog = TimePickerDialog(
             this,
 //            { view, hourOfDay, minute ->
@@ -240,8 +205,8 @@ class ActivityAddTask : AppCompatActivity() {
 
                 setSelectedTime()
             },
-            currentHour,
-            currentMinute,
+            selectedHourOfDay,
+            selectedMinute,
             true,
         )
         timePickerDialog.show()
