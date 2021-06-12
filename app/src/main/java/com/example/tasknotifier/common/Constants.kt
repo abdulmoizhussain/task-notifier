@@ -77,7 +77,7 @@ object Constants {
             calendar.add(Calendar.MINUTE, 30)
         }
     )
-    val stopAfterArray = intArrayOf(0, 2, 3, 4, 5, 6, 7)
+    val stopAfterArray = intArrayOf(1, 2, 3, 4, 5, 6, 7)
 
     fun getNextOccurrence(repeatIndex: Int): Calendar {
         val calendar = Calendar.getInstance()

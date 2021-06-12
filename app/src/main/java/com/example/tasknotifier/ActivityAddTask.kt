@@ -51,7 +51,7 @@ class ActivityAddTask : AppCompatActivity() {
 
         run {
             // set Today's date
-            val dateToday = MyDateFormat.EEE_dd_MMM_yyyy.format(Date())
+            val dateToday = MyDateFormat.EEE_MMM_dd_yyyy.format(Date())
             findViewById<TextView>(R.id.textViewDateToday).text = resources.getString(R.string.text_date_today, dateToday)
         }
 
@@ -179,7 +179,7 @@ class ActivityAddTask : AppCompatActivity() {
         try {
             calendar = Calendar.getInstance().apply {
 
-                val date: Date = MyDateFormat.EEE_dd_MMM_yyyy
+                val date: Date = MyDateFormat.EEE_MMM_dd_yyyy
                     .parse(findViewById<TextView>(R.id.textViewDate).text.toString()) ?: throw ParseException("ParseException", 0)
 
                 timeInMillis = date.time
@@ -312,7 +312,7 @@ class ActivityAddTask : AppCompatActivity() {
         val calendar = Calendar.getInstance()
         calendar.set(selectedYear, selectedMonth, selectedDayOfMonth)
 
-        findViewById<TextView>(R.id.textViewDate).text = MyDateFormat.EEE_dd_MMM_yyyy.format(calendar.time)
+        findViewById<TextView>(R.id.textViewDate).text = MyDateFormat.EEE_MMM_dd_yyyy.format(calendar.time)
     }
 
     private fun setSelectedTime() {
