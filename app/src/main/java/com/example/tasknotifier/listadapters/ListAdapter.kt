@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.tasknotifier.ActivityAddTask
 import com.example.tasknotifier.R
 import com.example.tasknotifier.common.Constants
+import com.example.tasknotifier.common.TaskStatusEnum
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.utils.MyAlarmManager
 import com.example.tasknotifier.utils.MyDateFormat
@@ -40,7 +41,7 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         //  recheck all the date formats whether they are valid standards or not.
         itemView.textViewDateTime.text = MyDateFormat.EEE_dd_MMM_yyyy_HH_mm_ss.format(currentTaskItem.dateTime)
 
-        itemView.textViewStatus.text = currentTaskItem.status.toString()
+        itemView.textViewStatus.text = TaskStatusEnum.getReadableStatus(currentTaskItem.status, currentTaskItem.dateTime)
 
         itemView.setOnClickListener { onClickItemView ->
             val context = onClickItemView.context

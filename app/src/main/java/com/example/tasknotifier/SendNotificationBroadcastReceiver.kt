@@ -66,7 +66,10 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
                 else if (task.repeat == 0) {
                     // "Repeat: None" logic here
                     // Do nothing && Do not reschedule.
-                    return@launch
+
+                    // return@launch
+                    // not returning from here and letting it go to the statement updateOneAsync so that db will be updated
+                    // and then list will be updated with its status.
                 }
                 // When a repeat duration is selected along with "Never Stop" option.
                 else if (task.stopAfter == 0 || sentCount < Constants.stopAfterArray[task.stopAfter]) {
