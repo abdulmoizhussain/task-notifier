@@ -3,8 +3,6 @@ package com.example.tasknotifier
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Context
-import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
@@ -14,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.common.TaskStatusEnum
 import com.example.tasknotifier.data.task.Task
+import com.example.tasknotifier.services.TaskService
 import com.example.tasknotifier.utils.MyAlarmManager
 import com.example.tasknotifier.utils.MyDateFormat
 import com.example.tasknotifier.viewmodels.TaskViewModel
@@ -156,10 +155,11 @@ class ActivityAddTask : AppCompatActivity() {
         if (taskDbId > 0) {
 
             task.id = taskDbId
+            task.sentCount = 0
 
             taskViewModel.updateOne(task)
 
-            createIntentAndSetAlarmManager(this, taskDbId, task)
+            TaskService.createIntentAndSetExactAlarm(this, taskDbId, task.dateTime)
 
             finish()
             return
@@ -170,23 +170,10 @@ class ActivityAddTask : AppCompatActivity() {
             GlobalScope.launch {
                 val taskIdInt = taskViewModel.addOneAsync(task).toInt()
 
-                createIntentAndSetAlarmManager(this@ActivityAddTask, taskIdInt, task)
+                TaskService.createIntentAndSetExactAlarm(this@ActivityAddTask, taskIdInt, task.dateTime)
 
                 finish()
             }
-        }
-    }
-
-    private fun createIntentAndSetAlarmManager(context: Context, taskIdInt: Int, task: Task) {
-        val intent = Intent(applicationContext, SendNotificationBroadcastReceiver::class.java)
-        intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskIdInt)
-        intent.putExtra(Constants.INTENT_EXTRA_TASK_DESCRIPTION, task.description)
-        intent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, task.dateTime)
-
-        if (checkboxSetExact) {
-            MyAlarmManager.setExact(context, taskIdInt, intent, task.dateTime)
-        } else {
-            MyAlarmManager.setInexact(context, taskIdInt, intent, task.dateTime)
         }
     }
 

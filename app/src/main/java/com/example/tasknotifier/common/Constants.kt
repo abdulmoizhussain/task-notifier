@@ -3,8 +3,6 @@ package com.example.tasknotifier.common
 import java.util.*
 
 object Constants {
-    const val INTENT_EXTRA_TASK_DESCRIPTION = "INTENT_EXTRA_TASK_DESCRIPTION"
-    const val INTENT_EXTRA_SET_WHEN = "INTENT_EXTRA_SET_WHEN"
     const val INTENT_EXTRA_TASK_ID = "INTENT_EXTRA_TASK_ID"
     const val NOTIFICATION_CHANNEL_DEFAULT = "NOTIFICATION_CHANNEL_DEFAULT"
 
