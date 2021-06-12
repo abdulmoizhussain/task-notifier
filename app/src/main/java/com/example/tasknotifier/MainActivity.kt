@@ -17,8 +17,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // TODO: reschedule all the active tasks after device restart/startup.
-        // TODO: export/import feature.
+        // TODO: export/import / Backup/Restore feature.
+        // TODO: add app-settings feature for: 12/24 hour time format, dark/light theme, select notification sound, vibration on/off, sticky notification option at add-task.
+        // TODO: ask people that should there be title or not?
+        // TODO: create notification view to also show notification count for a task, we might then skip title..
+        // TODO: correct navigation from task view to MainActivity
+        // TODO: Start all the tasks whose date/time are due (in future).
+        // TODO: Delete all the tasks.
+        // TODO: Turn Off all the tasks.
+        // TODO: Order By / Sort By: Date, On, Off, Expired.
+        // TODO: Filter By On/Off/
 
         // RecyclerView
         val recyclerViewListAdapter = ListAdapter()
