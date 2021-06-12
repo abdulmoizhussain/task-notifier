@@ -17,7 +17,6 @@
     <string name="label_select_repeat_duration">Select Repeat Duration</string>
     <string name="label_stop_after">Stop After</string>
     <string name="label_add_new_task">Add New Task</string>
-    <string name="label_set_exact">Set Exact</string>
     <string name="hint_description">Description</string>
     <string name="text_date_today">Today is %1$s</string>
     <string-array name="repeat_values">

@@ -29,7 +29,6 @@ class ActivityAddTask : AppCompatActivity() {
     private var selectedMinute: Int = 0
     private var selectedRepeat: Int = 0
     private var selectedStopAfter: Int = 0
-    private var checkboxSetExact: Boolean = true
     private var taskDbId: Int = 0
     private lateinit var taskViewModel: TaskViewModel
 
@@ -41,9 +40,6 @@ class ActivityAddTask : AppCompatActivity() {
         findViewById<LinearLayout>(R.id.linearLayoutTime).setOnClickListener { onClickSelectTime() }
         findViewById<LinearLayout>(R.id.linearLayoutRepeat).setOnClickListener { onClickSelectRepeat() }
         findViewById<LinearLayout>(R.id.linearLayoutStopAfter).setOnClickListener { onClickSelectStopAfter() }
-
-        // TODO remove checkBoxSetExactTime when all the dev and testing is complete.
-        findViewById<Button>(R.id.checkBoxSetExactTime).setOnClickListener(::onClickSetExactCheckbox)
 
         val buttonTurnOnOrUpdateTask = findViewById<Button>(R.id.buttonTurnOnOrUpdateTask)
         val buttonDeleteTask = findViewById<Button>(R.id.buttonDeleteTask)
@@ -359,10 +355,6 @@ class ActivityAddTask : AppCompatActivity() {
             findViewById<LinearLayout>(R.id.linearLayoutBottomBar).visibility =
                 if (keypadHeight > screenHeight * 0.15) View.GONE else View.VISIBLE
         }
-    }
-
-    private fun onClickSetExactCheckbox(view: View) {
-        checkboxSetExact = (view as CheckBox).isChecked
     }
 
     private fun onClickDeleteTask() {
