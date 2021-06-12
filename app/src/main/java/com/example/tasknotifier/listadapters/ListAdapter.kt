@@ -36,8 +36,8 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         itemView.textViewTaskDescription.text = currentTaskItem.description
 
         // TODO:
-        // remove :ss when all the dev and testing is complete
-        // recheck all the date formats whether they are valid or not.
+        //  remove :ss when all the testing is complete
+        //  recheck all the date formats whether they are valid standards or not.
         itemView.textViewDateTime.text = MyDateFormat.EEE_dd_MMM_yyyy_HH_mm_ss.format(currentTaskItem.dateTime)
 
         itemView.textViewStatus.text = currentTaskItem.status.toString()
