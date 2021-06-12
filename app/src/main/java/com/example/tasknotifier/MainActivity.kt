@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         // TODO: Turn Off all the tasks.
         // TODO: Order By / Sort By: Date, On, Off, Expired.
         // TODO: Filter By On/Off/
+        // TODO: use dismiss-able snack-bar (like that of LinkedIn) for toast like messages.
 
         // RecyclerView
         val recyclerViewListAdapter = ListAdapter()
