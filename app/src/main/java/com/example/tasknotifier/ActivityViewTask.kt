@@ -36,7 +36,6 @@ class ActivityViewTask : AppCompatActivity() {
 
                 findViewById<TextView>(R.id.textViewTaskDescription).text = task.description
 
-                // TODO use common practice for SimpleDateFormat...
                 val date = MyDateFormat.EEE_dd_MMM_yyyy.format(task.dateTime)
                 findViewById<TextView>(R.id.textViewDate).text = getString(R.string.show_date_with_label, date)
 
