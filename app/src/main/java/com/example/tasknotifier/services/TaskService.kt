@@ -15,7 +15,7 @@ class TaskService(context: Context) {
             val intent = Intent(context.applicationContext, SendNotificationBroadcastReceiver::class.java)
             intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, requestCode)
 
-            MyAlarmManager.setExact(context, requestCode, intent, triggerAtMillis)
+            MyAlarmManager.setAlarmClock(context, requestCode, intent, triggerAtMillis)
         }
     }
 
