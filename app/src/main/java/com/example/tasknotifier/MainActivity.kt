@@ -19,15 +19,19 @@ class MainActivity : AppCompatActivity() {
 
         // TODO: export/import / Backup/Restore feature.
         // TODO: add app-settings feature for: 12/24 hour time format, dark/light theme, select notification sound, vibration on/off, sticky notification option at add-task.
+        // TODO: FORCEFUL LIGHT THEME FOR NOW.
         // TODO: ask people that should there be title or not?
         // TODO: create notification view to also show notification count for a task, we might then skip title..
-        // TODO: correct navigation from task view to MainActivity
+        // TODO: navigation back from task view to MainActivity.
         // TODO: Start all the tasks whose date/time are due (in future).
         // TODO: Delete all the tasks.
         // TODO: Turn Off all the tasks.
         // TODO: Order By / Sort By: Date, On, Off, Expired.
         // TODO: Filter By On/Off/
         // TODO: use dismiss-able snack-bar (like that of LinkedIn) for toast like messages.
+        // TODO: Hours, Days, Weeks algorithm like that of facebook.
+        // TODO: Notify now button Button.
+        // TODO:
 
         // RecyclerView
         val recyclerViewListAdapter = ListAdapter()
