@@ -12,7 +12,7 @@ import com.example.tasknotifier.utils.MyAlarmManager
 class TaskService(context: Context) {
     companion object {
         fun createIntentAndSetExactAlarm(context: Context, requestCode: Int, triggerAtMillis: Long) {
-            val intent = Intent(context.applicationContext, SendNotificationBroadcastReceiver::class.java)
+            val intent = Intent(context, SendNotificationBroadcastReceiver::class.java)
             intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, requestCode)
 
             MyAlarmManager.setAlarmClock(context, requestCode, intent, triggerAtMillis)

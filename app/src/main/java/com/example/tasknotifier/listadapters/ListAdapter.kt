@@ -4,6 +4,7 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasknotifier.ActivityAddTask
 import com.example.tasknotifier.R
@@ -11,7 +12,6 @@ import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.common.TaskStatusEnum
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.utils.MyDateFormat
-import kotlinx.android.synthetic.main.row_recyclerview_all_tasks.view.*
 
 class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
@@ -32,13 +32,13 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         val currentTaskItem: Task = taskList[position]
         val taskId = currentTaskItem.id
         val itemView: View = holder.itemView
-        itemView.textViewTaskDescription.text = currentTaskItem.description
+        itemView.findViewById<TextView>(R.id.textViewTaskDescription).text = currentTaskItem.description
 
         // TODO:
         //  remove :ss when all the testing is complete
-        itemView.textViewDateTime.text = MyDateFormat.EEE_MMM_dd_yyyy_HH_mm_ss.format(currentTaskItem.dateTime)
+        itemView.findViewById<TextView>(R.id.textViewDateTime).text = MyDateFormat.EEE_MMM_dd_yyyy_HH_mm_ss.format(currentTaskItem.dateTime)
 
-        itemView.textViewStatus.text = TaskStatusEnum.getReadableStatus(currentTaskItem.status, currentTaskItem.dateTime)
+        itemView.findViewById<TextView>(R.id.textViewStatus).text = TaskStatusEnum.getReadableStatus(currentTaskItem.status, currentTaskItem.dateTime)
 
         itemView.setOnClickListener { onClickItemView ->
             val context = onClickItemView.context

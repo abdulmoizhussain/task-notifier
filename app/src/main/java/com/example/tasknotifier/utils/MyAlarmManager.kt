@@ -13,7 +13,7 @@ class MyAlarmManager {
     companion object {
 
         fun setInexact(context: Context, requestCode: Int, intent: Intent, triggerAtMillis: Long) {
-            val pendingIntent = PendingIntent.getBroadcast(context.applicationContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -24,7 +24,7 @@ class MyAlarmManager {
         }
 
         fun setExact(context: Context, requestCode: Int, intent: Intent, triggerAtMillis: Long) {
-            val pendingIntent = PendingIntent.getBroadcast(context.applicationContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             when {
@@ -41,7 +41,7 @@ class MyAlarmManager {
         }
 
         fun setAlarmClock(context: Context, requestCode: Int, intent: Intent, triggerAtMillis: Long) {
-            val pendingIntent = PendingIntent.getBroadcast(context.applicationContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             when {
@@ -64,8 +64,8 @@ class MyAlarmManager {
         }
 
         fun cancelByRequestCode(context: Context, requestCode: Int) {
-            val pendingIntent = Intent(context.applicationContext, SendNotificationBroadcastReceiver::class.java).let { intent ->
-                PendingIntent.getBroadcast(context.applicationContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent = Intent(context, SendNotificationBroadcastReceiver::class.java).let { intent ->
+                PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
             }
 
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager

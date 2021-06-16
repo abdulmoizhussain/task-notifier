@@ -15,8 +15,8 @@ import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.services.TaskService
 import com.example.tasknotifier.utils.MyAlarmManager
 import com.example.tasknotifier.utils.MyDateFormat
+import com.example.tasknotifier.utils.MyNotificationManager
 import com.example.tasknotifier.viewmodels.TaskViewModel
-import kotlinx.android.synthetic.main.activity_add_task.*
 import kotlinx.coroutines.*
 import java.util.*
 
@@ -39,6 +39,7 @@ class ActivityAddTask : AppCompatActivity() {
         findViewById<LinearLayout>(R.id.linearLayoutTime).setOnClickListener { onClickSelectTime() }
         findViewById<LinearLayout>(R.id.linearLayoutRepeat).setOnClickListener { onClickSelectRepeat() }
         findViewById<LinearLayout>(R.id.linearLayoutStopAfter).setOnClickListener { onClickSelectStopAfter() }
+        findViewById<Button>(R.id.buttonNotifyNow).setOnClickListener { onClickNotifyNow() }
 
         val buttonTurnOnOrUpdateTask = findViewById<Button>(R.id.buttonTurnOnOrUpdateTask)
         val buttonDeleteTask = findViewById<Button>(R.id.buttonDeleteTask)
@@ -141,7 +142,8 @@ class ActivityAddTask : AppCompatActivity() {
             }
 
             val triggerAtMillis = calendar.timeInMillis
-            val description = editTextDescription.text.toString()
+            // TODO incomplete
+            val description = findViewById<EditText>(R.id.editTextDescription).text.toString()
 
             Task(description, triggerAtMillis, selectedRepeat, selectedStopAfter)
         }
@@ -346,5 +348,28 @@ class ActivityAddTask : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun onClickNotifyNow() {
+        // TODO incomplete
+        val editTextDescriptionText = findViewById<EditText>(R.id.editTextDescription).text
+        if (editTextDescriptionText.isNullOrBlank()) {
+            Toast.makeText(this, "Task description is empty.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // TODO maybe temporary :P
+        val currentTimeMillis = System.currentTimeMillis()
+        val hourNow = MyDateFormat.HH_mm_ss.format(currentTimeMillis)
+        val contentTitle = "(1) $hourNow"
+
+        MyNotificationManager.notify(
+            this.applicationContext,
+            taskDbId,
+            contentTitle,
+            editTextDescriptionText.toString(),
+            currentTimeMillis,
+            true
+        )
     }
 }
