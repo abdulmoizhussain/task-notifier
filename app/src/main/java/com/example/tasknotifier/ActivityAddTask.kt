@@ -134,7 +134,7 @@ class ActivityAddTask : AppCompatActivity() {
             // When date/time is in the past, don't proceed.
             if (calendar.timeInMillis < System.currentTimeMillis()) {
                 val alertDialog = AlertDialog.Builder(this).create()
-                alertDialog.setMessage("Oops!\nThe scheduled time is in the past. Please choose a time in the future.")
+                alertDialog.setMessage(resources.getString(R.string.error_past_time))
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "OK") { dialog, _ ->
                     dialog.dismiss()
                 }
