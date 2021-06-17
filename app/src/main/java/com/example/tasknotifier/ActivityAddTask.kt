@@ -30,11 +30,13 @@ class ActivityAddTask : AppCompatActivity() {
     private var selectedStopAfter: Int = 0
     private var taskDbId: Int = 0
     private lateinit var taskViewModel: TaskViewModel
+    private lateinit var editTextDescription: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
 
+        editTextDescription = findViewById(R.id.editTextDescription)
         findViewById<LinearLayout>(R.id.linearLayoutDate).setOnClickListener { onClickSelectDate() }
         findViewById<LinearLayout>(R.id.linearLayoutTime).setOnClickListener { onClickSelectTime() }
         findViewById<LinearLayout>(R.id.linearLayoutRepeat).setOnClickListener { onClickSelectRepeat() }
@@ -71,7 +73,7 @@ class ActivityAddTask : AppCompatActivity() {
                         Toast.makeText(this@ActivityAddTask, "Task with id: $taskDbId not found.", Toast.LENGTH_LONG).show()
                         setOneHourLaterDateTime()
                     } else {
-                        findViewById<EditText>(R.id.editTextDescription).setText(task.description)
+                        editTextDescription.setText(task.description)
 
                         val calendar = Calendar.getInstance().apply { timeInMillis = task.dateTime }
 
@@ -142,8 +144,7 @@ class ActivityAddTask : AppCompatActivity() {
             }
 
             val triggerAtMillis = calendar.timeInMillis
-            // TODO incomplete
-            val description = findViewById<EditText>(R.id.editTextDescription).text.toString()
+            val description = editTextDescription.text.toString()
 
             Task(description, triggerAtMillis, selectedRepeat, selectedStopAfter)
         }
@@ -352,7 +353,7 @@ class ActivityAddTask : AppCompatActivity() {
 
     private fun onClickNotifyNow() {
         // TODO incomplete
-        val editTextDescriptionText = findViewById<EditText>(R.id.editTextDescription).text
+        val editTextDescriptionText = editTextDescription.text
         if (editTextDescriptionText.isNullOrBlank()) {
             Toast.makeText(this, "Task description is empty.", Toast.LENGTH_SHORT).show()
             return
