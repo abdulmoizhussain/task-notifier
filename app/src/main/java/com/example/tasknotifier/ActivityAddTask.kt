@@ -121,15 +121,7 @@ class ActivityAddTask : AppCompatActivity() {
 
     private fun onClickAddOrUpdateTask() {
         val task: Task = let {
-            val calendar: Calendar = Calendar.getInstance().apply {
-                set(Calendar.YEAR, selectedYear)
-                set(Calendar.MONTH, selectedMonth)
-                set(Calendar.DAY_OF_MONTH, selectedDayOfMonth)
-                set(Calendar.HOUR_OF_DAY, selectedHourOfDay)
-                set(Calendar.MINUTE, selectedMinute)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }
+            val calendar: Calendar = getCalendarInstanceForTask()
 
             // When date/time is in the past, don't proceed.
             if (calendar.timeInMillis < System.currentTimeMillis()) {
@@ -353,10 +345,30 @@ class ActivityAddTask : AppCompatActivity() {
 
     private fun onClickNotifyNow() {
         // TODO incomplete
-        val editTextDescriptionText = editTextDescription.text
-        if (editTextDescriptionText.isNullOrBlank()) {
+        val editTextDescriptionEditable = editTextDescription.text
+        if (editTextDescriptionEditable.isNullOrBlank()) {
             Toast.makeText(this, "Task description is empty.", Toast.LENGTH_SHORT).show()
             return
+        }
+
+        val description = editTextDescriptionEditable.toString()
+
+        run {
+            val calendar: Calendar = getCalendarInstanceForTask()
+            val task = Task(description, calendar.timeInMillis, selectedRepeat, selectedStopAfter)
+
+            if (taskDbId > 0) { // update db
+                task.id = taskDbId
+                taskViewModel.updateOne(task)
+                return@run
+            }
+
+            runBlocking {
+                launch {
+                    task.status = TaskStatusEnum.Off
+                    taskDbId = taskViewModel.addOneAsync(task).toInt()
+                }
+            }
         }
 
         // TODO maybe temporary :P
@@ -365,12 +377,26 @@ class ActivityAddTask : AppCompatActivity() {
         val contentTitle = "(1) $hourNow"
 
         MyNotificationManager.notify(
-            this.applicationContext,
+            this,
             taskDbId,
             contentTitle,
-            editTextDescriptionText.toString(),
+            description,
             currentTimeMillis,
             true
         )
+
+        // TODO incomplete
+    }
+
+    private fun getCalendarInstanceForTask(): Calendar {
+        return Calendar.getInstance().apply {
+            set(Calendar.YEAR, selectedYear)
+            set(Calendar.MONTH, selectedMonth)
+            set(Calendar.DAY_OF_MONTH, selectedDayOfMonth)
+            set(Calendar.HOUR_OF_DAY, selectedHourOfDay)
+            set(Calendar.MINUTE, selectedMinute)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
     }
 }

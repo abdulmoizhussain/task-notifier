@@ -23,18 +23,17 @@ class MainActivity : AppCompatActivity() {
         // TODO: ask people that should there be title or not?
         // TODO: create notification view to also show notification count for a task, we might then skip title..
         // TODO: navigation back from task view to MainActivity.
-        // TODO: Start all the tasks whose date/time are due (in future).
+        // TODO: Start all the tasks [whose date/time are due (in future)].
         // TODO: Delete all the tasks.
         // TODO: Turn Off all the tasks.
         // TODO: Order By / Sort By: Date, On, Off, Expired.
         // TODO: Filter By On/Off/
         // TODO: use dismiss-able snack-bar (like that of LinkedIn) for toast like messages.
         // TODO: Hours, Days, Weeks algorithm like that of facebook.
-        // TODO: Notify now button Button.
+        // TODO: "Notify Now" Button.
         // TODO: Give Yes/No confirmation before deleting an alarm.
         // TODO: try giving the option to delete the alarms by long press.
         // TODO: a scenario in which users will open the app after an update and then the tasks will not be scheduled. so in that case fix the bug which show that the tasks are not scheduled in the mainactivity list of tasks.
-        // TODO: remove applicationContext from everywhere
         // TODO:
 
         // RecyclerView
