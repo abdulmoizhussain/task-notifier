@@ -38,7 +38,12 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
         //  remove :ss when all the testing is complete
         itemView.findViewById<TextView>(R.id.textViewDateTime).text = MyDateFormat.EEE_MMM_dd_yyyy_HH_mm_ss.format(currentTaskItem.dateTime)
 
-        itemView.findViewById<TextView>(R.id.textViewStatus).text = TaskStatusEnum.getReadableStatus(currentTaskItem.status, currentTaskItem.dateTime)
+        itemView.findViewById<TextView>(R.id.textViewStatus).text = TaskStatusEnum.getReadableStatus(
+            holder.itemView.context,
+            currentTaskItem.id,
+            currentTaskItem.status,
+            currentTaskItem.dateTime
+        )
 
         itemView.setOnClickListener { onClickItemView ->
             val context = onClickItemView.context

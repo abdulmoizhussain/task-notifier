@@ -71,5 +71,13 @@ class MyAlarmManager {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
             alarmManager.cancel(pendingIntent)
         }
+
+        fun isAlarmOff(context: Context, requestCode: Int): Boolean {
+            // TODO this one is buggy
+            val pendingIntent = Intent(context, SendNotificationBroadcastReceiver::class.java).let { intent ->
+                PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_NO_CREATE)
+            }
+            return pendingIntent == null
+        }
     }
 }

@@ -122,6 +122,7 @@ class ActivityAddTask : AppCompatActivity() {
     private fun onClickAddOrUpdateTask() {
         val task: Task = let {
             val alertDialog = AlertDialog.Builder(this).create()
+            alertDialog.setCancelable(false)
             alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "OK") { dialog, _ -> dialog.dismiss() }
 
             // when description is empty, don't proceed.
@@ -366,6 +367,7 @@ class ActivityAddTask : AppCompatActivity() {
     private fun onClickNotifyNow() {
         if (editTextDescription.text.isNullOrBlank()) {
             val alertDialog = AlertDialog.Builder(this).create()
+            alertDialog.setCancelable(false)
             alertDialog.setMessage(resources.getString(R.string.error_task_description))
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK") { dialog, _ -> dialog.dismiss() }
             alertDialog.show()

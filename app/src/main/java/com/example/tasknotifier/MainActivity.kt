@@ -17,6 +17,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+//        val receiver = ComponentName(applicationContext, ReScheduleTasks::class.java)
+//        applicationContext.packageManager?.setComponentEnabledSetting(
+//            receiver,
+//            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+//            PackageManager.DONT_KILL_APP,
+//        )
+
         // TODO: export/import / Backup/Restore feature.
         // TODO: add app-settings feature for: 12/24 hour time format, dark/light theme, select notification sound, vibration on/off, sticky notification option at add-task.
         // TODO: FORCEFUL LIGHT THEME FOR NOW.
