@@ -11,14 +11,12 @@ import com.example.tasknotifier.common.TaskStatusEnum
 //)
 
 @Entity(tableName = "task_table")
-data class Task(
-    val description: String,
-    val dateTime: Long,
-    val repeat: Int,
-    val stopAfter: Int,
-) {
+data class Task(var description: String = "") {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0
+    var dateTime: Long = 0
+    var repeat: Int = 0
+    var stopAfter: Int = 0
     var sentCount: Int = 0
     var status: TaskStatusEnum = TaskStatusEnum.On
 }

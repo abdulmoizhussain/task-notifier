@@ -138,7 +138,11 @@ class ActivityAddTask : AppCompatActivity() {
             val triggerAtMillis = calendar.timeInMillis
             val description = editTextDescription.text.toString()
 
-            Task(description, triggerAtMillis, selectedRepeat, selectedStopAfter)
+            val task = Task(description)
+            task.dateTime = triggerAtMillis
+            task.repeat = selectedRepeat
+            task.stopAfter = selectedStopAfter
+            task
         }
 
         // Do not create a new task. Update and reschedule existing one.
@@ -344,48 +348,53 @@ class ActivityAddTask : AppCompatActivity() {
     }
 
     private fun onClickNotifyNow() {
-        // TODO incomplete
-        val editTextDescriptionEditable = editTextDescription.text
-        if (editTextDescriptionEditable.isNullOrBlank()) {
+        if (editTextDescription.text.isNullOrBlank()) {
             Toast.makeText(this, "Task description is empty.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val description = editTextDescriptionEditable.toString()
+        runBlocking {
+            launch {
+                val description = editTextDescription.text.toString()
+                val sentCount: Int
+                val calendar: Calendar = getCalendarInstanceForTask()
 
-        run {
-            val calendar: Calendar = getCalendarInstanceForTask()
-            val task = Task(description, calendar.timeInMillis, selectedRepeat, selectedStopAfter)
+                var task: Task? = if (taskDbId > 0) taskViewModel.getOneByIdAsync(taskDbId) else null
+                if (task == null) {
+                    task = Task()
+                }
 
-            if (taskDbId > 0) { // update db
-                task.id = taskDbId
-                taskViewModel.updateOne(task)
-                return@run
-            }
+                task.description = description
+                task.dateTime = calendar.timeInMillis
+                task.repeat = selectedRepeat
+                task.stopAfter = selectedStopAfter
+                task.sentCount += 1
 
-            runBlocking {
-                launch {
+                if (taskDbId > 0) {
+                    task.id = taskDbId
+                    taskViewModel.updateOne(task)
+                } else {
                     task.status = TaskStatusEnum.Off
                     taskDbId = taskViewModel.addOneAsync(task).toInt()
                 }
+
+                sentCount = task.sentCount
+
+                // TODO maybe temporary :P
+                val currentTimeMillis = System.currentTimeMillis()
+                val hourNow = MyDateFormat.HH_mm_ss.format(currentTimeMillis)
+                val contentTitle = "($sentCount) $hourNow"
+
+                MyNotificationManager.notify(
+                    this@ActivityAddTask,
+                    taskDbId,
+                    contentTitle,
+                    description,
+                    currentTimeMillis,
+                    true,
+                )
             }
         }
-
-        // TODO maybe temporary :P
-        val currentTimeMillis = System.currentTimeMillis()
-        val hourNow = MyDateFormat.HH_mm_ss.format(currentTimeMillis)
-        val contentTitle = "(1) $hourNow"
-
-        MyNotificationManager.notify(
-            this,
-            taskDbId,
-            contentTitle,
-            description,
-            currentTimeMillis,
-            true
-        )
-
-        // TODO incomplete
     }
 
     private fun getCalendarInstanceForTask(): Calendar {

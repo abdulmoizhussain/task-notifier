@@ -82,12 +82,10 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
                     TaskService.createIntentAndSetExactAlarm(context, taskId, triggerAtMillis)
                 }
 
-                val taskToUpdate = Task(
-                    task.description,
-                    triggerAtMillis,
-                    task.repeat,
-                    task.stopAfter
-                )
+                val taskToUpdate = Task(task.description)
+                taskToUpdate.dateTime = triggerAtMillis
+                taskToUpdate.repeat = task.repeat
+                taskToUpdate.stopAfter = task.stopAfter
                 taskToUpdate.id = taskId
                 taskToUpdate.sentCount = sentCount
 
