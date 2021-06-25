@@ -121,17 +121,21 @@ class ActivityAddTask : AppCompatActivity() {
 
     private fun onClickAddOrUpdateTask() {
         val task: Task = let {
-            val calendar: Calendar = getCalendarInstanceForTask()
+            val alertDialog = AlertDialog.Builder(this).create()
+            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "OK") { dialog, _ -> dialog.dismiss() }
 
-            // When date/time is in the past, don't proceed.
-            if (calendar.timeInMillis < System.currentTimeMillis()) {
-                val alertDialog = AlertDialog.Builder(this).create()
-                alertDialog.setMessage(resources.getString(R.string.error_past_time))
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "OK") { dialog, _ ->
-                    dialog.dismiss()
-                }
+            // when description is empty, don't proceed.
+            if (editTextDescription.text.isNullOrBlank()) {
+                alertDialog.setMessage(resources.getString(R.string.error_task_description))
                 alertDialog.show()
+                return
+            }
 
+            val calendar: Calendar = getCalendarInstanceForTask()
+            // When date/time is in past, don't proceed.
+            if (calendar.timeInMillis < System.currentTimeMillis()) {
+                alertDialog.setMessage(resources.getString(R.string.error_past_time))
+                alertDialog.show()
                 return
             }
 
@@ -347,9 +351,24 @@ class ActivityAddTask : AppCompatActivity() {
         }
     }
 
+    private fun getCalendarInstanceForTask(): Calendar {
+        return Calendar.getInstance().apply {
+            set(Calendar.YEAR, selectedYear)
+            set(Calendar.MONTH, selectedMonth)
+            set(Calendar.DAY_OF_MONTH, selectedDayOfMonth)
+            set(Calendar.HOUR_OF_DAY, selectedHourOfDay)
+            set(Calendar.MINUTE, selectedMinute)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+    }
+
     private fun onClickNotifyNow() {
         if (editTextDescription.text.isNullOrBlank()) {
-            Toast.makeText(this, "Task description is empty.", Toast.LENGTH_SHORT).show()
+            val alertDialog = AlertDialog.Builder(this).create()
+            alertDialog.setMessage(resources.getString(R.string.error_task_description))
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK") { dialog, _ -> dialog.dismiss() }
+            alertDialog.show()
             return
         }
 
@@ -357,7 +376,6 @@ class ActivityAddTask : AppCompatActivity() {
             launch {
                 val description = editTextDescription.text.toString()
                 val sentCount: Int
-                val calendar: Calendar = getCalendarInstanceForTask()
 
                 var task: Task? = if (taskDbId > 0) taskViewModel.getOneByIdAsync(taskDbId) else null
                 if (task == null) {
@@ -365,7 +383,7 @@ class ActivityAddTask : AppCompatActivity() {
                 }
 
                 task.description = description
-                task.dateTime = calendar.timeInMillis
+                task.dateTime = getCalendarInstanceForTask().timeInMillis
                 task.repeat = selectedRepeat
                 task.stopAfter = selectedStopAfter
                 task.sentCount += 1
@@ -394,18 +412,6 @@ class ActivityAddTask : AppCompatActivity() {
                     true,
                 )
             }
-        }
-    }
-
-    private fun getCalendarInstanceForTask(): Calendar {
-        return Calendar.getInstance().apply {
-            set(Calendar.YEAR, selectedYear)
-            set(Calendar.MONTH, selectedMonth)
-            set(Calendar.DAY_OF_MONTH, selectedDayOfMonth)
-            set(Calendar.HOUR_OF_DAY, selectedHourOfDay)
-            set(Calendar.MINUTE, selectedMinute)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
         }
     }
 }

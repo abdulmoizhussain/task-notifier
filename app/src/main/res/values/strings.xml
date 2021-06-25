@@ -21,6 +21,7 @@
     <string name="button_notify_now">Notify Now</string>
     <string name="text_date_today">Today is %1$s</string>
     <string name="error_past_time">Oops!\nThe scheduled time is in the past. Please choose a time in the future.</string>
+    <string name="error_task_description">Oops!\nTask description is empty. Please write a description.</string>
     <string name="error_empty_msg">Oops!\nThe message is empty. Please write a message.</string>
     <string-array name="repeat_values">
         <item>None</item>
