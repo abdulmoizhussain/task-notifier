@@ -40,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         // TODO: Give Yes/No confirmation before deleting an alarm.
         // TODO: try giving the option to delete the alarms by long press.
         // TODO: a scenario in which users will open the app after an update and then the tasks will not be scheduled. so in that case fix the bug which show that the tasks are not scheduled in the mainactivity list of tasks.
+        // TODO: EVERYTHING IS OKAY, JUST SHOW THE NOTIFICATIONS FROM A BACKGROUND SERVICE.
         // TODO:
 
         // RecyclerView
