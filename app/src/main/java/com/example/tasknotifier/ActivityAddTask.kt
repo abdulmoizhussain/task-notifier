@@ -3,19 +3,20 @@ package com.example.tasknotifier
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.example.tasknotifier.android_services.NotificationService
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.common.TaskStatusEnum
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.services.TaskService
 import com.example.tasknotifier.utils.MyAlarmManager
 import com.example.tasknotifier.utils.MyDateFormat
-import com.example.tasknotifier.utils.MyNotificationManager
 import com.example.tasknotifier.viewmodels.TaskViewModel
 import kotlinx.coroutines.*
 import java.util.*
@@ -405,14 +406,16 @@ class ActivityAddTask : AppCompatActivity() {
                 val hourNow = MyDateFormat.HH_mm_ss.format(currentTimeMillis)
                 val contentTitle = "($sentCount) $hourNow"
 
-                MyNotificationManager.notify(
-                    this@ActivityAddTask,
-                    taskDbId,
-                    contentTitle,
-                    description,
-                    currentTimeMillis,
-                    true,
-                )
+//                testing in progress
+                Intent(this@ActivityAddTask, NotificationService::class.java).let { serviceIntent ->
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskDbId)
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_CONTENT_TITLE, contentTitle)
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_DESCRIPTION, description)
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, currentTimeMillis)
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_ON_GOING, true)
+
+                    startForegroundService(serviceIntent)
+                }
             }
         }
     }

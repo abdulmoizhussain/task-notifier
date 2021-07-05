@@ -18,6 +18,7 @@ class NotificationService : Service() {
             val setWhen = intent.getLongExtra(Constants.INTENT_EXTRA_SET_WHEN, 0L)
             val onGoing = intent.getBooleanExtra(Constants.INTENT_EXTRA_ON_GOING, false)
 
+            //                testing in progress
             MyNotificationManager.notify(
                 this,
                 taskId,
@@ -26,6 +27,17 @@ class NotificationService : Service() {
                 setWhen,
                 onGoing
             )
+
+//            val notification = MyNotificationManager.createNotification(
+//                this,
+//                taskId,
+//                contentTitle,
+//                description,
+//                setWhen,
+//                onGoing
+//            )
+//
+//            startForeground(taskId, notification)
         }
 
         return START_STICKY

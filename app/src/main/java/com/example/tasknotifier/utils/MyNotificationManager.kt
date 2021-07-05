@@ -22,6 +22,31 @@ class MyNotificationManager {
             setWhen: Long,
             onGoing: Boolean
         ) {
+            //                testing in progress
+            val notification = createNotification(
+                context,
+                notificationId,
+                contentTitle,
+                contentText,
+                setWhen,
+                onGoing,
+            )
+
+            notification.flags = notification.flags or Notification.FLAG_FOREGROUND_SERVICE
+            notification.flags = notification.flags or Notification.FLAG_ONGOING_EVENT
+
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.notify(notificationId, notification)
+        }
+
+        fun createNotification(
+            context: Context,
+            notificationId: Int,
+            contentTitle: String?,
+            contentText: String?,
+            setWhen: Long,
+            onGoing: Boolean
+        ): Notification {
             val pendingIntent: PendingIntent = Intent(context, ActivityViewTask::class.java).let { intentMainActivity ->
 
                 // TODO PUT EXTRAS DYNAMICALLY...
@@ -51,8 +76,8 @@ class MyNotificationManager {
 
             builder.setWhen(setWhen)
             builder.setShowWhen(true)
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.notify(notificationId, builder.build())
+
+            return builder.build()
         }
 
         fun cancelById(context: Context, notificationId: Int) {
