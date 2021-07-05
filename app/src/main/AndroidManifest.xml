@@ -13,6 +13,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TaskNotifier">
+        <service
+            android:name=".android_services.NotificationService"
+            android:enabled="true"
+            android:exported="false"></service>
+
         <receiver
             android:name=".broadcast_receivers.ReScheduleTasks"
             android:enabled="true"
