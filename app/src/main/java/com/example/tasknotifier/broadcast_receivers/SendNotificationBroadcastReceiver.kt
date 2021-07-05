@@ -1,13 +1,13 @@
-package com.example.tasknotifier
+package com.example.tasknotifier.broadcast_receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.example.tasknotifier.android_services.NotificationService
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.services.TaskService
 import com.example.tasknotifier.utils.MyDateFormat
-import com.example.tasknotifier.utils.MyNotificationManager
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -42,14 +42,24 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
                 val hourNow = MyDateFormat.HH_mm_ss.format(System.currentTimeMillis())
                 val contentTitle = "($sentCount) $hourThen -> $hourNow"
 
-                MyNotificationManager.notify(
-                    context,
-                    taskId,
-                    contentTitle,
-                    description,
-                    setWhen,
-                    true
-                )
+                Intent(context, NotificationService::class.java).let { serviceIntent ->
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskId)
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_CONTENT_TITLE, contentTitle)
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_DESCRIPTION, description)
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, setWhen)
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_ON_GOING, true)
+
+                    context.startService(serviceIntent)
+                }
+
+//                MyNotificationManager.notify(
+//                    context,
+//                    taskId,
+//                    contentTitle,
+//                    description,
+//                    setWhen,
+//                    true
+//                )
 
                 if (task == null) {
                     return@launch

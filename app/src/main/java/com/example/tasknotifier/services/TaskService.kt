@@ -2,7 +2,7 @@ package com.example.tasknotifier.services
 
 import android.content.Context
 import android.content.Intent
-import com.example.tasknotifier.SendNotificationBroadcastReceiver
+import com.example.tasknotifier.broadcast_receivers.SendNotificationBroadcastReceiver
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.data.AppDatabase
 import com.example.tasknotifier.data.task.Task

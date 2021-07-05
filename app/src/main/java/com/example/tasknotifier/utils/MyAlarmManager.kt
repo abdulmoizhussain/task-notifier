@@ -7,7 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import com.example.tasknotifier.MainActivity
-import com.example.tasknotifier.SendNotificationBroadcastReceiver
+import com.example.tasknotifier.broadcast_receivers.SendNotificationBroadcastReceiver
 
 class MyAlarmManager {
     companion object {
