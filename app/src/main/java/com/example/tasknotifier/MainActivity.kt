@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.tasknotifier.android_services.NotificationService
 import com.example.tasknotifier.listadapters.ListAdapter
 import com.example.tasknotifier.viewmodels.TaskViewModel
 
@@ -16,6 +17,18 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+//        let {
+//            val intent = Intent()
+//            intent.component =
+//                ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity")
+//            if (packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
+//                startActivity(intent)
+//            }
+//        }
+
+        // testing in progress
+        startService(Intent(this, OnStartupService::class.java))
+        startService(Intent(this, NotificationService::class.java))
 
 //        val receiver = ComponentName(applicationContext, ReScheduleTasks::class.java)
 //        applicationContext.packageManager?.setComponentEnabledSetting(

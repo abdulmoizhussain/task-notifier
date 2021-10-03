@@ -13,10 +13,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TaskNotifier">
+
         <service
             android:name=".android_services.NotificationService"
             android:enabled="true"
-            android:exported="false"></service>
+            android:exported="false"
+            android:process=":ProcessNotificationService"
+
+            />
+        <service
+            android:name=".OnStartupService"
+            android:enabled="true"
+            android:exported="false"
+            android:process=":ProcessOnStartupService"
+
+            />
 
         <receiver
             android:name=".broadcast_receivers.ReScheduleTasks"
@@ -29,17 +40,19 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".ActivityViewTask" />
-
         <receiver
             android:name=".broadcast_receivers.SendNotificationBroadcastReceiver"
             android:enabled="true"
             android:exported="false" />
 
+        <activity android:name=".ActivityViewTask" />
+
         <activity
             android:name=".ActivityAddTask"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

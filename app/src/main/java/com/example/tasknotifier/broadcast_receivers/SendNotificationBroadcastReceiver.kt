@@ -49,8 +49,7 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, setWhen)
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_ON_GOING, true)
 
-                    //                testing in progress
-                    context.startForegroundService(serviceIntent)
+                    context.startService(serviceIntent)
                 }
 
                 if (task == null) {

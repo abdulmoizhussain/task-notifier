@@ -9,7 +9,15 @@ import com.example.tasknotifier.utils.MyNotificationManager
 class NotificationService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-//        return super.onStartCommand(intent, flags, startId)
+
+        MyNotificationManager.notify(
+            this,
+            1011,
+            "contentTitle",
+            "description",
+            0L,
+            true
+        )
 
         if (intent != null) {
             val taskId = intent.getIntExtra(Constants.INTENT_EXTRA_TASK_ID, 0)
@@ -27,17 +35,6 @@ class NotificationService : Service() {
                 setWhen,
                 onGoing
             )
-
-//            val notification = MyNotificationManager.createNotification(
-//                this,
-//                taskId,
-//                contentTitle,
-//                description,
-//                setWhen,
-//                onGoing
-//            )
-//
-//            startForeground(taskId, notification)
         }
 
         return START_STICKY

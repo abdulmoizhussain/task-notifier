@@ -414,7 +414,7 @@ class ActivityAddTask : AppCompatActivity() {
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, currentTimeMillis)
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_ON_GOING, true)
 
-                    startForegroundService(serviceIntent)
+                    startService(serviceIntent)
                 }
             }
         }

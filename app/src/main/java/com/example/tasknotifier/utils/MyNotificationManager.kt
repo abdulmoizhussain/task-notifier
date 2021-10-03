@@ -32,9 +32,6 @@ class MyNotificationManager {
                 onGoing,
             )
 
-            notification.flags = notification.flags or Notification.FLAG_FOREGROUND_SERVICE
-            notification.flags = notification.flags or Notification.FLAG_ONGOING_EVENT
-
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(notificationId, notification)
         }
@@ -64,10 +61,13 @@ class MyNotificationManager {
             builder.setContentText(contentText)
             builder.setSmallIcon(R.drawable.ic_launcher_background)
             builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
-            builder.setDefaults(Notification.DEFAULT_ALL)
             builder.setContentIntent(pendingIntent)
+            builder.setDefaults(Notification.DEFAULT_ALL)
             builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             builder.priority = NotificationCompat.PRIORITY_HIGH
+
+            // TODO remove notification after some time, to show start of the service
+//            builder.setTimeoutAfter(10000)
 
             if (onGoing) {
                 builder.setOngoing(onGoing)
