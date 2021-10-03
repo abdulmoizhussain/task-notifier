@@ -167,14 +167,14 @@ class ActivityAddTask : AppCompatActivity() {
 
         // Add and schedule new Task
         runBlocking {
-            GlobalScope.launch {
+            // GlobalScope.launch was here
+            launch {
                 val taskIdInt = taskViewModel.addOneAsync(task).toInt()
 
                 TaskService.createIntentAndSetExactAlarm(this@ActivityAddTask, taskIdInt, task.dateTime)
-
-                finish()
             }
         }
+        finish()
     }
 
     private fun onClickSelectDate() {

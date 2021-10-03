@@ -36,7 +36,7 @@ class MyNotificationManager {
             notificationManager.notify(notificationId, notification)
         }
 
-        fun createNotification(
+        private fun createNotification(
             context: Context,
             notificationId: Int,
             contentTitle: String?,

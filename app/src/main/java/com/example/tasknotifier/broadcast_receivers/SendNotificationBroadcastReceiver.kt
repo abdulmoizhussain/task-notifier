@@ -8,7 +8,6 @@ import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.services.TaskService
 import com.example.tasknotifier.utils.MyDateFormat
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
@@ -19,7 +18,8 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
         val taskService = TaskService(context)
 
         runBlocking {
-            GlobalScope.launch {
+            // GlobalScope.launch was here
+            launch {
 
                 val taskId = intent.getIntExtra(Constants.INTENT_EXTRA_TASK_ID, 0)
 
