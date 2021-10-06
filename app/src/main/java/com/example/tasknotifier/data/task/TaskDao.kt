@@ -23,4 +23,7 @@ interface TaskDao {
 
     @Query("SELECT * FROM task_table WHERE status=:status AND dateTime>=:dateTime")
     suspend fun fetchAllByStatusWhichAreDueAsync(status: TaskStatusEnum, dateTime: Long): Array<Task>
+
+    @Query("SELECT * FROM task_table WHERE inProgress=1")
+    suspend fun fetchAllTheInProgressAsync(): Array<Task>
 }

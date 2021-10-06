@@ -8,6 +8,8 @@ import com.example.tasknotifier.data.AppDatabase
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.repositories.TaskRepository
 import com.example.tasknotifier.utils.MyAlarmManager
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class TaskService(context: Context) {
     companion object {
@@ -34,7 +36,23 @@ class TaskService(context: Context) {
         taskRepository.updateOneAsync(task)
     }
 
+    fun turnOffInProgressByTaskId(taskId: Int) {
+        runBlocking {
+            launch {
+                val task = taskRepository.getOneByIdAsync(taskId)
+                if (task != null) {
+                    task.inProgress = false
+                    taskRepository.updateOneAsync(task)
+                }
+            }
+        }
+    }
+
     suspend fun fetchAllWhichAreDueAndOnAsync(): Array<Task> {
         return taskRepository.fetchAllWhichAreDueAndOnAsync()
+    }
+
+    suspend fun fetchAllTheInProgressAsync(): Array<Task> {
+        return taskRepository.fetchAllTheInProgressAsync()
     }
 }

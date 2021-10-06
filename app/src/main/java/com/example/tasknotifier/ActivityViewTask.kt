@@ -53,6 +53,7 @@ class ActivityViewTask : AppCompatActivity() {
 
     private fun onClickRemoveThisNotification() {
         MyNotificationManager.cancelById(this, taskDbId)
+        TaskService(this).turnOffInProgressByTaskId(taskDbId)
     }
 
     private fun onClickEditThisTask() {

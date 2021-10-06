@@ -3,11 +3,12 @@ package com.example.tasknotifier.broadcast_receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.example.tasknotifier.android_services.NotificationService
+import com.example.tasknotifier.android_services.NotificationSenderAndroidService
+import com.example.tasknotifier.android_services.TaskSchedulerAndroidService
 import com.example.tasknotifier.common.Constants
+import com.example.tasknotifier.common.Globals
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.services.TaskService
-import com.example.tasknotifier.utils.MyDateFormat
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
@@ -37,12 +38,9 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
                     sentCount += 1
                 }
 
-                // TODO maybe temporary :P
-                val hourThen = MyDateFormat.HH_mm_ss.format(setWhen)
-                val hourNow = MyDateFormat.HH_mm_ss.format(System.currentTimeMillis())
-                val contentTitle = "($sentCount) $hourThen -> $hourNow"
+                val contentTitle = Globals.createTitleForTask(setWhen, sentCount)
 
-                Intent(context, NotificationService::class.java).let { serviceIntent ->
+                Intent(context, NotificationSenderAndroidService::class.java).let { serviceIntent ->
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskId)
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_CONTENT_TITLE, contentTitle)
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_DESCRIPTION, description)
@@ -80,7 +78,7 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
                     // Reschedule this task at its next occurrence.
                     triggerAtMillis = Constants.getNextOccurrence(task.repeat).timeInMillis
 
-                    TaskService.createIntentAndSetExactAlarm(context, taskId, triggerAtMillis)
+//                    TaskService.createIntentAndSetExactAlarm(context, taskId, triggerAtMillis)
                 }
 
                 val taskToUpdate = Task(task.description)
@@ -89,8 +87,11 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
                 taskToUpdate.stopAfter = task.stopAfter
                 taskToUpdate.id = taskId
                 taskToUpdate.sentCount = sentCount
+                taskToUpdate.inProgress = true
 
                 taskService.updateOneAsync(taskToUpdate)
+
+                context.startService(Intent(context, TaskSchedulerAndroidService::class.java))
             }
         }
     }

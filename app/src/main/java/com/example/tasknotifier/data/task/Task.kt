@@ -19,4 +19,5 @@ data class Task(var description: String = "") {
     var stopAfter: Int = 0
     var sentCount: Int = 0
     var status: TaskStatusEnum = TaskStatusEnum.On
+    var inProgress: Boolean = false
 }

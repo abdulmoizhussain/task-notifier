@@ -14,6 +14,53 @@ import com.example.tasknotifier.common.Constants
 
 class MyNotificationManager {
     companion object {
+        fun notifySilently(
+            context: Context,
+            notificationId: Int,
+            contentTitle: String?,
+            contentText: String?,
+            setWhen: Long,
+            onGoing: Boolean
+        ) {
+            val pendingIntent: PendingIntent = Intent(context, ActivityViewTask::class.java).let { intentMainActivity ->
+
+                // TODO PUT EXTRAS DYNAMICALLY...
+                intentMainActivity.putExtra(Constants.INTENT_EXTRA_TASK_ID, notificationId)
+
+                val taskStackBuilder = TaskStackBuilder.create(context)
+                taskStackBuilder.addParentStack(MainActivity::class.java)
+                taskStackBuilder.addNextIntent(intentMainActivity)
+
+                taskStackBuilder.getPendingIntent(notificationId, PendingIntent.FLAG_CANCEL_CURRENT) as PendingIntent
+            }
+
+            val builder = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_SILENT)
+            builder.setContentTitle(contentTitle)
+            builder.setContentText(contentText)
+            builder.setSmallIcon(R.drawable.ic_launcher_background)
+            builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+            builder.setContentIntent(pendingIntent)
+
+            builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            builder.priority = NotificationCompat.PRIORITY_LOW
+
+            // TODO remove notification after some time, to show start of the service
+//            builder.setTimeoutAfter(10000)
+
+            if (onGoing) {
+                builder.setOngoing(onGoing)
+                builder.setAutoCancel(false)
+            }
+
+            builder.setWhen(setWhen)
+            builder.setShowWhen(true)
+
+            val notification = builder.build()
+
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.notify(notificationId, notification)
+        }
+
         fun notify(
             context: Context,
             notificationId: Int,
@@ -22,28 +69,6 @@ class MyNotificationManager {
             setWhen: Long,
             onGoing: Boolean
         ) {
-            //                testing in progress
-            val notification = createNotification(
-                context,
-                notificationId,
-                contentTitle,
-                contentText,
-                setWhen,
-                onGoing,
-            )
-
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.notify(notificationId, notification)
-        }
-
-        private fun createNotification(
-            context: Context,
-            notificationId: Int,
-            contentTitle: String?,
-            contentText: String?,
-            setWhen: Long,
-            onGoing: Boolean
-        ): Notification {
             val pendingIntent: PendingIntent = Intent(context, ActivityViewTask::class.java).let { intentMainActivity ->
 
                 // TODO PUT EXTRAS DYNAMICALLY...
@@ -62,7 +87,9 @@ class MyNotificationManager {
             builder.setSmallIcon(R.drawable.ic_launcher_background)
             builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             builder.setContentIntent(pendingIntent)
+
             builder.setDefaults(Notification.DEFAULT_ALL)
+
             builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             builder.priority = NotificationCompat.PRIORITY_HIGH
 
@@ -77,7 +104,10 @@ class MyNotificationManager {
             builder.setWhen(setWhen)
             builder.setShowWhen(true)
 
-            return builder.build()
+            val notification = builder.build()
+
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.notify(notificationId, notification)
         }
 
         fun cancelById(context: Context, notificationId: Int) {

@@ -28,4 +28,8 @@ class TaskRepository(private val taskDao: TaskDao) {
     suspend fun fetchAllWhichAreDueAndOnAsync(): Array<Task> {
         return taskDao.fetchAllByStatusWhichAreDueAsync(TaskStatusEnum.On, System.currentTimeMillis())
     }
+
+    suspend fun fetchAllTheInProgressAsync(): Array<Task> {
+        return taskDao.fetchAllTheInProgressAsync()
+    }
 }

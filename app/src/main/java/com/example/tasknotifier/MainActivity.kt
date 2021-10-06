@@ -7,9 +7,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tasknotifier.android_services.NotificationService
+import com.example.tasknotifier.android_services.NotificationReviverAndroidService
+import com.example.tasknotifier.common.Console
 import com.example.tasknotifier.listadapters.ListAdapter
+import com.example.tasknotifier.services.TaskService
+import com.example.tasknotifier.utils.SPManager
 import com.example.tasknotifier.viewmodels.TaskViewModel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity() {
     private lateinit var taskViewModel: TaskViewModel
@@ -17,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
 //        let {
 //            val intent = Intent()
 //            intent.component =
@@ -26,9 +32,19 @@ class MainActivity : AppCompatActivity() {
 //            }
 //        }
 
-        // testing in progress
-        startService(Intent(this, OnStartupService::class.java))
-        startService(Intent(this, NotificationService::class.java))
+        SPManager(this).let { preferenceManager ->
+            if (preferenceManager.isFirstLaunch()) {
+                startService(Intent(this, NotificationReviverAndroidService::class.java))
+                preferenceManager.markFirstLaunchAsCompleted()
+            }
+        }
+
+        runBlocking {
+            launch {
+                val tasks = TaskService(this@MainActivity).fetchAllTheInProgressAsync()
+                Console.log(tasks.size)
+            }
+        }
 
 //        val receiver = ComponentName(applicationContext, ReScheduleTasks::class.java)
 //        applicationContext.packageManager?.setComponentEnabledSetting(
@@ -52,7 +68,8 @@ class MainActivity : AppCompatActivity() {
         // TODO: Hours, Days, Weeks algorithm like that of facebook.
         // TODO: Give Yes/No confirmation before deleting an alarm.
         // TODO: try giving the option to delete the alarms by long press.
-        // TODO: a scenario in which users will open the app after an update and then the tasks will not be scheduled. so in that case fix the bug which show that the tasks are not scheduled in the mainactivity list of tasks.
+        // TODO: a scenario in which users will open the app after an update and then the tasks will not be scheduled.
+        //  so in that case fix the bug which show that the tasks are not scheduled in the MainActivity list of tasks.
         // TODO: EVERYTHING IS OKAY, JUST SHOW THE NOTIFICATIONS FROM A BACKGROUND SERVICE.
         // TODO: Show Hint on long-press, specially on icons.
         // TODO:

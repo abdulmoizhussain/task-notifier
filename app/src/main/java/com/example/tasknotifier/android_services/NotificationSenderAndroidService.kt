@@ -6,27 +6,17 @@ import android.os.IBinder
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.utils.MyNotificationManager
 
-class NotificationService : Service() {
+class NotificationSenderAndroidService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val taskId: Int = intent?.getIntExtra(Constants.INTENT_EXTRA_TASK_ID, -1) ?: -1
 
-        MyNotificationManager.notify(
-            this,
-            1011,
-            "contentTitle",
-            "description",
-            0L,
-            true
-        )
-
-        if (intent != null) {
-            val taskId = intent.getIntExtra(Constants.INTENT_EXTRA_TASK_ID, 0)
+        if (intent != null && taskId > -1) {
             val contentTitle = intent.getStringExtra(Constants.INTENT_EXTRA_CONTENT_TITLE)
             val description = intent.getStringExtra(Constants.INTENT_EXTRA_DESCRIPTION)
             val setWhen = intent.getLongExtra(Constants.INTENT_EXTRA_SET_WHEN, 0L)
             val onGoing = intent.getBooleanExtra(Constants.INTENT_EXTRA_ON_GOING, false)
 
-            //                testing in progress
             MyNotificationManager.notify(
                 this,
                 taskId,

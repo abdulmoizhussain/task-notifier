@@ -10,11 +10,12 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.tasknotifier.android_services.NotificationService
+import com.example.tasknotifier.android_services.NotificationSenderAndroidService
+import com.example.tasknotifier.android_services.TaskSchedulerAndroidService
 import com.example.tasknotifier.common.Constants
+import com.example.tasknotifier.common.Globals
 import com.example.tasknotifier.common.TaskStatusEnum
 import com.example.tasknotifier.data.task.Task
-import com.example.tasknotifier.services.TaskService
 import com.example.tasknotifier.utils.MyAlarmManager
 import com.example.tasknotifier.utils.MyDateFormat
 import com.example.tasknotifier.viewmodels.TaskViewModel
@@ -157,9 +158,14 @@ class ActivityAddTask : AppCompatActivity() {
             task.id = taskDbId
             task.sentCount = 0
 
-            taskViewModel.updateOne(task)
+            runBlocking {
+                launch {
+                    taskViewModel.updateOneAsync(task)
+                }
+            }
 
-            TaskService.createIntentAndSetExactAlarm(this, taskDbId, task.dateTime)
+//            TaskService.createIntentAndSetExactAlarm(this, taskDbId, task.dateTime)
+            startService(Intent(this, TaskSchedulerAndroidService::class.java))
 
             finish()
             return
@@ -169,11 +175,14 @@ class ActivityAddTask : AppCompatActivity() {
         runBlocking {
             // GlobalScope.launch was here
             launch {
-                val taskIdInt = taskViewModel.addOneAsync(task).toInt()
+//                val taskIdInt = taskViewModel.addOneAsync(task).toInt()
+                taskViewModel.addOneAsync(task)
 
-                TaskService.createIntentAndSetExactAlarm(this@ActivityAddTask, taskIdInt, task.dateTime)
+//                TaskService.createIntentAndSetExactAlarm(this@ActivityAddTask, taskIdInt, task.dateTime)
             }
         }
+
+        startService(Intent(this, TaskSchedulerAndroidService::class.java))
         finish()
     }
 
@@ -378,7 +387,6 @@ class ActivityAddTask : AppCompatActivity() {
         runBlocking {
             launch {
                 val description = editTextDescription.text.toString()
-                val sentCount: Int
 
                 var task: Task? = if (taskDbId > 0) taskViewModel.getOneByIdAsync(taskDbId) else null
                 if (task == null) {
@@ -399,19 +407,14 @@ class ActivityAddTask : AppCompatActivity() {
                     taskDbId = taskViewModel.addOneAsync(task).toInt()
                 }
 
-                sentCount = task.sentCount
-
-                // TODO maybe temporary :P
-                val currentTimeMillis = System.currentTimeMillis()
-                val hourNow = MyDateFormat.HH_mm_ss.format(currentTimeMillis)
-                val contentTitle = "($sentCount) $hourNow"
+                val contentTitle = Globals.createTitleForTask(task.dateTime, task.sentCount)
 
 //                testing in progress
-                Intent(this@ActivityAddTask, NotificationService::class.java).let { serviceIntent ->
+                Intent(this@ActivityAddTask, NotificationSenderAndroidService::class.java).let { serviceIntent ->
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskDbId)
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_CONTENT_TITLE, contentTitle)
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_DESCRIPTION, description)
-                    serviceIntent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, currentTimeMillis)
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, System.currentTimeMillis())
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_ON_GOING, true)
 
                     startService(serviceIntent)
