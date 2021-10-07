@@ -15,20 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TaskNotifier">
         <service
-            android:name=".android_services.TaskSchedulerAndroidService"
+            android:name=".android_services.TaskNotifierAndroidService"
             android:enabled="true"
             android:exported="false"
-            android:process=":ProcessTaskSchedulerAndroidService" />
-        <service
-            android:name=".android_services.NotificationReviverAndroidService"
-            android:enabled="true"
-            android:exported="false"
-            android:process=":ProcessNotificationReviverAndroidService" />
-        <service
-            android:name=".android_services.NotificationSenderAndroidService"
-            android:enabled="true"
-            android:exported="false"
-            android:process=":ProcessNotificationSenderAndroidService" />
+            android:process=":ProcessTaskNotifierAndroidService" />
 
         <receiver
             android:name=".broadcast_receivers.OnBootReceiver"

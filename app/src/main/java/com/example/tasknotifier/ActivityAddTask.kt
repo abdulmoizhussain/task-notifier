@@ -10,8 +10,7 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.tasknotifier.android_services.NotificationSenderAndroidService
-import com.example.tasknotifier.android_services.TaskSchedulerAndroidService
+import com.example.tasknotifier.android_services.TaskNotifierAndroidService
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.common.Globals
 import com.example.tasknotifier.common.TaskStatusEnum
@@ -165,7 +164,10 @@ class ActivityAddTask : AppCompatActivity() {
             }
 
 //            TaskService.createIntentAndSetExactAlarm(this, taskDbId, task.dateTime)
-            startService(Intent(this, TaskSchedulerAndroidService::class.java))
+            Intent(this, TaskNotifierAndroidService::class.java).let { mIntent ->
+                mIntent.putExtra(Constants.INTENT_EXTRA_TASK_SCHEDULER_SERVICE, true)
+                startService(mIntent)
+            }
 
             finish()
             return
@@ -182,7 +184,10 @@ class ActivityAddTask : AppCompatActivity() {
             }
         }
 
-        startService(Intent(this, TaskSchedulerAndroidService::class.java))
+        Intent(this, TaskNotifierAndroidService::class.java).let { mIntent ->
+            mIntent.putExtra(Constants.INTENT_EXTRA_TASK_SCHEDULER_SERVICE, true)
+            startService(mIntent)
+        }
         finish()
     }
 
@@ -410,7 +415,7 @@ class ActivityAddTask : AppCompatActivity() {
                 val contentTitle = Globals.createTitleForTask(task.dateTime, task.sentCount)
 
 //                testing in progress
-                Intent(this@ActivityAddTask, NotificationSenderAndroidService::class.java).let { serviceIntent ->
+                Intent(this@ActivityAddTask, TaskNotifierAndroidService::class.java).let { serviceIntent ->
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskDbId)
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_CONTENT_TITLE, contentTitle)
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_DESCRIPTION, description)

@@ -3,8 +3,7 @@ package com.example.tasknotifier.broadcast_receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.example.tasknotifier.android_services.NotificationSenderAndroidService
-import com.example.tasknotifier.android_services.TaskSchedulerAndroidService
+import com.example.tasknotifier.android_services.TaskNotifierAndroidService
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.common.Globals
 import com.example.tasknotifier.data.task.Task
@@ -40,7 +39,7 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
 
                 val contentTitle = Globals.createTitleForTask(setWhen, sentCount)
 
-                Intent(context, NotificationSenderAndroidService::class.java).let { serviceIntent ->
+                Intent(context, TaskNotifierAndroidService::class.java).let { serviceIntent ->
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskId)
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_CONTENT_TITLE, contentTitle)
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_DESCRIPTION, description)
@@ -91,7 +90,10 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
 
                 taskService.updateOneAsync(taskToUpdate)
 
-                context.startService(Intent(context, TaskSchedulerAndroidService::class.java))
+                Intent(context, TaskNotifierAndroidService::class.java).let { mIntent ->
+                    mIntent.putExtra(Constants.INTENT_EXTRA_TASK_SCHEDULER_SERVICE, true)
+                    context.startService(mIntent)
+                }
             }
         }
     }

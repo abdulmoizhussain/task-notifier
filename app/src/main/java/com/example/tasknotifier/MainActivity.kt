@@ -7,14 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tasknotifier.android_services.NotificationReviverAndroidService
-import com.example.tasknotifier.common.Console
 import com.example.tasknotifier.listadapters.ListAdapter
-import com.example.tasknotifier.services.TaskService
-import com.example.tasknotifier.utils.SPManager
 import com.example.tasknotifier.viewmodels.TaskViewModel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity() {
     private lateinit var taskViewModel: TaskViewModel
@@ -32,19 +26,15 @@ class MainActivity : AppCompatActivity() {
 //            }
 //        }
 
-        SPManager(this).let { preferenceManager ->
-            if (preferenceManager.isFirstLaunch()) {
-                startService(Intent(this, NotificationReviverAndroidService::class.java))
-                preferenceManager.markFirstLaunchAsCompleted()
-            }
-        }
-
-        runBlocking {
-            launch {
-                val tasks = TaskService(this@MainActivity).fetchAllTheInProgressAsync()
-                Console.log(tasks.size)
-            }
-        }
+//        SPManager(this).let { preferenceManager ->
+//            if (preferenceManager.isFirstLaunch()) {
+//                Intent(this, TaskNotifierAndroidService::class.java).let { mIntent ->
+//                    mIntent.putExtra(Constants.INTENT_EXTRA_NOTIFICATION_REVIVER_SERVICE, true)
+//                    startService(mIntent)
+//                }
+//                preferenceManager.markFirstLaunchAsCompleted()
+//            }
+//        }
 
 //        val receiver = ComponentName(applicationContext, ReScheduleTasks::class.java)
 //        applicationContext.packageManager?.setComponentEnabledSetting(
@@ -53,6 +43,7 @@ class MainActivity : AppCompatActivity() {
 //            PackageManager.DONT_KILL_APP,
 //        )
 
+        // TODO: try again: setExactAndAllowWhileIdle.
         // TODO: export/import / Backup/Restore feature.
         // TODO: add app-settings feature for: 12/24 hour time format, dark/light theme, select notification sound, vibration on/off, sticky notification option at add-task.
         // TODO: FORCEFUL LIGHT THEME FOR NOW.
