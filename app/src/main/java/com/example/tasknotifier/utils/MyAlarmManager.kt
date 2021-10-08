@@ -13,7 +13,14 @@ class MyAlarmManager {
     companion object {
 
         fun setInexact(context: Context, requestCode: Int, intent: Intent, triggerAtMillis: Long) {
-            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent: PendingIntent = let {
+                val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                } else {
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                }
+                PendingIntent.getBroadcast(context, requestCode, intent, flags)
+            }
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -24,7 +31,14 @@ class MyAlarmManager {
         }
 
         fun setExact(context: Context, requestCode: Int, intent: Intent, triggerAtMillis: Long) {
-            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent: PendingIntent = let {
+                val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                } else {
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                }
+                PendingIntent.getBroadcast(context, requestCode, intent, flags)
+            }
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             when {
@@ -41,7 +55,14 @@ class MyAlarmManager {
         }
 
         fun setAlarmClock(context: Context, requestCode: Int, intent: Intent, triggerAtMillis: Long) {
-            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val pendingIntent: PendingIntent = let {
+                val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                } else {
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                }
+                PendingIntent.getBroadcast(context, requestCode, intent, flags)
+            }
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             when {

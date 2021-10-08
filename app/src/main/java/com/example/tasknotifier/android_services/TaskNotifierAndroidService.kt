@@ -36,12 +36,10 @@ class TaskNotifierAndroidService : Service() {
             runBlocking {
                 launch {
                     TaskService(this@TaskNotifierAndroidService).fetchAllTheInProgressAsync().forEach { task ->
-                        val taskTitle = Globals.createTitleForTask(task.dateTime, task.sentCount)
-
                         MyNotificationManager.notifySilently(
                             this@TaskNotifierAndroidService,
                             task.id,
-                            taskTitle,
+                            Globals.createTitleForTask(task.dateTime, task.sentCount),
                             task.description,
                             task.dateTime,
                             true,
