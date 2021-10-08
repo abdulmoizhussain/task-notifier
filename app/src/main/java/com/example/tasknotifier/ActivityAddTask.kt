@@ -402,6 +402,7 @@ class ActivityAddTask : AppCompatActivity() {
                 task.dateTime = getCalendarInstanceForTask().timeInMillis
                 task.repeat = selectedRepeat
                 task.stopAfter = selectedStopAfter
+                task.inProgress = true
                 task.sentCount += 1
 
                 if (taskDbId > 0) {
