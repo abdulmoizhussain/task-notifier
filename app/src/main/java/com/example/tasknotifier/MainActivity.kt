@@ -56,7 +56,6 @@ class MainActivity : AppCompatActivity() {
         // TODO: Filter By On/Off/
         // TODO: use dismiss-able snack-bar (like that of LinkedIn) for toast like messages.
         // TODO: Hours, Days, Weeks algorithm like that of facebook.
-        // TODO: Give Yes/No confirmation before deleting an alarm.
         // TODO: try giving the option to delete the alarms by long press.
         // TODO: a scenario in which users will open the app after an update and then the tasks will not be scheduled.
         //  so in that case fix the bug which show that the tasks are not scheduled in the MainActivity list of tasks.
