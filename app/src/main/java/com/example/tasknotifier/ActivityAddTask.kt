@@ -20,6 +20,8 @@ import com.example.tasknotifier.utils.MyDateFormat
 import com.example.tasknotifier.viewmodels.TaskViewModel
 import kotlinx.coroutines.*
 import java.util.*
+import android.content.DialogInterface
+
 
 class ActivityAddTask : AppCompatActivity() {
     private var selectedYear: Int = 0
@@ -342,9 +344,24 @@ class ActivityAddTask : AppCompatActivity() {
     }
 
     private fun onClickDeleteTask() {
-        MyAlarmManager.cancelByRequestCode(this, taskDbId)
-        taskViewModel.deleteOneById(taskDbId)
-        finish()
+        val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+            when (which) {
+                DialogInterface.BUTTON_POSITIVE -> {
+                    MyAlarmManager.cancelByRequestCode(this, taskDbId)
+                    taskViewModel.deleteOneById(taskDbId)
+                    finish()
+                }
+                DialogInterface.BUTTON_NEGATIVE -> {
+                }
+            }
+        }
+
+        AlertDialog
+            .Builder(this)
+            .setMessage("Are you sure you want to delete?")
+            .setPositiveButton("Yes", dialogClickListener)
+            .setNegativeButton("No", dialogClickListener)
+            .show()
     }
 
     private fun onClickTurnOffTask() {

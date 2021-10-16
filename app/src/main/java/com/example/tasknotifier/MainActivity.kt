@@ -49,7 +49,6 @@ class MainActivity : AppCompatActivity() {
         // TODO: FORCEFUL LIGHT THEME FOR NOW.
         // TODO: ask people that should there be title or not?
         // TODO: create notification view to also show notification count for a task, we might then skip title..
-        // TODO: navigation back from task view to MainActivity.
         // TODO: Start all the tasks [whose date/time are due (in future)].
         // TODO: Delete all the tasks.
         // TODO: Turn Off all the tasks.
@@ -61,7 +60,6 @@ class MainActivity : AppCompatActivity() {
         // TODO: try giving the option to delete the alarms by long press.
         // TODO: a scenario in which users will open the app after an update and then the tasks will not be scheduled.
         //  so in that case fix the bug which show that the tasks are not scheduled in the MainActivity list of tasks.
-        // TODO: EVERYTHING IS OKAY, JUST SHOW THE NOTIFICATIONS FROM A BACKGROUND SERVICE.
         // TODO: Show Hint on long-press, specially on icons.
         // TODO:
 
@@ -80,5 +78,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun onCliCkGoToAddUser() {
         startActivity(Intent(this, ActivityAddTask::class.java))
+    }
+
+    override fun onBackPressed() {
+        val intent = Intent(Intent.ACTION_MAIN)
+        intent.addCategory(Intent.CATEGORY_HOME)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        finish()
     }
 }
