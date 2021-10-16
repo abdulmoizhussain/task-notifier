@@ -8,6 +8,7 @@
     <string name="label_button_delete">Delete</string>
     <string name="label_button_update">Update</string>
     <string name="label_date">Date</string>
+    <string name="msg_task_deleted">The task has been deleted.</string>
     <string name="show_date_with_label">Date: %1$s</string>
     <string name="show_time_with_label">Time: %1$s</string>
     <string name="label_time">Time</string>

@@ -32,12 +32,18 @@ class ActivityViewTask : AppCompatActivity() {
         val taskService = TaskService(this)
         runBlocking {
             launch {
-                val task = taskService.getOneByIdAsync(taskDbId) ?: return@launch
+                val task = taskService.getOneByIdAsync(taskDbId)
+                val textViewDate = findViewById<TextView>(R.id.textViewDate)
+
+                if (task == null) {
+                    textViewDate.text = getString(R.string.msg_task_deleted)
+                    return@launch
+                }
 
                 findViewById<TextView>(R.id.textViewTaskDescription).text = task.description
 
                 val date = MyDateFormat.EEE_MMM_dd_yyyy.format(task.dateTime)
-                findViewById<TextView>(R.id.textViewDate).text = getString(R.string.show_date_with_label, date)
+                textViewDate.text = getString(R.string.show_date_with_label, date)
 
                 val time = MyDateFormat.HH_mm.format(task.dateTime)
                 findViewById<TextView>(R.id.textViewTime).text = getString(R.string.show_time_with_label, time)
@@ -62,5 +68,10 @@ class ActivityViewTask : AppCompatActivity() {
         intent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskDbId)
 
         startActivity(intent)
+    }
+
+    override fun onBackPressed() {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
     }
 }
