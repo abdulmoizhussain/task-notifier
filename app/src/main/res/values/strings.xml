@@ -18,6 +18,7 @@
     <string name="label_select_repeat_duration">Select Repeat Duration</string>
     <string name="label_stop_after">Stop After</string>
     <string name="label_add_new_task">Add New Task</string>
+    <string name="label_restart_service">Restart Service</string>
     <string name="hint_description">Description</string>
     <string name="button_notify_now">Notify Now</string>
     <string name="text_date_today">Today is %1$s</string>

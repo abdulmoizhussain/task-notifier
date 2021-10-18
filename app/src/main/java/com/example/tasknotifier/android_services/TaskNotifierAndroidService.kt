@@ -13,7 +13,7 @@ import kotlinx.coroutines.runBlocking
 class TaskNotifierAndroidService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        MyNotificationManager.notifySilently(
+        MyNotificationManager.notifyWithUnClickable(
             this,
             999999,
             null,

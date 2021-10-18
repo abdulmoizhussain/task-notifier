@@ -14,6 +14,37 @@ import com.example.tasknotifier.common.Constants
 
 class MyNotificationManager {
     companion object {
+        fun notifyWithUnClickable(
+            context: Context,
+            notificationId: Int,
+            contentTitle: String?,
+            contentText: String?,
+            setWhen: Long,
+            onGoing: Boolean
+        ) {
+            val builder = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_SILENT)
+            builder.setContentTitle(contentTitle)
+            builder.setContentText(contentText)
+            builder.setSmallIcon(R.drawable.ic_launcher_background)
+            builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
+
+            builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            builder.priority = NotificationCompat.PRIORITY_LOW
+
+            if (onGoing) {
+                builder.setOngoing(onGoing)
+                builder.setAutoCancel(false)
+            }
+
+            builder.setWhen(setWhen)
+            builder.setShowWhen(true)
+
+            val notification = builder.build()
+
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.notify(notificationId, notification)
+        }
+
         fun notifySilently(
             context: Context,
             notificationId: Int,

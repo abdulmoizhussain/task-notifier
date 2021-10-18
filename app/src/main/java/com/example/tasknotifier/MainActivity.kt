@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.tasknotifier.android_services.TaskNotifierAndroidService
+import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.listadapters.ListAdapter
 import com.example.tasknotifier.viewmodels.TaskViewModel
 
@@ -73,6 +75,7 @@ class MainActivity : AppCompatActivity() {
         taskViewModel.readAllData.observe(this, { tasks -> recyclerViewListAdapter.setData(tasks) })
 
         findViewById<Button>(R.id.buttonAddNewTask).setOnClickListener { onCliCkGoToAddUser() }
+        findViewById<Button>(R.id.buttonRestartService).setOnClickListener { onClickRestartService() }
     }
 
     private fun onCliCkGoToAddUser() {
@@ -85,5 +88,14 @@ class MainActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
         finish()
+    }
+
+    private fun onClickRestartService() {
+        val mIntent = Intent(this, TaskNotifierAndroidService::class.java)
+        mIntent.putExtra(Constants.INTENT_EXTRA_NOTIFICATION_REVIVER_SERVICE, true)
+        mIntent.putExtra(Constants.INTENT_EXTRA_TASK_SCHEDULER_SERVICE, true)
+
+        stopService(mIntent)
+        startService(mIntent)
     }
 }
