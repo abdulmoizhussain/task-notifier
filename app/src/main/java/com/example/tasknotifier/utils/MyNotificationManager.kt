@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.example.tasknotifier.ActivityViewTask
@@ -69,6 +70,7 @@ class MyNotificationManager {
             builder.setContentTitle(contentTitle)
             builder.setContentText(contentText)
             builder.setSmallIcon(R.drawable.ic_launcher_background)
+            builder.setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher))
             builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             builder.setContentIntent(pendingIntent)
 
@@ -116,6 +118,7 @@ class MyNotificationManager {
             builder.setContentTitle(contentTitle)
             builder.setContentText(contentText)
             builder.setSmallIcon(R.drawable.ic_launcher_background)
+            builder.setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher))
             builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             builder.setContentIntent(pendingIntent)
 
