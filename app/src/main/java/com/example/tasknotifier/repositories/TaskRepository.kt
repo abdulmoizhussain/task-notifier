@@ -9,6 +9,10 @@ class TaskRepository(private val taskDao: TaskDao) {
 
     val readAllData: LiveData<List<Task>> = taskDao.readAllData()
 
+    suspend fun getAllAsync(): List<Task> {
+        return taskDao.readAllAsync()
+    }
+
     suspend fun getOneByIdAsync(id: Int): Task? {
         return taskDao.getOneByIdAsync(id)
     }

@@ -8,9 +8,15 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasknotifier.android_services.TaskNotifierAndroidService
+import com.example.tasknotifier.common.Console
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.listadapters.ListAdapter
+import com.example.tasknotifier.services.TaskService
 import com.example.tasknotifier.viewmodels.TaskViewModel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.json.JSONArray
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var taskViewModel: TaskViewModel
@@ -76,6 +82,19 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.buttonAddNewTask).setOnClickListener { onCliCkGoToAddUser() }
         findViewById<Button>(R.id.buttonRestartService).setOnClickListener { onClickRestartService() }
+
+
+        // TODO: testing code to be removed when used properly:
+        val ts = TaskService(this)
+        runBlocking {
+            launch {
+                val all = ts.getAllAsync()
+
+                val jsonArray = JSONArray()
+                all.forEach { task -> jsonArray.put(task.toJsonObject()) }
+                Console.log(jsonArray.toString())
+            }
+        }
     }
 
     private fun onCliCkGoToAddUser() {

@@ -21,6 +21,9 @@ interface TaskDao {
     @Query("SELECT * FROM task_table ORDER BY id DESC")
     fun readAllData(): LiveData<List<Task>>
 
+    @Query("SELECT * FROM task_table ORDER BY id ASC")
+    suspend fun readAllAsync(): List<Task>
+
     @Query("SELECT * FROM task_table WHERE status=:status AND dateTime>=:dateTime")
     suspend fun fetchAllByStatusWhichAreDueAsync(status: TaskStatusEnum, dateTime: Long): Array<Task>
 

@@ -29,6 +29,10 @@ class TaskService(context: Context) {
         taskRepository = TaskRepository(taskDao)
     }
 
+    suspend fun getAllAsync(): List<Task> {
+        return taskRepository.getAllAsync()
+    }
+
     suspend fun getOneByIdAsync(id: Int): Task? {
         return taskRepository.getOneByIdAsync(id)
     }
