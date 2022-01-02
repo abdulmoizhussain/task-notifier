@@ -76,7 +76,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/textViewDateToday">
 
                 <TextView
-                    android:id="@+id/textView2"
+                    android:id="@+id/textViewSelectDateLabel"
                     android:layout_width="120dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
@@ -109,7 +109,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/linearLayoutDate">
 
                 <TextView
-                    android:id="@+id/textView4"
+                    android:id="@+id/textViewSelectTimeLabel"
                     android:layout_width="120dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
@@ -142,7 +142,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/linearLayoutTime">
 
                 <TextView
-                    android:id="@+id/textView6"
+                    android:id="@+id/textViewSelectRepeatLabel"
                     android:layout_width="120dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
@@ -175,7 +175,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/linearLayoutRepeat">
 
                 <TextView
-                    android:id="@+id/textView8"
+                    android:id="@+id/textViewSelectStopAfterLabel"
                     android:layout_width="120dp"
                     android:layout_height="match_parent"
                     android:gravity="center"

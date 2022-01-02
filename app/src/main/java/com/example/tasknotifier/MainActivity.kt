@@ -1,8 +1,10 @@
 package com.example.tasknotifier
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -77,12 +79,12 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // ViewModel
-        taskViewModel = ViewModelProvider(this).get(TaskViewModel::class.java)
+        taskViewModel = ViewModelProvider(this)[TaskViewModel::class.java]
         taskViewModel.readAllData.observe(this, { tasks -> recyclerViewListAdapter.setData(tasks) })
 
         findViewById<Button>(R.id.buttonAddNewTask).setOnClickListener { onCliCkGoToAddUser() }
-        findViewById<Button>(R.id.buttonRestartService).setOnClickListener { onClickRestartService() }
 
+        onClickSettingsButton()
 
         // TODO: testing code to be removed when used properly:
         val ts = TaskService(this)
@@ -116,5 +118,22 @@ class MainActivity : AppCompatActivity() {
 
         stopService(mIntent)
         startService(mIntent)
+    }
+
+    private fun onClickSettingsButton() {
+        // source: https://stackoverflow.com/a/22655641/8075004
+        val dialogViewSettings = this.layoutInflater.inflate(R.layout.settings_popup_alert_dialog_layout, null)
+
+        val alertDialogBuilder = AlertDialog.Builder(this)
+        alertDialogBuilder.setView(dialogViewSettings)
+
+        val alertDialog = alertDialogBuilder.create()
+
+        dialogViewSettings.findViewById<TextView>(R.id.textViewRestartService).setOnClickListener {
+            onClickRestartService()
+            alertDialog.dismiss()
+        }
+
+        alertDialog.show()
     }
 }

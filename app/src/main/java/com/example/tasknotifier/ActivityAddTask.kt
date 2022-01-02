@@ -60,7 +60,7 @@ class ActivityAddTask : AppCompatActivity() {
             findViewById<TextView>(R.id.textViewDateToday).text = resources.getString(R.string.text_date_today, dateToday)
         }
 
-        taskViewModel = ViewModelProvider(this).get(TaskViewModel::class.java)
+        taskViewModel = ViewModelProvider(this)[TaskViewModel::class.java]
 
         applySoftKeyboardVirtualKeyboardListener()
 
@@ -289,7 +289,7 @@ class ActivityAddTask : AppCompatActivity() {
     }
 
     private fun enableStopAfterControl(enable: Boolean = true) {
-        findViewById<TextView>(R.id.textView8).isEnabled = enable
+        findViewById<TextView>(R.id.textViewSelectStopAfterLabel).isEnabled = enable
         findViewById<TextView>(R.id.textViewStopAfter).isEnabled = enable
         findViewById<View>(R.id.linearLayoutStopAfter).isClickable = enable
     }
