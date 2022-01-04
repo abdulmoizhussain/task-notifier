@@ -1,16 +1,17 @@
 package com.example.tasknotifier
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasknotifier.android_services.TaskNotifierAndroidService
-import com.example.tasknotifier.common.Console
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.listadapters.ListAdapter
 import com.example.tasknotifier.services.TaskService
@@ -84,19 +85,24 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.buttonAddNewTask).setOnClickListener { onCliCkGoToAddUser() }
 
-        onClickSettingsButton()
+        findViewById<ImageView>(R.id.imageViewSettings).setOnClickListener { onClickSettingsButton() }
 
         // TODO: testing code to be removed when used properly:
-        val ts = TaskService(this)
-        runBlocking {
-            launch {
-                val all = ts.getAllAsync()
+//        var jsonString: String? = null
+//        runBlocking {
+//            launch {
+//                jsonString = exportTasksAsJsonArrayAsync()
+//            }
+//        }
+//        val fileOutputStream = openFileOutput("output.json", Context.MODE_WORLD_WRITEABLE)
+//        fileOutputStream.write(jsonString?.toByteArray())
+    }
 
-                val jsonArray = JSONArray()
-                all.forEach { task -> jsonArray.put(task.toJsonObject()) }
-                Console.log(jsonArray.toString())
-            }
-        }
+    private suspend fun exportTasksAsJsonArrayAsync(): String {
+        val tasks = TaskService(this).getAllAsync()
+        val jsonArray = JSONArray()
+        tasks.forEach { task -> jsonArray.put(task.toJsonObject()) }
+        return jsonArray.toString()
     }
 
     private fun onCliCkGoToAddUser() {

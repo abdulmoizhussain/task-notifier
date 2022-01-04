@@ -209,7 +209,7 @@ class ActivityAddTask : AppCompatActivity() {
             selectedDayOfMonth,
         )
 
-        // source: https://stackoverflow.com/a/33996958
+        // source: https://stackoverflow.com/a/23762355/8075004
         // How to disable past dates in Android date picker?
         datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
 

@@ -118,7 +118,10 @@ class MyNotificationManager {
             builder.setContentTitle(contentTitle)
             builder.setContentText(contentText)
             builder.setSmallIcon(R.drawable.ic_launcher_background)
+
+            // source: https://stackoverflow.com/a/11756312/8075004
             builder.setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher))
+
             builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             builder.setContentIntent(pendingIntent)
 
