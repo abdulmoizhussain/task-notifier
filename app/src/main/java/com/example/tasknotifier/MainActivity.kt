@@ -71,7 +71,8 @@ class MainActivity : AppCompatActivity() {
         // TODO: a scenario in which users will open the app after an update and then the tasks will not be scheduled.
         //  so in that case fix the bug which show that the tasks are not scheduled in the MainActivity list of tasks.
         // TODO: Show Hint on long-press, specially on icons.
-        // TODO:
+        // TODO: trim description text while creating notification.
+        // TODO: give checkbox with task delete dialog: "also remove notification"
 
         // RecyclerView
         val recyclerViewListAdapter = ListAdapter()
