@@ -13,6 +13,7 @@
         android:layout_height="0px"
         android:fadeScrollbars="false"
         android:fillViewport="true"
+        android:focusableInTouchMode="true"
         android:orientation="vertical"
         android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@+id/linearLayoutBottomBar"

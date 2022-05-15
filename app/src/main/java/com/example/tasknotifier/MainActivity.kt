@@ -1,7 +1,6 @@
 package com.example.tasknotifier
 
 import android.app.AlertDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -16,8 +15,6 @@ import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.listadapters.ListAdapter
 import com.example.tasknotifier.services.TaskService
 import com.example.tasknotifier.viewmodels.TaskViewModel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.json.JSONArray
 
 
@@ -82,11 +79,18 @@ class MainActivity : AppCompatActivity() {
 
         // ViewModel
         taskViewModel = ViewModelProvider(this)[TaskViewModel::class.java]
-        taskViewModel.readAllData.observe(this, { tasks -> recyclerViewListAdapter.setData(tasks) })
+        taskViewModel.readAllData.observe(this) { tasks -> recyclerViewListAdapter.setData(tasks) }
 
         findViewById<Button>(R.id.buttonAddNewTask).setOnClickListener { onCliCkGoToAddUser() }
 
         findViewById<ImageView>(R.id.imageViewSettings).setOnClickListener { onClickSettingsButton() }
+
+        exportToFolder()
+    }
+
+    private fun exportToFolder() {
+//        val root: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+//        val root = this.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
 
         // TODO: testing code to be removed when used properly:
 //        var jsonString: String? = null

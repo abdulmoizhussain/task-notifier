@@ -3,10 +3,12 @@ package com.example.tasknotifier
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -18,9 +20,9 @@ import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.utils.MyAlarmManager
 import com.example.tasknotifier.utils.MyDateFormat
 import com.example.tasknotifier.viewmodels.TaskViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.*
-import android.content.DialogInterface
 
 
 class ActivityAddTask : AppCompatActivity() {
@@ -40,11 +42,14 @@ class ActivityAddTask : AppCompatActivity() {
         setContentView(R.layout.activity_add_task)
 
         editTextDescription = findViewById(R.id.editTextDescription)
+        val textViewDateToday: TextView = findViewById(R.id.textViewDateToday)
+
         findViewById<LinearLayout>(R.id.linearLayoutDate).setOnClickListener { onClickSelectDate() }
         findViewById<LinearLayout>(R.id.linearLayoutTime).setOnClickListener { onClickSelectTime() }
         findViewById<LinearLayout>(R.id.linearLayoutRepeat).setOnClickListener { onClickSelectRepeat() }
         findViewById<LinearLayout>(R.id.linearLayoutStopAfter).setOnClickListener { onClickSelectStopAfter() }
         findViewById<Button>(R.id.buttonNotifyNow).setOnClickListener { onClickNotifyNow() }
+        textViewDateToday.setOnClickListener { shiftFocusFromEditTextAndHideSoftKeyboard() }
 
         val buttonTurnOnOrUpdateTask = findViewById<Button>(R.id.buttonTurnOnOrUpdateTask)
         val buttonDeleteTask = findViewById<Button>(R.id.buttonDeleteTask)
@@ -57,7 +62,7 @@ class ActivityAddTask : AppCompatActivity() {
         run {
             // set Today's date
             val dateToday = MyDateFormat.EEE_MMM_dd_yyyy.format(System.currentTimeMillis())
-            findViewById<TextView>(R.id.textViewDateToday).text = resources.getString(R.string.text_date_today, dateToday)
+            textViewDateToday.text = resources.getString(R.string.text_date_today, dateToday)
         }
 
         taskViewModel = ViewModelProvider(this)[TaskViewModel::class.java]
@@ -449,5 +454,17 @@ class ActivityAddTask : AppCompatActivity() {
     override fun onBackPressed() {
         startActivity(Intent(this, MainActivity::class.java))
         finish()
+    }
+
+    private fun shiftFocusFromEditTextAndHideSoftKeyboard() {
+        // source: https://stackoverflow.com/a/39884008/8075004
+        editTextDescription.clearFocus()
+
+        // source: https://stackoverflow.com/a/54759383/8075004
+        // https://stackoverflow.com/q/4165414/8075004
+        val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(editTextDescription.windowToken, 0)
+
+        findViewById<View>(R.id.scrollView1)
     }
 }

@@ -31,6 +31,8 @@ class MyNotificationManager {
 
             builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             builder.priority = NotificationCompat.PRIORITY_LOW
+            builder.setSilent(true)
+            builder.setDefaults(0)
 
             if (onGoing) {
                 builder.setOngoing(onGoing)
@@ -76,6 +78,8 @@ class MyNotificationManager {
 
             builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             builder.priority = NotificationCompat.PRIORITY_LOW
+            builder.setSilent(true)
+            builder.setDefaults(0)
 
             // TODO remove notification after some time, to show start of the service
 //            builder.setTimeoutAfter(10000)
