@@ -11,7 +11,6 @@ import com.example.tasknotifier.utils.MyDateFormat
 import com.example.tasknotifier.utils.MyNotificationManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.util.*
 
 class ActivityViewTask : AppCompatActivity() {
     private var taskDbId: Int = 0

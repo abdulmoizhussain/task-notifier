@@ -84,8 +84,6 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.buttonAddNewTask).setOnClickListener { onCliCkGoToAddUser() }
 
         findViewById<ImageView>(R.id.imageViewSettings).setOnClickListener { onClickSettingsButton() }
-
-        exportToFolder()
     }
 
     private fun exportToFolder() {
