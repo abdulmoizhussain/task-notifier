@@ -3,9 +3,11 @@ package com.example.tasknotifier
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -82,9 +84,32 @@ class MainActivity : AppCompatActivity() {
         taskViewModel.readAllData.observe(this) { tasks -> recyclerViewListAdapter.setData(tasks) }
 
         findViewById<Button>(R.id.buttonAddNewTask).setOnClickListener { onCliCkGoToAddUser() }
-
-        findViewById<ImageView>(R.id.imageViewSettings).setOnClickListener { onClickSettingsButton() }
     }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val menuInflater = menuInflater
+        menuInflater.inflate(R.menu.options_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.option_restart_service -> {
+                onClickRestartService()
+                true
+            }
+            R.id.option_export_data -> {
+                Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_SHORT).show()
+                true
+            }
+            R.id.option_import_data -> {
+                Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_SHORT).show()
+                false
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
 
     private fun exportToFolder() {
 //        val root: File = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
