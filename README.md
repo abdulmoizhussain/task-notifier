@@ -1,4 +1,4 @@
-# task-notifier
+# Task Notifier (Android Application)
 
 ## [Download Now (APK file)][1]
 
