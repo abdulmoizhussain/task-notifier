@@ -27,7 +27,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // TODO debugging stuff
+        // TODO Create 2 identical pending intents and check if they are equivalent.
+
+        // TODO Debugging stuff
         /*
         val context = this
         val requestCode = 88
