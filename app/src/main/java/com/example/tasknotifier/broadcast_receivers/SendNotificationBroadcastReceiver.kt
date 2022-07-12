@@ -10,7 +10,6 @@ import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.services.TaskService
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.util.*
 
 class SendNotificationBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

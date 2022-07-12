@@ -352,7 +352,7 @@ class ActivityAddTask : AppCompatActivity() {
         val dialogClickListener = DialogInterface.OnClickListener { _, which ->
             when (which) {
                 DialogInterface.BUTTON_POSITIVE -> {
-                    MyAlarmManager.cancelByRequestCode(this, taskDbId)
+                    MyAlarmManager.cancel(this, taskDbId)
                     taskViewModel.deleteOneById(taskDbId)
                     finish()
                 }
@@ -381,7 +381,7 @@ class ActivityAddTask : AppCompatActivity() {
 
                     taskViewModel.updateOne(task)
 
-                    MyAlarmManager.cancelByRequestCode(this@ActivityAddTask, taskDbId)
+                    MyAlarmManager.cancel(this@ActivityAddTask, taskDbId)
 
                     finish()
                 }

@@ -27,6 +27,45 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // TODO debugging stuff
+        /*
+        val context = this
+        val requestCode = 88
+        val triggerAtMillis = Date().time + (1000 * 10)
+
+        val mIntent = Intent(context, SendNotificationBroadcastReceiver::class.java)
+
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+
+        val pendingIntent: PendingIntent = PendingIntent.getBroadcast(context, requestCode, mIntent, flags)
+
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT -> {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+            }
+            else -> {
+                alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+            }
+        }
+
+        val pendingIntentC3 = PendingIntent.getBroadcast(context, requestCode, mIntent, flags)
+        val alarmManagerNew = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        Log.a("before alarm manager cancellation")
+        alarmManagerNew.cancel(pendingIntentC3)
+        Log.a("before pending intent cancellation")
+        pendingIntentC3.cancel()
+        */
+
 //        let {
 //            val intent = Intent()
 //            intent.component =
@@ -87,7 +126,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val menuInflater = menuInflater
         menuInflater.inflate(R.menu.options_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
@@ -100,7 +138,7 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.option_export_data -> {
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_SHORT).show()
-                true
+                false
             }
             R.id.option_import_data -> {
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_SHORT).show()

@@ -13,14 +13,15 @@ import kotlinx.coroutines.runBlocking
 class TaskNotifierAndroidService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        MyNotificationManager.notifyWithUnClickable(
-            this,
-            999999,
-            null,
-            "Back service started",
-            System.currentTimeMillis(),
-            false,
-        )
+
+//        MyNotificationManager.notifyWithUnClickable(
+//            this,
+//            999999,
+//            null,
+//            "Back service started",
+//            System.currentTimeMillis(),
+//            false,
+//        )
 
         var notificationReviver = false
         var taskScheduler = false

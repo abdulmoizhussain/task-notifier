@@ -12,33 +12,8 @@ import com.example.tasknotifier.broadcast_receivers.SendNotificationBroadcastRec
 class MyAlarmManager {
     companion object {
 
-        fun setInexact(context: Context, requestCode: Int, intent: Intent, triggerAtMillis: Long) {
-            val pendingIntent: PendingIntent = let {
-                val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                } else {
-                    PendingIntent.FLAG_UPDATE_CURRENT
-                }
-                PendingIntent.getBroadcast(context, requestCode, intent, flags)
-            }
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-            } else {
-                alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-            }
-        }
-
-        fun setExact(context: Context, requestCode: Int, intent: Intent, triggerAtMillis: Long) {
-            val pendingIntent: PendingIntent = let {
-                val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                } else {
-                    PendingIntent.FLAG_UPDATE_CURRENT
-                }
-                PendingIntent.getBroadcast(context, requestCode, intent, flags)
-            }
+        fun setExact(context: Context, requestCode: Int, mIntent: Intent, triggerAtMillis: Long) {
+            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, mIntent, getFlagUpdateCurrent())
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             when {
@@ -54,23 +29,41 @@ class MyAlarmManager {
             }
         }
 
-        fun setAlarmClock(context: Context, requestCode: Int, intent: Intent, triggerAtMillis: Long) {
-            val pendingIntent: PendingIntent = let {
-                val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                } else {
-                    PendingIntent.FLAG_UPDATE_CURRENT
-                }
-                PendingIntent.getBroadcast(context, requestCode, intent, flags)
+        // TODO check all of its usages that if the intent & context being passed are always identical or not.
+        fun cancel(context: Context, requestCode: Int) {
+            // helpful sources: also check the comments
+            // https://stackoverflow.com/a/9575569/8075004
+
+            val mIntent = Intent(context, SendNotificationBroadcastReceiver::class.java)
+            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, mIntent, getFlagUpdateCurrent())
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+            alarmManager.cancel(pendingIntent)
+            pendingIntent.cancel()
+        }
+
+        @Suppress("unused")
+        fun setInexact(context: Context, requestCode: Int, mIntent: Intent, triggerAtMillis: Long) {
+            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, mIntent, getFlagUpdateCurrent())
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+            } else {
+                alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
             }
+        }
+
+        @Suppress("unused")
+        fun setAlarmClock(context: Context, requestCode: Int, mIntent: Intent, triggerAtMillis: Long) {
+            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, mIntent, getFlagUpdateCurrent())
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP -> {
                     // helpful source for setAlarmClock: https://stackoverflow.com/a/34699710
-                    val pendingIntentForAlarmClockIcon = Intent(context, MainActivity::class.java).let { internalIntent ->
-                        PendingIntent.getActivity(context, 0, internalIntent, 0)
-                    }
+                    val tempIntent = Intent(context, MainActivity::class.java)
+                    val pendingIntentForAlarmClockIcon = PendingIntent.getActivity(context, 0, tempIntent, getFlagUpdateCurrent())
                     val alarmClockInfo = AlarmClockInfo(triggerAtMillis, pendingIntentForAlarmClockIcon)
 
                     alarmManager.setAlarmClock(alarmClockInfo, pendingIntent)
@@ -84,21 +77,30 @@ class MyAlarmManager {
             }
         }
 
-        fun cancelByRequestCode(context: Context, requestCode: Int) {
-            val pendingIntent = Intent(context, SendNotificationBroadcastReceiver::class.java).let { intent ->
-                PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-            }
-
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            alarmManager.cancel(pendingIntent)
-        }
-
+        @Suppress("unused")
         fun isAlarmOff(context: Context, requestCode: Int): Boolean {
             // TODO this one is buggy
-            val pendingIntent = Intent(context, SendNotificationBroadcastReceiver::class.java).let { intent ->
-                PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_NO_CREATE)
-            }
+            // helpful sources:
+            // https://issuetracker.google.com/issues/36909112
+            val mIntent = Intent(context, SendNotificationBroadcastReceiver::class.java)
+            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, mIntent, getFlagNoCreate())
             return pendingIntent == null
+        }
+
+        private fun getFlagUpdateCurrent(): Int {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
+        }
+
+        private fun getFlagNoCreate(): Int {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_NO_CREATE
+            } else {
+                PendingIntent.FLAG_NO_CREATE
+            }
         }
     }
 }
