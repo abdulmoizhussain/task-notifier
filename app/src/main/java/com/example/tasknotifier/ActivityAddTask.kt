@@ -7,6 +7,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -24,9 +25,20 @@ import com.example.tasknotifier.viewmodels.TaskViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 
 class ActivityAddTask : AppCompatActivity() {
+    companion object {
+        private const val UI_PREFERENCES = "task_notifier_ui_preferences"
+        private const val DESCRIPTION_HEIGHT_KEY = "description_field_height_dp"
+        private const val DEFAULT_DESCRIPTION_HEIGHT_DP = 180
+        private const val MIN_DESCRIPTION_HEIGHT_DP = 120
+        private const val MAX_DESCRIPTION_HEIGHT_DP = 480
+        private const val MAX_DESCRIPTION_SCREEN_FRACTION = 0.55f
+    }
+
     private var selectedYear: Int = 0
     private var selectedMonth: Int = 0
     private var selectedDayOfMonth: Int = 0
@@ -43,6 +55,7 @@ class ActivityAddTask : AppCompatActivity() {
         setContentView(R.layout.activity_add_task)
 
         editTextDescription = findViewById(R.id.editTextDescription)
+        setupDescriptionFieldResizing()
         val textViewDateToday: TextView = findViewById(R.id.textViewDateToday)
 
         findViewById<LinearLayout>(R.id.linearLayoutDate).setOnClickListener { onClickSelectDate() }
@@ -302,6 +315,91 @@ class ActivityAddTask : AppCompatActivity() {
         findViewById<View>(R.id.linearLayoutStopAfter).isClickable = enable
         findViewById<View>(R.id.linearLayoutStopAfter).alpha = if (enable) 1f else 0.5f
     }
+
+    private fun setupDescriptionFieldResizing() {
+        val resizeHandle = findViewById<View>(R.id.descriptionResizeHandle)
+        var dragStartRawY = 0f
+        var dragStartHeight = 0
+        var heightChangedDuringDrag = false
+
+        editTextDescription.post { applyPreferredDescriptionHeight() }
+
+        resizeHandle.setOnTouchListener { view, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    dragStartRawY = event.rawY
+                    dragStartHeight = editTextDescription.height
+                    heightChangedDuringDrag = false
+                    view.parent.requestDisallowInterceptTouchEvent(true)
+                    true
+                }
+
+                MotionEvent.ACTION_MOVE -> {
+                    val requestedHeight = dragStartHeight + (event.rawY - dragStartRawY).roundToInt()
+                    val adjustedHeight = requestedHeight.coerceIn(
+                        dpToPx(MIN_DESCRIPTION_HEIGHT_DP),
+                        maximumDescriptionHeightPx(),
+                    )
+
+                    if (editTextDescription.layoutParams.height != adjustedHeight) {
+                        editTextDescription.layoutParams = editTextDescription.layoutParams.apply {
+                            height = adjustedHeight
+                        }
+                        heightChangedDuringDrag = true
+                    }
+                    true
+                }
+
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    view.parent.requestDisallowInterceptTouchEvent(false)
+                    if (event.actionMasked == MotionEvent.ACTION_UP || heightChangedDuringDrag) {
+                        savePreferredDescriptionHeight()
+                    }
+                    if (event.actionMasked == MotionEvent.ACTION_UP) {
+                        view.performClick()
+                    }
+                    true
+                }
+
+                else -> false
+            }
+        }
+    }
+
+    private fun applyPreferredDescriptionHeight() {
+        val preferredHeightDp = getSharedPreferences(UI_PREFERENCES, MODE_PRIVATE)
+            .getInt(DESCRIPTION_HEIGHT_KEY, DEFAULT_DESCRIPTION_HEIGHT_DP)
+        val adjustedHeight = dpToPx(preferredHeightDp).coerceIn(
+            dpToPx(MIN_DESCRIPTION_HEIGHT_DP),
+            maximumDescriptionHeightPx(),
+        )
+
+        if (editTextDescription.layoutParams.height != adjustedHeight) {
+            editTextDescription.layoutParams = editTextDescription.layoutParams.apply {
+                height = adjustedHeight
+            }
+        }
+    }
+
+    private fun savePreferredDescriptionHeight() {
+        val preferredHeightDp = pxToDp(editTextDescription.height)
+        getSharedPreferences(UI_PREFERENCES, MODE_PRIVATE)
+            .edit()
+            .putInt(DESCRIPTION_HEIGHT_KEY, preferredHeightDp)
+            .apply()
+    }
+
+    private fun maximumDescriptionHeightPx(): Int {
+        val screenAwareMaximumDp =
+            (resources.configuration.screenHeightDp * MAX_DESCRIPTION_SCREEN_FRACTION).roundToInt()
+        val maximumHeightDp = min(MAX_DESCRIPTION_HEIGHT_DP, screenAwareMaximumDp)
+            .coerceAtLeast(MIN_DESCRIPTION_HEIGHT_DP)
+        return dpToPx(maximumHeightDp)
+    }
+
+    private fun dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).roundToInt()
+
+    private fun pxToDp(px: Int): Int = (px / resources.displayMetrics.density).roundToInt()
 
     private fun setSelectedDate() {
         val calendar = Calendar.getInstance()
