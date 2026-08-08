@@ -6,7 +6,7 @@ import android.content.Intent
 import com.example.tasknotifier.android_services.TaskNotifierAndroidService
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.common.Globals
-import com.example.tasknotifier.data.task.Task
+import com.example.tasknotifier.common.TaskStatusEnum
 import com.example.tasknotifier.services.TaskService
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -23,34 +23,13 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
                 val taskId = intent.getIntExtra(Constants.INTENT_EXTRA_TASK_ID, 0)
 
                 val task = taskService.getOneByIdAsync(taskId)
-
-                var description = ""
-                var setWhen = 0L
-                var sentCount = 0
-
-                if (task != null) {
-                    description = task.description
-                    setWhen = task.dateTime
-                    sentCount = task.sentCount
-
-                    sentCount += 1
-                }
-
-                val contentTitle = Globals.createTitleForTask(setWhen, sentCount)
-
-                Intent(context, TaskNotifierAndroidService::class.java).let { serviceIntent ->
-                    serviceIntent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskId)
-                    serviceIntent.putExtra(Constants.INTENT_EXTRA_CONTENT_TITLE, contentTitle)
-                    serviceIntent.putExtra(Constants.INTENT_EXTRA_DESCRIPTION, description)
-                    serviceIntent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, setWhen)
-                    serviceIntent.putExtra(Constants.INTENT_EXTRA_ON_GOING, true)
-
-                    context.startService(serviceIntent)
-                }
-
-                if (task == null) {
+                if (task == null || task.status != TaskStatusEnum.On) {
                     return@launch
                 }
+
+                val description = task.description
+                val setWhen = task.dateTime
+                val sentCount = task.sentCount + 1
 
                 var triggerAtMillis = task.dateTime
 
@@ -79,15 +58,21 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
 //                    TaskService.createIntentAndSetExactAlarm(context, taskId, triggerAtMillis)
                 }
 
-                val taskToUpdate = Task(task.description)
-                taskToUpdate.dateTime = triggerAtMillis
-                taskToUpdate.repeat = task.repeat
-                taskToUpdate.stopAfter = task.stopAfter
-                taskToUpdate.id = taskId
-                taskToUpdate.sentCount = sentCount
-                taskToUpdate.inProgress = true
+                if (!taskService.updateAfterAlarmIfStillOnAsync(taskId, triggerAtMillis, sentCount)) {
+                    return@launch
+                }
 
-                taskService.updateOneAsync(taskToUpdate)
+                val contentTitle = Globals.createTitleForTask(setWhen, sentCount)
+
+                Intent(context, TaskNotifierAndroidService::class.java).let { serviceIntent ->
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_TASK_ID, taskId)
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_CONTENT_TITLE, contentTitle)
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_DESCRIPTION, description)
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_SET_WHEN, setWhen)
+                    serviceIntent.putExtra(Constants.INTENT_EXTRA_ON_GOING, true)
+
+                    context.startService(serviceIntent)
+                }
 
                 Intent(context, TaskNotifierAndroidService::class.java).let { mIntent ->
                     mIntent.putExtra(Constants.INTENT_EXTRA_TASK_SCHEDULER_SERVICE, true)

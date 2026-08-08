@@ -384,7 +384,7 @@ class ActivityAddTask : AppCompatActivity() {
                 } else {
                     task.status = TaskStatusEnum.Off
 
-                    taskViewModel.updateOne(task)
+                    taskViewModel.updateOneAsync(task)
 
                     MyAlarmManager.cancel(this@ActivityAddTask, taskDbId)
 

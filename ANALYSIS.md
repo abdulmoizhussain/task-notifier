@@ -96,6 +96,14 @@ Each task notification now uses:
 
 Regression tests now create temporary Room tasks and verify that two notifications open their respective task rows and that the dismissal callback restores only an active task notification.
 
+### Scheduling shutoff and one-shot service lifecycle
+
+The edit-screen action is now labelled **Turn off scheduling** to reflect its precise contract: it persistently changes the task status to `Off` and cancels its future `AlarmManager` event, while intentionally leaving `inProgress` and any already-visible notification unchanged. The Room update is awaited before the Activity finishes, preventing lifecycle cancellation from leaving the database status as `On` and allowing a later boot or time-change restoration to recreate the alarm.
+
+Alarm delivery now rejects missing or `Off` tasks before posting a notification or updating Room. This closes the race in which an already-dispatched broadcast could previously recreate an `On` task after its future scheduling had been turned off.
+
+`TaskNotifierAndroidService` now completes each synchronous scheduling/notification command, calls `stopSelfResult(startId)`, and returns `START_NOT_STICKY`. Alarms and notifications remain owned by their Android system services after this one-shot service exits. Emulator regression coverage confirms that the service stops while its scheduled alarm and posted notification remain active.
+
 ### Separate notification presentation
 
 Each task notification now receives its own stable app-defined group key derived from its database ID. This prevents the normal Android auto-grouping path used when an app posts several notifications without group identities. Regression tests verify that different task notifications have different group keys, and emulator notification-manager inspection confirmed the posted keys remain separate without an app-generated summary.
@@ -114,7 +122,7 @@ The existing XML/View interface was refreshed on August 8, 2026 without changing
 - The theme now uses a restrained indigo/neutral palette, consistent surfaces, outlines, spacing, button hierarchy, and text contrast.
 - New XML resources retain compatibility with the existing API 16 minimum.
 
-Emulator QA covered the populated main list and both new/edit form states. Build, unit tests, and lint pass. The three Android instrumentation tests also pass when invoked directly through ADB; the AGP 7.1 Gradle UTP wrapper can abort on the newer emulator runtime because of a protobuf tooling conflict, which is separate from application behavior.
+Emulator QA covered the populated main list and both new/edit form states. Build, unit tests, and lint pass. Seven Android instrumentation tests also pass when invoked directly through ADB; the AGP 7.1 Gradle UTP wrapper can abort on the newer emulator runtime because of a protobuf tooling conflict, which is separate from application behavior.
 
 ## Areas requiring changes before a target SDK upgrade
 
@@ -233,7 +241,7 @@ Recommended direction:
 
 ### Sticky service lifecycle
 
-`TaskNotifierAndroidService` returns `START_STICKY`, performs synchronous database work, and calls `System.gc()`. Explicit garbage collection should be removed. More importantly, the service responsibilities should be separated into notification delivery, task rescheduling, and persistent work before choosing the appropriate modern Android component for each responsibility.
+The previous sticky-service retention issue has been corrected: `TaskNotifierAndroidService` now returns `START_NOT_STICKY`, stops itself with its current `startId` after completing a command, and no longer invokes `System.gc()`. Its synchronous `runBlocking` work and background `startService()` entry points still require redesign before a target SDK upgrade, as described above.
 
 ### Broadcast receiver execution time
 

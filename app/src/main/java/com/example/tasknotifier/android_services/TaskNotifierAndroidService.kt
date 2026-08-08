@@ -13,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 class TaskNotifierAndroidService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        try {
 
 //        MyNotificationManager.notifyWithUnClickable(
 //            this,
@@ -76,8 +77,11 @@ class TaskNotifierAndroidService : Service() {
             )
         }
 
-        System.gc()
-        return START_STICKY
+        } finally {
+            stopSelfResult(startId)
+        }
+
+        return START_NOT_STICKY
     }
 
     override fun onBind(intent: Intent): IBinder {

@@ -115,6 +115,8 @@ class MainActivity : AppCompatActivity() {
         // TODO: Show Hint on long-press, specially on icons.
         // TODO: trim description text while creating notification.
         // TODO: give checkbox with task delete dialog: "also remove notification"
+        // TODO: Preserve crash logs. and create a UI for viewing and copying the crash texts.
+
 
         // RecyclerView
         val recyclerViewListAdapter = ListAdapter()
@@ -159,14 +161,17 @@ class MainActivity : AppCompatActivity() {
                 onClickRestartService()
                 true
             }
+
             R.id.option_export_data -> {
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_SHORT).show()
                 false
             }
+
             R.id.option_import_data -> {
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_SHORT).show()
                 false
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }

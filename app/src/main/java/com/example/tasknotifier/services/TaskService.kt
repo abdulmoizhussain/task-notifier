@@ -41,6 +41,10 @@ class TaskService(context: Context) {
         taskRepository.updateOneAsync(task)
     }
 
+    suspend fun updateAfterAlarmIfStillOnAsync(id: Int, dateTime: Long, sentCount: Int): Boolean {
+        return taskRepository.updateAfterAlarmIfStillOnAsync(id, dateTime, sentCount)
+    }
+
     fun turnOffInProgressByTaskId(taskId: Int) {
         runBlocking {
             launch {

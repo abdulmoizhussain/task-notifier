@@ -8,7 +8,7 @@ Task Notifier is a native Android reminder app for creating one-time or repeatin
 
 ## Features
 
-- Create, edit, enable, disable, and delete reminder tasks.
+- Create, edit, turn future scheduling on or off, and delete reminder tasks.
 - Send a task notification immediately with **Notify Now**.
 - Repeat reminders hourly, daily, weekly, monthly, yearly, or at several custom minute/hour/day/week/month intervals.
 - Optionally stop a repeating reminder after a selected number of notifications.
@@ -65,7 +65,7 @@ The project is a single Android application module built with Kotlin and XML lay
 - AndroidX AppCompat, RecyclerView, Lifecycle, and Preference libraries.
 - Room for local task persistence.
 - `AlarmManager` and broadcast receivers for reminder scheduling.
-- Android notification channels and a service for delivering and restoring notifications.
+- Android notification channels and a one-shot service for scheduling alarms and delivering or restoring notifications.
 - A repository and `AndroidViewModel` layer between the activities and Room database.
 
 ## Known limitations

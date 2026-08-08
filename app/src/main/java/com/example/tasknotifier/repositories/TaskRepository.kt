@@ -29,6 +29,15 @@ class TaskRepository(private val taskDao: TaskDao) {
         taskDao.updateOneAsync(task)
     }
 
+    suspend fun updateAfterAlarmIfStillOnAsync(id: Int, dateTime: Long, sentCount: Int): Boolean {
+        return taskDao.updateAfterAlarmIfStatusAsync(
+            id,
+            dateTime,
+            sentCount,
+            TaskStatusEnum.On,
+        ) == 1
+    }
+
     suspend fun fetchAllWhichAreDueAndOnAsync(): Array<Task> {
         return taskDao.fetchAllByStatusWhichAreDueAsync(TaskStatusEnum.On, System.currentTimeMillis())
     }

@@ -15,6 +15,14 @@ interface TaskDao {
     @Update
     suspend fun updateOneAsync(task: Task)
 
+    @Query("UPDATE task_table SET dateTime=:dateTime, sentCount=:sentCount, inProgress=1 WHERE id=:id AND status=:requiredStatus")
+    suspend fun updateAfterAlarmIfStatusAsync(
+        id: Int,
+        dateTime: Long,
+        sentCount: Int,
+        requiredStatus: TaskStatusEnum,
+    ): Int
+
     @Query("SELECT * FROM task_table where id=:id")
     suspend fun getOneByIdAsync(id: Int): Task?
 
