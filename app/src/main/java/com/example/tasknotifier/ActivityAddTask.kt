@@ -19,6 +19,7 @@ import com.example.tasknotifier.common.TaskStatusEnum
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.utils.MyAlarmManager
 import com.example.tasknotifier.utils.MyDateFormat
+import com.example.tasknotifier.utils.MyNotificationManager
 import com.example.tasknotifier.viewmodels.TaskViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -353,6 +354,7 @@ class ActivityAddTask : AppCompatActivity() {
             when (which) {
                 DialogInterface.BUTTON_POSITIVE -> {
                     MyAlarmManager.cancel(this, taskDbId)
+                    MyNotificationManager.cancelById(this, taskDbId)
                     taskViewModel.deleteOneById(taskDbId)
                     finish()
                 }

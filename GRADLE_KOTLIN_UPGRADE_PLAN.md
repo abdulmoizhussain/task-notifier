@@ -1,33 +1,48 @@
 # Gradle and Kotlin Upgrade Plan
 
-Plan date: August 8, 2026
+Plan refreshed: August 8, 2026
 
-This document proposes a build-tool modernization path. It is an analysis and implementation plan only; the versions and configuration described here have not yet been applied.
+This document starts from the verified working legacy baseline. It is a plan only; the proposed modernization versions have not been applied.
 
-For the broader application and deprecated-code review, see [`ANALYSIS.md`](ANALYSIS.md).
+For application and target-SDK prerequisites, see [`ANALYSIS.md`](ANALYSIS.md).
 
-## Current state
+## Verified working baseline
 
-| Component | Current version or setting | Assessment |
+| Component | Current value | Status |
 | --- | --- | --- |
-| Android Gradle Plugin | 8.2.0 | Old but currently paired with a compatible Gradle version |
-| Gradle wrapper | 8.2 | Correct minimum for AGP 8.2 |
-| Gradle runtime JDK | JDK 17 required | Already the required baseline for AGP 8.2+ |
-| Kotlin Gradle plugin | 1.6.21 | Very old; predates the K2 compiler |
-| Kotlin annotation processing | kapt | Maintenance mode and incompatible with AGP 9 built-in Kotlin |
-| Java source/target | Java 8 | Valid but unnecessarily old for a fully modernized project |
-| Kotlin JVM target | JVM 8 | Configured through the legacy `android.kotlinOptions` DSL |
-| Compile SDK | 31 | Outdated |
-| Target SDK | 30 | Below current Google Play requirements |
-| Build Tools | Explicitly pinned to 31.0.0 | Normally should follow AGP's default |
+| Android Studio | Panda 4 / 2025.3.4 | Successfully syncs the project |
+| Android Gradle Plugin | 7.1.3 | Minimum compatibility bridge accepted by Panda 4 |
+| Gradle wrapper | 7.2 | Correct pairing for AGP 7.1 |
+| Gradle runtime JDK | JDK 11 | Required for this AGP generation |
+| Kotlin Gradle plugin | 1.6.10 | Working but obsolete |
+| Kotlin annotation processing | kapt | Working for Room 2.4.0 but in maintenance mode |
+| Java source/target | Java 8 | Working application bytecode target |
+| Kotlin JVM target | JVM 8 | Configured through `android.kotlinOptions` |
+| Compile SDK | 31 | Working but outdated |
+| Target SDK | 30 | Working but below current Play requirements |
+| Minimum SDK | 16 | Working but restricts dependency choices |
 
-AGP 8.2 and Gradle 8.2 are internally compatible, and Kotlin 1.6 is supported by AGP 8.2. Therefore, the current problem is age and migration distance rather than an invalid version combination.
+The project originally used AGP 7.0.4 and Gradle 7.0.2. That exact historical combination was successfully compiled, tested, installed, and launched using JDK 11. Panda 4 then required the small AGP 7.1.3/Gradle 7.2 bridge for supported IDE import. Kotlin, dependencies, source, manifest, compile SDK, and target SDK were unchanged.
 
-Reference: [AGP and Gradle compatibility](https://developer.android.com/build/releases/about-agp)
+Baseline verification completed:
+
+- Gradle wrapper startup on JDK 11.
+- `assembleDebug`.
+- `testDebugUnitTest`.
+- `lintDebug`.
+- APK installation and cold launch on Android 13/API 33.
+- Existing `connectedDebugAndroidTest` test.
+- Successful Panda 4 Gradle sync and user-confirmed emulator launch.
+
+On August 8, 2026, notification regression coverage was expanded to three connected tests. The suite verifies task-specific notification routing and restoration of an active notification after its dismissal callback. `assembleDebug`, unit tests, lint, and all connected tests pass on the legacy toolchain.
+
+This baseline should be committed or tagged before further upgrades.
+
+References: [AGP 7.0 compatibility](https://developer.android.com/build/releases/agp-7-0-0-release-notes), [AGP and Gradle compatibility](https://developer.android.com/build/releases/about-agp)
 
 ## Recommended destination
 
-The recommended final build stack is:
+The long-term destination, based on stable releases available on the analysis date, is:
 
 | Component | Target |
 | --- | --- |
@@ -35,269 +50,219 @@ The recommended final build stack is:
 | Gradle wrapper | 9.5.0 |
 | Gradle runtime JDK | 17 |
 | Kotlin integration | AGP built-in Kotlin |
-| Kotlin language/API level | 2.4 where supported by the built-in compiler |
-| Standalone Kotlin version, if temporarily required on AGP 8 | 2.4.10 |
+| Kotlin language level | 2.4 |
+| Standalone Kotlin version during an AGP 8 checkpoint | 2.4.10 |
 | Annotation processing | KSP |
-| Java source/target | 17 |
-| Kotlin JVM target | Inherit Java target compatibility or explicitly use 17 |
-| Compile SDK | 36 |
+| Java/Kotlin JVM target | 17 |
+| Compile SDK | 36 initially; consider 37 separately |
 | Target SDK | 36 |
 
-AGP 9.3 supports API 37 and requires Gradle 9.5 and JDK 17. AGP 9.3.1 is the latest patch listed in the current release notes.
+AGP 9.3 supports API 37 and requires Gradle 9.5 and JDK 17. Kotlin 2.4 class files require AGP 8.5.2 or newer. Kotlin 2.4.10 is the current bug-fix release in the Kotlin 2.4 line.
 
-Reference: [AGP 9.3 release notes](https://developer.android.com/build/releases/agp-9-3-0-release-notes)
+References: [AGP 9.3 release notes](https://developer.android.com/build/releases/agp-9-3-0-release-notes), [Kotlin releases](https://kotlinlang.org/docs/releases.html), [Kotlin and AGP compatibility](https://developer.android.com/build/kotlin-support)
 
-Kotlin 2.4.10 is the latest Kotlin 2.4 bug-fix release. Android's compatibility table requires AGP 8.5.2 or later for Kotlin 2.4 class files, so Kotlin 2.4 must not be introduced while the project remains on AGP 8.2.
+## Upgrade principles
 
-References: [Kotlin releases](https://kotlinlang.org/docs/releases.html), [Kotlin and AGP compatibility](https://developer.android.com/build/kotlin-support)
+- Preserve a runnable checkpoint at every phase.
+- Separate build-tool upgrades from target-SDK behavior changes.
+- Change one major compatibility boundary at a time: Gradle runtime JDK, AGP, Kotlin, annotation processing, dependencies, and target SDK.
+- Do not accept a large collection of Android Studio Upgrade Assistant changes without reviewing the exact diff.
+- Run the same build and emulator checks after every checkpoint.
+- Keep database compatibility and existing user reminders intact.
+- Do not combine an optional Groovy-to-Kotlin-DSL rewrite with required build upgrades.
 
-## Why a staged upgrade is recommended
+## Phase 0: Preserve the baseline
 
-Moving directly from AGP 8.2/Kotlin 1.6 to AGP 9.3 combines several independent migrations:
+Status: ready.
 
-- Gradle 8 to Gradle 9.
-- AGP 8's legacy DSL to AGP 9's new DSL interfaces.
-- External Kotlin Android plugin to built-in Kotlin.
-- Kotlin 1.6 compiler to Kotlin 2.4/K2 behavior.
-- kapt to KSP.
-- Java/JVM 8 to 17.
-- Compile and target SDK 31/30 to 36.
-- Multiple years of AndroidX, Room, and coroutines updates.
-- Android runtime behavior changes for notifications, exact alarms, services, and edge-to-edge UI.
+1. Review the AGP 7.1.3 and Gradle 7.2 compatibility bridge.
+2. Commit or tag the working baseline.
+3. Preserve the known-good debug APK for comparison.
+4. Record current lint findings and runtime behavior.
+5. Keep Android Studio configured to use the wrapper and JDK 11 while on AGP 7.x.
 
-A staged approach creates smaller failure sets and makes regressions easier to diagnose.
+Exit criteria:
 
-## Phase 0: Establish a reproducible baseline
+- Clean, recoverable Git baseline.
+- Panda 4 sync succeeds.
+- Debug build, tests, lint, installation, and launch succeed.
 
-Before editing build files:
+## Phase 1: Prepare code without raising target SDK
 
-1. Use JDK 17 for both Android Studio Gradle and command-line Gradle.
-2. Record the active Android Studio version and installed SDK components.
-3. Run and save results for:
-   - `assembleDebug`
-   - `assembleRelease`
-   - `testDebugUnitTest`
-   - `connectedDebugAndroidTest`, when a device is available
-   - `lintDebug`
-4. Record existing warnings rather than treating all warnings after the upgrade as new.
-5. Manually test alarm creation, notification delivery, repeat scheduling, boot restoration, editing, disabling, and deletion.
-6. Preserve a known-good APK for behavior comparison.
+Keep target SDK 30 initially. Implement upgrade-sensitive changes while existing behavior can still be compared with the verified baseline:
 
-Do not start the version upgrade until the current branch either builds successfully or its existing failures are documented.
+1. Replace deprecated `onBackPressed()` overrides with `OnBackPressedDispatcher` callbacks.
+2. Add explicit immutable flags to notification activity pending intents. **Completed August 8, 2026**, together with unique task identities and warm-activity routing tests.
+3. Remove `System.gc()` and make the unbound service's `onBind()` return `null`.
+4. Replace `runBlocking` on UI, receiver, and service paths with structured coroutines.
+5. Separate notification delivery, alarm rescheduling, and durable background work responsibilities.
+6. Prepare notification runtime-permission handling without raising the target SDK yet.
+7. Prepare exact-alarm access checks and denial behavior.
+8. Add window-inset/IME handling for modern edge-to-edge behavior.
+9. Enable Room schema export and add migration tests before changing Room.
 
-## Phase 1: Prepare application code and dependencies
+Detailed reasoning is in [`ANALYSIS.md`](ANALYSIS.md#areas-requiring-changes-before-a-target-sdk-upgrade).
 
-Perform target-SDK-sensitive application changes before the final AGP jump:
+Exit criteria:
 
-1. Implement Android 13+ notification permission handling.
-2. Implement modern exact-alarm permission/access handling.
-3. Replace background `startService()` paths with WorkManager or compliant foreground-service flows.
-4. Add explicit immutable pending-intent flags.
-5. Replace `onBackPressed()` overrides with `OnBackPressedDispatcher` callbacks.
-6. Add window-inset handling and test edge-to-edge layouts.
-7. Replace blocking `runBlocking` flows with structured, lifecycle-aware coroutines.
-8. Enable Room schema export and add database migration tests.
+- Existing features still work at target SDK 30.
+- New code paths are covered by tests where practical.
+- No database schema change occurs without a migration test.
 
-Then update runtime dependencies in small groups rather than all at once:
+## Phase 2: Move to the final AGP 7 line
 
-1. Core, AppCompat, Activity, and Material.
+Recommended checkpoint:
+
+- AGP 7.4.2.
+- Gradle 7.5.
+- JDK 11.
+- Keep Kotlin 1.6.10 for the first sync/build.
+
+Procedure:
+
+1. Upgrade only AGP and the Gradle wrapper.
+2. Sync and run the full validation suite.
+3. Add the required `namespace` declaration if it has not already been introduced.
+4. Remove the explicit Build Tools version if AGP's selected version works.
+5. Modernize simple Android DSL spellings where supported.
+6. After AGP 7.4.2 is stable, upgrade Kotlin separately to 1.9.25.
+7. Build and test again before continuing.
+
+Why this checkpoint exists:
+
+- It closes the AGP 7 generation before crossing into AGP 8.
+- Kotlin 1.9 requires AGP 7.4.2 or newer according to Android's Kotlin compatibility table.
+- It keeps JDK 11 while isolating Kotlin compiler changes from the JDK 17 transition.
+
+## Phase 3: Move to AGP 8 and JDK 17
+
+Recommended checkpoint:
+
+- AGP 8.13.x.
+- Gradle 8.13.
+- Gradle runtime JDK 17.
+- Kotlin 2.4.10 using the Kotlin Android plugin temporarily.
+- KSP for Room.
+
+Do this in smaller commits even if Android Studio presents it as one upgrade:
+
+1. Change the Gradle runtime from JDK 11 to JDK 17.
+2. Upgrade AGP and its compatible Gradle wrapper.
+3. Resolve AGP 8 DSL, namespace, manifest, and build-feature changes while keeping the existing Kotlin version.
+4. Run the full validation suite.
+5. Upgrade Kotlin from 1.9.25 to 2.4.10 and resolve K2 compiler findings.
+6. Replace kapt with KSP for Room.
+7. Update Room and its compiler together.
+8. Run the full validation suite again.
+
+At this phase, modernize build organization:
+
+- Replace the root `buildscript` classpath with the plugins DSL.
+- Move plugin repositories to `pluginManagement` in `settings.gradle`.
+- Move dependency repositories to `dependencyResolutionManagement`.
+- Optionally introduce `gradle/libs.versions.toml`.
+- Replace eager task creation and deprecated `rootProject.buildDir` access with lazy APIs and `layout.buildDirectory`.
+- Adopt current BuildConfig and R-class defaults where possible; add legacy compatibility flags only for a verified source requirement.
+
+## Phase 4: Upgrade dependencies and compile SDK
+
+Update dependencies in groups so failures remain attributable:
+
+1. Core, AppCompat, Activity, Material, and ConstraintLayout.
 2. Lifecycle and ViewModel; remove `lifecycle-extensions`.
-3. Room runtime and compiler.
+3. Room runtime, Room KTX, KSP compiler, and Room testing.
 4. Coroutines.
-5. RecyclerView, ConstraintLayout, Preference, test libraries, and Espresso.
+5. RecyclerView and Preference.
+6. JUnit, AndroidX Test, and Espresso.
 
-Each group should be built and tested before continuing. Current AndroidX releases may require raising the minimum SDK. Decide whether to retain API 16 or move to a newer baseline such as API 23 before selecting exact library versions.
+Then:
 
-## Phase 2: Upgrade to the final AGP 8 line
+1. Raise compile SDK to 36 while keeping target SDK 30 temporarily.
+2. Resolve compile-time API changes and lint findings.
+3. Decide whether min SDK 16 remains a requirement.
+4. If adopting current libraries requires a higher minimum, evaluate API 23 as a practical baseline and document the user impact.
 
-Use AGP 8.13 and Gradle 8.13 as an intermediate checkpoint.
+Do not choose dependency versions solely because they are the newest. Verify each artifact's minimum SDK and compatibility with Kotlin, KSP, and Room.
 
-This phase should include:
+## Phase 5: Raise target SDK to 36
 
-1. Upgrade AGP from 8.2.0 to 8.13.x.
-2. Upgrade the Gradle wrapper from 8.2 to 8.13.
-3. Keep JDK 17.
-4. Upgrade Kotlin from 1.6.21 to 2.4.10.
-5. Migrate Room from kapt to KSP.
-6. Set compile SDK and target SDK to 36.
-7. Remove the explicit Build Tools version unless a verified requirement remains.
-8. Move Java and Kotlin bytecode targets to 17.
-9. Resolve all Kotlin K2 compiler errors and warnings.
-10. Run all baseline build and behavioral checks.
+Only start this phase after the application prerequisites in `ANALYSIS.md` are implemented.
 
-This intermediate checkpoint separates Kotlin, KSP, SDK, and dependency problems from AGP 9's built-in-Kotlin and new-DSL changes.
+1. Raise target SDK one behavior boundary at a time where useful, testing after each step.
+2. Complete Android 13+ notification permission handling.
+3. Complete exact-alarm permission/access handling and Play policy review.
+4. Replace invalid background service starts with appropriate WorkManager or foreground-service flows.
+5. Add any required foreground-service permissions and service types.
+6. Validate pending-intent mutability on API 31+.
+7. Validate edge-to-edge and predictive-back behavior.
+8. Add modern backup/data-extraction rules.
+9. Test Doze, battery optimization, reboot, clock changes, timezone changes, and permission revocation.
+10. Confirm Google Play target-API and policy compliance.
 
-## Phase 3: Modernize the build layout
+Starting August 31, 2026, new applications and updates submitted to Google Play must target API 36.
 
-Before or during the AGP 8 checkpoint:
+Reference: [Google Play target API requirements](https://support.google.com/googleplay/android-developer/answer/11926878?hl=en-AU)
 
-1. Replace the root `buildscript` classpath with the plugins DSL.
-2. Move plugin repositories to `pluginManagement` in `settings.gradle`.
-3. Move dependency repositories to `dependencyResolutionManagement`.
-4. Optionally introduce `gradle/libs.versions.toml` for version management.
-5. Replace method-style Android properties:
-   - `compileSdkVersion 31` → `compileSdk 36`
-   - `minSdkVersion 16` → `minSdk 16` or the newly selected minimum
-   - `targetSdkVersion 30` → `targetSdk 36`
-6. Replace the eager clean task and deprecated `rootProject.buildDir` access with lazy APIs using `layout.buildDirectory`.
-7. Review and remove unnecessary compatibility flags from `gradle.properties`.
-8. Keep the namespace and application ID explicit and separate.
+## Phase 6: Migrate to AGP 9 built-in Kotlin
 
-Migrating Groovy scripts to Kotlin DSL is optional. It can improve IDE assistance, but it should not be combined with the core toolchain upgrade unless there is a clear benefit, because it adds another source of errors.
+Final checkpoint:
 
-## Phase 4: Migrate to AGP 9.3.1
+- AGP 9.3.1.
+- Gradle 9.5.0.
+- JDK 17.
+- Built-in Kotlin.
+- KSP.
 
-AGP 9 enables built-in Kotlin by default. The project must be adjusted accordingly:
+Required changes:
 
-1. Upgrade AGP to 9.3.1.
-2. Upgrade the Gradle wrapper to 9.5.0.
-3. Continue using JDK 17.
-4. Remove the `kotlin-android` plugin from the app module.
-5. Remove the Kotlin Gradle plugin classpath/version from the root build.
-6. Remove `kotlin-kapt`; Room should already be using KSP.
-7. Replace `android.kotlinOptions` with `kotlin.compilerOptions`, if explicit compiler settings remain necessary.
-8. Confirm that Kotlin's JVM target matches Java target compatibility.
-9. Resolve new DSL and removed API errors without opting out when a supported migration exists.
-10. Run the complete build, lint, test, and manual behavior matrix again.
+1. Remove `kotlin-android` from the app module.
+2. Remove the standalone Kotlin Gradle plugin classpath/version from the root build.
+3. Ensure no kapt usage remains.
+4. Replace `android.kotlinOptions` with `kotlin.compilerOptions` only where explicit options are still needed.
+5. Let Kotlin's JVM target inherit Java target compatibility unless a documented override is required.
+6. Resolve AGP 9 new-DSL issues without relying on the temporary legacy-DSL opt-out as the final state.
+7. Run build, lint, unit, instrumentation, Room migration, and manual alarm/notification tests.
 
-Android documents temporary opt-outs through `android.builtInKotlin=false` and `android.newDsl=false`, but these should be emergency transition aids rather than the planned final state. The opt-outs are not a durable solution for later AGP releases.
+AGP documents temporary `android.builtInKotlin=false` and `android.newDsl=false` opt-outs, but they should be emergency migration aids rather than the intended result.
 
 Reference: [Migrate to built-in Kotlin](https://developer.android.com/build/migrate-to-built-in-kotlin)
 
-## Required build-script migrations
+## Important version cautions
 
-### Kotlin Android plugin
+- Do not run the current Gradle 7.2 build on JDK 21; use JDK 11.
+- Do not move to AGP 8 without moving the Gradle runtime to JDK 17.
+- Do not introduce Kotlin 2.4 before reaching AGP 8.5.2 or newer.
+- Do not move to AGP 9 while leaving `kotlin-android` enabled unless deliberately using the temporary documented opt-out.
+- Prefer KSP over `com.android.legacy-kapt`; legacy kapt is a fallback, not the destination.
+- Do not raise target SDK to 36 as a build-number-only change.
+- Do not assume current AndroidX releases still support min SDK 16.
+- Keep the Gradle runtime JDK separate conceptually from the application's Java/Kotlin bytecode target.
 
-Current:
+## Validation gate for every phase
 
-```groovy
-plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-}
+Run at least:
+
+```powershell
+.\gradlew.bat assembleDebug testDebugUnitTest lintDebug
 ```
 
-AGP 9 destination:
+With an emulator or device connected:
 
-```groovy
-plugins {
-    id 'com.android.application'
-    id 'com.google.devtools.ksp'
-}
+```powershell
+.\gradlew.bat connectedDebugAndroidTest
 ```
 
-Built-in Kotlin replaces only the Kotlin Android plugin. KSP remains a separate plugin.
+Also verify:
 
-### kapt to KSP
+- Debug APK installation and cold launch.
+- Release build with R8 enabled.
+- Creation, editing, disabling, deletion, and immediate notification.
+- One-time and repeating alarm delivery.
+- Stop-after behavior.
+- Notification tap/back-stack behavior.
+- Reboot and time/timezone rescheduling.
+- Room data preservation across the update.
+- Denied/revoked notification and exact-alarm access.
+- Doze and manufacturer battery restrictions.
 
-Current:
-
-```groovy
-id 'kotlin-kapt'
-kapt 'androidx.room:room-compiler:<version>'
-```
-
-Destination:
-
-```groovy
-id 'com.google.devtools.ksp'
-ksp 'androidx.room:room-compiler:<version>'
-```
-
-Reference: [Migrate from kapt to KSP](https://developer.android.com/build/migrate-to-ksp)
-
-### Kotlin compiler options
-
-Current:
-
-```groovy
-android {
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
-}
-```
-
-Destination direction:
-
-```groovy
-android {
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-}
-```
-
-With built-in Kotlin, the Kotlin JVM target defaults to the Android Java target compatibility. Add `kotlin.compilerOptions` only when another compiler setting must be explicit.
-
-### Gradle clean task
-
-Current:
-
-```groovy
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
-```
-
-Destination direction:
-
-```groovy
-tasks.register('clean', Delete) {
-    delete layout.buildDirectory
-}
-```
-
-Reference: [Gradle `buildDir` deprecation](https://docs.gradle.org/current/userguide/upgrading_version_8.html)
-
-## Version-selection cautions
-
-- Do not upgrade Kotlin to 2.4 while remaining on AGP 8.2. Kotlin 2.4 class files require AGP 8.5.2 or later.
-- Do not install AGP 9 while leaving `kotlin-android` enabled unless intentionally using the documented temporary opt-out flags.
-- Do not leave Room on `kapt` for the intended AGP 9 destination. Prefer KSP; `com.android.legacy-kapt` is only a fallback.
-- Do not raise target SDK to 36 as a purely build-file change. Runtime notification, exact-alarm, background-service, and layout behavior must be updated and tested.
-- Do not blindly update every AndroidX artifact to its latest version while retaining min SDK 16. Check each artifact's minimum SDK first.
-- Do not update AGP without updating the Gradle wrapper to a compatible version.
-- JDK 17 is the Gradle runtime requirement. Java/Kotlin bytecode compatibility is a separate setting, although moving the project to JVM 17 is recommended.
-
-## Validation gates
-
-Every phase should pass these gates before continuing:
-
-### Build gate
-
-- Gradle sync completes without errors.
-- Debug and release APKs build.
-- R8 completes for the minified release build.
-- No unsupported Gradle or AGP API warning remains unexplained.
-
-### Test gate
-
-- Unit tests pass.
-- Instrumentation tests pass on the selected minimum and current Android versions.
-- Lint has no newly introduced errors.
-- Room schema and migration tests pass.
-
-### Runtime gate
-
-- Notification permission flows work.
-- Exact-alarm permission flows work.
-- Alarm delivery remains reliable in Doze.
-- Reboot and time/timezone changes reschedule correctly.
-- Notification taps produce the intended back stack.
-- Background work does not throw service-start exceptions.
-- Layouts render correctly edge-to-edge.
-
-### Release gate
-
-- A signed release build installs and launches.
-- The release build preserves Room data across an app update.
-- Play Console pre-launch and target-API checks pass.
-- Required permissions and foreground-service declarations comply with Play policy.
-
-## Recommended outcome
-
-The best balance of currency and maintainability is AGP 9.3.1 with Gradle 9.5, JDK 17, AGP built-in Kotlin, Kotlin 2.4 language level, KSP, and compile/target SDK 36.
-
-The recommended path is not a single version-number edit. First make the application compatible with the current Android platform, then establish an AGP 8.13/Kotlin 2.4/KSP checkpoint, and finally migrate to AGP 9.3.1 built-in Kotlin.
+Do not advance to the next phase until failures are understood and the current checkpoint is recoverable in Git.

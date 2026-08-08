@@ -22,11 +22,25 @@ class ActivityViewTask : AppCompatActivity() {
         findViewById<Button>(R.id.buttonEditThisTask).setOnClickListener { onClickEditThisTask() }
         findViewById<Button>(R.id.buttonRemoveThisNotification).setOnClickListener { onClickRemoveThisNotification() }
 
-        taskDbId = intent.getIntExtra(Constants.INTENT_EXTRA_TASK_ID, 0)
+        displayTaskFromIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        displayTaskFromIntent(intent)
+    }
+
+    private fun displayTaskFromIntent(sourceIntent: Intent) {
+        taskDbId = sourceIntent.getIntExtra(Constants.INTENT_EXTRA_TASK_ID, 0)
 
         if (taskDbId < 1) {
+            displayMissingTask()
             return
         }
+
+        findViewById<Button>(R.id.buttonEditThisTask).isEnabled = true
+        findViewById<Button>(R.id.buttonRemoveThisNotification).isEnabled = true
 
         val taskService = TaskService(this)
         runBlocking {
@@ -35,7 +49,7 @@ class ActivityViewTask : AppCompatActivity() {
                 val textViewDate = findViewById<TextView>(R.id.textViewDate)
 
                 if (task == null) {
-                    textViewDate.text = getString(R.string.msg_task_deleted)
+                    displayMissingTask()
                     return@launch
                 }
 
@@ -56,9 +70,19 @@ class ActivityViewTask : AppCompatActivity() {
         }
     }
 
+    private fun displayMissingTask() {
+        findViewById<TextView>(R.id.textViewTaskDescription).text = ""
+        findViewById<TextView>(R.id.textViewDate).text = getString(R.string.msg_task_deleted)
+        findViewById<TextView>(R.id.textViewTime).text = ""
+        findViewById<TextView>(R.id.textViewRepeat).text = ""
+        findViewById<TextView>(R.id.textViewStopAfter).text = ""
+        findViewById<Button>(R.id.buttonEditThisTask).isEnabled = false
+        findViewById<Button>(R.id.buttonRemoveThisNotification).isEnabled = false
+    }
+
     private fun onClickRemoveThisNotification() {
-        MyNotificationManager.cancelById(this, taskDbId)
         TaskService(this).turnOffInProgressByTaskId(taskDbId)
+        MyNotificationManager.cancelById(this, taskDbId)
     }
 
     private fun onClickEditThisTask() {

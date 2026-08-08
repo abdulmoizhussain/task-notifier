@@ -2,7 +2,19 @@
 
 Analysis date: August 8, 2026
 
-This document records a static analysis of the current project. It does not describe changes that have already been implemented. The Gradle and Kotlin modernization proposal is maintained separately in [`GRADLE_KOTLIN_UPGRADE_PLAN.md`](GRADLE_KOTLIN_UPGRADE_PLAN.md).
+This document records the current project analysis after restoring and verifying the legacy application. The Gradle and Kotlin modernization proposal is maintained separately in [`GRADLE_KOTLIN_UPGRADE_PLAN.md`](GRADLE_KOTLIN_UPGRADE_PLAN.md).
+
+## Verified baseline
+
+On August 8, 2026, the legacy project was successfully synced in Android Studio Panda 4 and launched in an emulator after applying only the IDE's minimum compatibility bridge:
+
+- Android Gradle Plugin 7.0.4 → 7.1.3.
+- Gradle wrapper 7.0.2 → 7.2.
+- Kotlin remained at 1.6.10.
+- Gradle continued to run on JDK 11.
+- Compile SDK remained 31 and target SDK remained 30.
+
+The historical AGP 7.0.4/Gradle 7.0.2 build was also verified before the bridge: debug compilation, unit tests, lint, APK installation, cold launch on Android 13/API 33, and the existing instrumentation test all succeeded. This confirms that later modernization failures should be treated as upgrade regressions rather than unresolved baseline failures.
 
 ## Project summary
 
@@ -41,6 +53,10 @@ The implementation uses classic Android Views rather than Jetpack Compose. It ha
 | --- | --- |
 | Application ID | `com.example.tasknotifier` |
 | Version | `0.0.3` (`versionCode` 3) |
+| Android Gradle Plugin | 7.1.3 |
+| Gradle wrapper | 7.2 |
+| Kotlin | 1.6.10 |
+| Gradle runtime JDK | JDK 11 |
 | Minimum SDK | API 16 / Android 4.1 |
 | Compile SDK | API 31 |
 | Target SDK | API 30 |
@@ -52,6 +68,33 @@ The implementation uses classic Android Views rather than Jetpack Compose. It ha
 The target SDK is the most important platform gap. Starting August 31, 2026, Google Play requires new applications and application updates to target Android 16 / API 36. The current application targets API 30.
 
 Reference: [Google Play target API requirements](https://support.google.com/googleplay/android-developer/answer/11926878?hl=en-AU)
+
+## Notification correctness fixes implemented
+
+Two notification defects were addressed on August 8, 2026 without changing the Gradle, Kotlin, compile SDK, or target SDK baseline.
+
+### Persistent-until-acknowledged task notifications
+
+Android 14 and later allow users to dismiss ordinary ongoing notifications by swiping them individually. `setOngoing(true)` therefore cannot provide the old non-dismissible behavior on current Android versions.
+
+Task Notifier now attaches a task-specific notification `deleteIntent`. If a user swipes an ongoing task notification away, `NotificationDismissedBroadcastReceiver` re-queries Room and silently posts it again only when that exact task still exists and has `inProgress == true`. Pressing **Remove this Notification** first turns off the database flag and then cancels the notification; deleting a task also cancels its notification. This preserves the product's persistent-until-acknowledged behavior while respecting the platform dismissal event.
+
+This is best-effort persistence, not a way to override system control. A user can still disable notification permission or channels, force-stop the app, or otherwise prevent reposting.
+
+Reference: [Android 14 changes to non-dismissible notifications](https://developer.android.com/about/versions/14/behavior-changes-all#non-dismissable-notifications)
+
+### Exact task routing from notification taps
+
+Each task notification now uses:
+
+- Its database ID as the pending-intent request code.
+- A unique data URI in the form `task-notifier://task/{id}`.
+- `FLAG_UPDATE_CURRENT` and `FLAG_IMMUTABLE` where supported.
+- `TaskStackBuilder.addNextIntentWithParentStack()` with `MainActivity` declared as the detail activity's parent.
+
+`ActivityViewTask` also processes replacement intents in `onNewIntent()` and redraws every field from the newly selected DB row. This covers both cold launches and taps received while a detail activity is already open.
+
+Regression tests now create temporary Room tasks and verify that two notifications open their respective task rows and that the dismissal callback restores only an active task notification.
 
 ## Areas requiring changes before a target SDK upgrade
 
@@ -93,9 +136,7 @@ Reference: [Notification runtime permission](https://developer.android.com/devel
 
 ### PendingIntent mutability
 
-The alarm pending intents correctly add `FLAG_IMMUTABLE` on Android 6.0 and later. However, the activity pending intents created by `TaskStackBuilder` in `MyNotificationManager` use only `FLAG_CANCEL_CURRENT`.
-
-Apps targeting API 31 or later must explicitly specify whether each pending intent is mutable or immutable. These notification pending intents appear not to require mutation and should normally be immutable.
+The alarm and notification pending intents now add `FLAG_IMMUTABLE` on Android 6.0 and later. This prerequisite is complete for the currently identified pending-intent call sites. Re-check all call sites when targeting API 31 or later and when introducing any new pending intents.
 
 ### Back navigation
 
@@ -150,15 +191,9 @@ The root build uses a `buildscript` classpath and `allprojects.repositories`. A 
 
 This is not necessarily an immediate runtime problem, but modernizing it reduces upgrade friction and makes plugin resolution more predictable.
 
-### Legacy Gradle properties
+### Gradle behavior changes
 
-The project explicitly restores older Android build behavior through:
-
-- `android.defaults.buildfeatures.buildconfig=true`
-- `android.nonTransitiveRClass=false`
-- `android.nonFinalResIds=false`
-
-These settings should be reviewed instead of copied automatically into a modern build. If production code does not require the old behavior, remove them and use current defaults. If a setting is still necessary, document why.
+The current `gradle.properties` does not override BuildConfig or R-class behavior. During AGP upgrades, adopt the newer defaults where the source permits it. Do not add compatibility flags such as `android.defaults.buildfeatures.buildconfig`, `android.nonTransitiveRClass`, or `android.nonFinalResIds` merely to silence an upgrade warning; introduce one only when a verified source requirement exists and document why.
 
 ## Other high-risk implementation areas
 
@@ -193,10 +228,10 @@ Recommended direction:
 The notification code should be reviewed for:
 
 - Notification permission state before posting.
-- Correct immutable pending-intent flags.
-- Unique task-stack behavior.
 - Channel-specific behavior, because importance, vibration, and sound are controlled by channels on Android 8.0+.
 - A valid monochrome small notification icon rather than the launcher background asset.
+
+Immutable notification pending intents and task-specific tap/back-stack behavior have now been implemented and covered by emulator regression tests.
 
 There is also an apparent channel configuration defect in `AppStartup`: properties intended for `silentChannel` are applied to `channel` after `silentChannel` is constructed.
 
@@ -245,4 +280,4 @@ When modernization work begins, verify at least:
 
 ## Analysis scope
 
-This report was produced through static inspection. No application source, Gradle configuration, manifest, or dependency versions were changed as part of the analysis, and no Gradle build or lint task was run.
+This report combines static source inspection with baseline build and emulator verification. The initial baseline verification changed only the minimal AGP 7.1.3 and Gradle 7.2 compatibility bridge required by Panda 4. Subsequent notification correctness work changed the notification manager, task-detail handling, manifest receiver/parent declarations, task deletion cleanup, and focused instrumentation tests; it did not change Gradle, Kotlin, SDK, or dependency versions.

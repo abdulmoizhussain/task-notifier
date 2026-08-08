@@ -34,8 +34,14 @@
             android:name=".broadcast_receivers.SendNotificationBroadcastReceiver"
             android:enabled="true"
             android:exported="false" />
+        <receiver
+            android:name=".broadcast_receivers.NotificationDismissedBroadcastReceiver"
+            android:enabled="true"
+            android:exported="false" />
 
-        <activity android:name=".ActivityViewTask" />
+        <activity
+            android:name=".ActivityViewTask"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ActivityAddTask"
             android:windowSoftInputMode="adjustResize" />

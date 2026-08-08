@@ -4,6 +4,7 @@ import android.content.Intent
 import java.util.*
 
 object Constants {
+    const val INTENT_ACTION_NOTIFICATION_DISMISSED = "com.example.tasknotifier.NOTIFICATION_DISMISSED"
     const val INTENT_EXTRA_TASK_ID = "INTENT_EXTRA_TASK_ID"
     const val INTENT_EXTRA_CONTENT_TITLE = "INTENT_EXTRA_CONTENT_TITLE"
     const val INTENT_EXTRA_DESCRIPTION = "INTENT_EXTRA_DESCRIPTION"

@@ -6,15 +6,63 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.Uri
+import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import com.example.tasknotifier.ActivityViewTask
-import com.example.tasknotifier.MainActivity
 import com.example.tasknotifier.R
+import com.example.tasknotifier.broadcast_receivers.NotificationDismissedBroadcastReceiver
 import com.example.tasknotifier.common.Constants
 
 class MyNotificationManager {
     companion object {
+        private fun pendingIntentFlags(): Int {
+            var flags = PendingIntent.FLAG_UPDATE_CURRENT
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                flags = flags or PendingIntent.FLAG_IMMUTABLE
+            }
+            return flags
+        }
+
+        private fun createTaskContentIntent(context: Context, taskId: Int): PendingIntent {
+            val detailIntent = Intent(context, ActivityViewTask::class.java).apply {
+                action = Intent.ACTION_VIEW
+                data = Uri.parse("task-notifier://task/$taskId")
+                putExtra(Constants.INTENT_EXTRA_TASK_ID, taskId)
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            }
+
+            return requireNotNull(
+                TaskStackBuilder.create(context)
+                    .addNextIntentWithParentStack(detailIntent)
+                    .getPendingIntent(taskId, pendingIntentFlags())
+            )
+        }
+
+        private fun createDismissIntent(context: Context, taskId: Int): PendingIntent {
+            val dismissIntent = Intent(context, NotificationDismissedBroadcastReceiver::class.java).apply {
+                action = Constants.INTENT_ACTION_NOTIFICATION_DISMISSED
+                data = Uri.parse("task-notifier://notification/$taskId/dismissed")
+                putExtra(Constants.INTENT_EXTRA_TASK_ID, taskId)
+            }
+
+            return PendingIntent.getBroadcast(context, taskId, dismissIntent, pendingIntentFlags())
+        }
+
+        private fun makePersistentUntilAcknowledged(
+            builder: NotificationCompat.Builder,
+            context: Context,
+            notificationId: Int,
+            onGoing: Boolean
+        ) {
+            if (onGoing) {
+                builder.setOngoing(true)
+                builder.setAutoCancel(false)
+                builder.setDeleteIntent(createDismissIntent(context, notificationId))
+            }
+        }
+
         fun notifyWithUnClickable(
             context: Context,
             notificationId: Int,
@@ -34,10 +82,7 @@ class MyNotificationManager {
             builder.setSilent(true)
             builder.setDefaults(0)
 
-            if (onGoing) {
-                builder.setOngoing(onGoing)
-                builder.setAutoCancel(false)
-            }
+            makePersistentUntilAcknowledged(builder, context, notificationId, onGoing)
 
             builder.setWhen(setWhen)
             builder.setShowWhen(true)
@@ -56,17 +101,7 @@ class MyNotificationManager {
             setWhen: Long,
             onGoing: Boolean
         ) {
-            val pendingIntent: PendingIntent = Intent(context, ActivityViewTask::class.java).let { intentMainActivity ->
-
-                // TODO PUT EXTRAS DYNAMICALLY...
-                intentMainActivity.putExtra(Constants.INTENT_EXTRA_TASK_ID, notificationId)
-
-                val taskStackBuilder = TaskStackBuilder.create(context)
-                taskStackBuilder.addParentStack(MainActivity::class.java)
-                taskStackBuilder.addNextIntent(intentMainActivity)
-
-                taskStackBuilder.getPendingIntent(notificationId, PendingIntent.FLAG_CANCEL_CURRENT) as PendingIntent
-            }
+            val pendingIntent = createTaskContentIntent(context, notificationId)
 
             val builder = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_SILENT)
             builder.setContentTitle(contentTitle)
@@ -84,10 +119,7 @@ class MyNotificationManager {
             // TODO remove notification after some time, to show start of the service
 //            builder.setTimeoutAfter(10000)
 
-            if (onGoing) {
-                builder.setOngoing(onGoing)
-                builder.setAutoCancel(false)
-            }
+            makePersistentUntilAcknowledged(builder, context, notificationId, onGoing)
 
             builder.setWhen(setWhen)
             builder.setShowWhen(true)
@@ -106,17 +138,7 @@ class MyNotificationManager {
             setWhen: Long,
             onGoing: Boolean
         ) {
-            val pendingIntent: PendingIntent = Intent(context, ActivityViewTask::class.java).let { intentMainActivity ->
-
-                // TODO PUT EXTRAS DYNAMICALLY...
-                intentMainActivity.putExtra(Constants.INTENT_EXTRA_TASK_ID, notificationId)
-
-                val taskStackBuilder = TaskStackBuilder.create(context)
-                taskStackBuilder.addParentStack(MainActivity::class.java)
-                taskStackBuilder.addNextIntent(intentMainActivity)
-
-                taskStackBuilder.getPendingIntent(notificationId, PendingIntent.FLAG_CANCEL_CURRENT) as PendingIntent
-            }
+            val pendingIntent = createTaskContentIntent(context, notificationId)
 
             val builder = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_DEFAULT)
             builder.setContentTitle(contentTitle)
@@ -137,10 +159,7 @@ class MyNotificationManager {
             // TODO remove notification after some time, to show start of the service
 //            builder.setTimeoutAfter(10000)
 
-            if (onGoing) {
-                builder.setOngoing(onGoing)
-                builder.setAutoCancel(false)
-            }
+            makePersistentUntilAcknowledged(builder, context, notificationId, onGoing)
 
             builder.setWhen(setWhen)
             builder.setShowWhen(true)
