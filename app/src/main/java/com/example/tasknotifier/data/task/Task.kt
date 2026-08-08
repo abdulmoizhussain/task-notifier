@@ -1,6 +1,7 @@
 package com.example.tasknotifier.data.task
 
 import androidx.room.Entity
+import androidx.room.ColumnInfo
 import androidx.room.PrimaryKey
 import com.example.tasknotifier.common.TaskStatusEnum
 import org.json.JSONObject
@@ -21,8 +22,14 @@ data class Task(var description: String = "") {
     var sentCount: Int = 0
     var status: TaskStatusEnum = TaskStatusEnum.On
     var inProgress: Boolean = false
+    @ColumnInfo(defaultValue = "0")
+    var dateCreated: Long = 0
+    @ColumnInfo(defaultValue = "0")
+    var dateModified: Long = 0
 
     fun toJsonObject(): JSONObject {
+        // TODO When import/export is implemented, include dateCreated and dateModified,
+        //      while treating absent values in legacy imports as unknown (0).
         val result = JSONObject()
         result.put("id", this.id)
         result.put("dateTime", this.dateTime)

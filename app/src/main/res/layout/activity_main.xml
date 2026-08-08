@@ -32,7 +32,7 @@
         android:minWidth="0dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:text="@string/label_order_latest_button"
+        android:text="@string/label_order_latest_created"
         android:textAllCaps="false"
         android:textColor="@color/text_secondary"
         android:textSize="13sp"

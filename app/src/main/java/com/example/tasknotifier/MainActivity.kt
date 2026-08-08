@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasknotifier.android_services.TaskNotifierAndroidService
 import com.example.tasknotifier.common.Constants
+import com.example.tasknotifier.data.task.TaskOrder
 import com.example.tasknotifier.listadapters.ListAdapter
 import com.example.tasknotifier.services.TaskService
 import com.example.tasknotifier.viewmodels.TaskViewModel
@@ -23,7 +24,17 @@ import org.json.JSONArray
 
 
 class MainActivity : AppCompatActivity() {
+    companion object {
+        private const val MAIN_UI_PREFERENCES = "main_ui_preferences"
+        private const val TASK_ORDER_KEY = "task_order"
+        private const val ORDER_MENU_GROUP = 1
+        private const val ORDER_LATEST_CREATED_ID = 101
+        private const val ORDER_RECENTLY_MODIFIED_ID = 102
+    }
+
     private lateinit var taskViewModel: TaskViewModel
+    private lateinit var buttonOrderBy: Button
+    private var selectedTaskOrder = TaskOrder.LATEST_CREATED
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,28 +137,79 @@ class MainActivity : AppCompatActivity() {
 
         // ViewModel
         taskViewModel = ViewModelProvider(this)[TaskViewModel::class.java]
+        selectedTaskOrder = loadTaskOrder()
+        taskViewModel.setTaskOrder(selectedTaskOrder)
         taskViewModel.readAllData.observe(this) { tasks ->
             recyclerViewListAdapter.setData(tasks)
             findViewById<View>(R.id.emptyState).visibility = if (tasks.isEmpty()) View.VISIBLE else View.GONE
         }
 
         findViewById<Button>(R.id.buttonAddNewTask).setOnClickListener { onCliCkGoToAddUser() }
-        findViewById<Button>(R.id.buttonOrderBy).setOnClickListener { showOrderByMenu(it) }
+        buttonOrderBy = findViewById(R.id.buttonOrderBy)
+        updateOrderButtonLabel()
+        buttonOrderBy.setOnClickListener { showOrderByMenu(it) }
     }
 
     private fun showOrderByMenu(anchor: View) {
         PopupMenu(this, anchor).apply {
-            menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.label_order_latest).apply {
+            menu.add(
+                ORDER_MENU_GROUP,
+                ORDER_LATEST_CREATED_ID,
+                Menu.NONE,
+                R.string.label_order_latest_created,
+            ).apply {
                 isCheckable = true
-                isChecked = true
+                isChecked = selectedTaskOrder == TaskOrder.LATEST_CREATED
             }
-            menu.setGroupCheckable(Menu.NONE, true, true)
+            menu.add(
+                ORDER_MENU_GROUP,
+                ORDER_RECENTLY_MODIFIED_ID,
+                Menu.NONE,
+                R.string.label_order_recently_modified,
+            ).apply {
+                isCheckable = true
+                isChecked = selectedTaskOrder == TaskOrder.RECENTLY_MODIFIED
+            }
+            menu.setGroupCheckable(ORDER_MENU_GROUP, true, true)
             setOnMenuItemClickListener { menuItem ->
-                menuItem.isChecked = true
+                val selectedOrder = when (menuItem.itemId) {
+                    ORDER_LATEST_CREATED_ID -> TaskOrder.LATEST_CREATED
+                    ORDER_RECENTLY_MODIFIED_ID -> TaskOrder.RECENTLY_MODIFIED
+                    else -> return@setOnMenuItemClickListener false
+                }
+                selectTaskOrder(selectedOrder)
                 true
             }
             show()
         }
+    }
+
+    private fun selectTaskOrder(order: TaskOrder) {
+        selectedTaskOrder = order
+        taskViewModel.setTaskOrder(order)
+        getSharedPreferences(MAIN_UI_PREFERENCES, MODE_PRIVATE)
+            .edit()
+            .putString(TASK_ORDER_KEY, order.name)
+            .apply()
+        updateOrderButtonLabel()
+    }
+
+    private fun loadTaskOrder(): TaskOrder {
+        val savedOrder = getSharedPreferences(MAIN_UI_PREFERENCES, MODE_PRIVATE)
+            .getString(TASK_ORDER_KEY, null)
+        return try {
+            if (savedOrder == null) TaskOrder.LATEST_CREATED else TaskOrder.valueOf(savedOrder)
+        } catch (_: IllegalArgumentException) {
+            TaskOrder.LATEST_CREATED
+        }
+    }
+
+    private fun updateOrderButtonLabel() {
+        val orderLabel = when (selectedTaskOrder) {
+            TaskOrder.LATEST_CREATED -> R.string.label_order_latest_created
+            TaskOrder.RECENTLY_MODIFIED -> R.string.label_order_recently_modified
+        }
+        buttonOrderBy.text = getString(R.string.label_order_by_value, getString(orderLabel))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

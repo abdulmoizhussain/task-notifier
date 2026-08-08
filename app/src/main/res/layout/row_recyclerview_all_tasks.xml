@@ -27,7 +27,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:maxLines="2"
+            android:maxLines="4"
             android:text="@string/label_null"
             android:textColor="@color/text_primary"
             android:textSize="17sp"

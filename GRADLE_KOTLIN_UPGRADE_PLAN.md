@@ -99,7 +99,7 @@ Keep target SDK 30 initially. Implement upgrade-sensitive changes while existing
 6. Prepare notification runtime-permission handling without raising the target SDK yet.
 7. Prepare exact-alarm access checks and denial behavior.
 8. Add window-inset/IME handling for modern edge-to-edge behavior.
-9. Enable Room schema export and add migration tests before changing Room.
+9. Enable Room schema export and add migration tests before changing Room. **Completed August 9, 2026:** schema version 2 has committed version 1/version 2 schemas and a verified non-destructive migration.
 
 Detailed reasoning is in [`ANALYSIS.md`](ANALYSIS.md#areas-requiring-changes-before-a-target-sdk-upgrade).
 

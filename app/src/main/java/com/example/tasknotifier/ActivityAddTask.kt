@@ -47,6 +47,7 @@ class ActivityAddTask : AppCompatActivity() {
     private var selectedRepeat: Int = 0
     private var selectedStopAfter: Int = 0
     private var taskDbId: Int = 0
+    private var taskDateCreated: Long = 0
     private lateinit var taskViewModel: TaskViewModel
     private lateinit var editTextDescription: EditText
 
@@ -98,6 +99,7 @@ class ActivityAddTask : AppCompatActivity() {
                         setOneHourLaterDateTime()
                     } else {
                         editTextDescription.setText(task.description)
+                        taskDateCreated = task.dateCreated
 
                         val calendar = Calendar.getInstance().apply { timeInMillis = task.dateTime }
 
@@ -166,11 +168,14 @@ class ActivityAddTask : AppCompatActivity() {
 
             val triggerAtMillis = calendar.timeInMillis
             val description = editTextDescription.text.toString()
+            val modifiedAt = System.currentTimeMillis()
 
             val task = Task(description)
             task.dateTime = triggerAtMillis
             task.repeat = selectedRepeat
             task.stopAfter = selectedStopAfter
+            task.dateCreated = if (taskDbId > 0) taskDateCreated else modifiedAt
+            task.dateModified = modifiedAt
             task
         }
 
@@ -481,6 +486,7 @@ class ActivityAddTask : AppCompatActivity() {
                     Toast.makeText(this@ActivityAddTask, "Task with id: $taskDbId not found.", Toast.LENGTH_LONG).show()
                 } else {
                     task.status = TaskStatusEnum.Off
+                    task.dateModified = System.currentTimeMillis()
 
                     taskViewModel.updateOneAsync(task)
 
@@ -517,10 +523,12 @@ class ActivityAddTask : AppCompatActivity() {
         runBlocking {
             launch {
                 val description = editTextDescription.text.toString()
+                val modifiedAt = System.currentTimeMillis()
 
                 var task: Task? = if (taskDbId > 0) taskViewModel.getOneByIdAsync(taskDbId) else null
                 if (task == null) {
                     task = Task()
+                    task.dateCreated = modifiedAt
                 }
 
                 task.description = description
@@ -529,10 +537,11 @@ class ActivityAddTask : AppCompatActivity() {
                 task.stopAfter = selectedStopAfter
                 task.inProgress = true
                 task.sentCount += 1
+                task.dateModified = modifiedAt
 
                 if (taskDbId > 0) {
                     task.id = taskDbId
-                    taskViewModel.updateOne(task)
+                    taskViewModel.updateOneAsync(task)
                 } else {
                     task.status = TaskStatusEnum.Off
                     taskDbId = taskViewModel.addOneAsync(task).toInt()

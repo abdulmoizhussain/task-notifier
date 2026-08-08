@@ -1,6 +1,6 @@
 # Task Notifier Project Analysis
 
-Analysis date: August 8, 2026
+Analysis refreshed: August 9, 2026
 
 This document records the current project analysis after restoring and verifying the legacy application. The Gradle and Kotlin modernization proposal is maintained separately in [`GRADLE_KOTLIN_UPGRADE_PLAN.md`](GRADLE_KOTLIN_UPGRADE_PLAN.md).
 
@@ -61,7 +61,7 @@ The implementation uses classic Android Views rather than Jetpack Compose. It ha
 | Compile SDK | API 31 |
 | Target SDK | API 30 |
 | Java source/target compatibility | Java 8 |
-| Database | Room 2.4.0 |
+| Database | Room 2.4.0, schema version 2 |
 | Lifecycle | Lifecycle 2.4.0 plus `lifecycle-extensions` 2.2.0 |
 | Coroutines | 1.5.2 |
 
@@ -114,15 +114,26 @@ Reference: [Android notification behavior and grouping](https://developer.androi
 
 ## UI and UX refresh implemented
 
-The existing XML/View interface was refreshed on August 8, 2026 without changing task storage, scheduling, or Gradle/Kotlin versions. The work intentionally prioritizes clarity over decoration:
+The existing XML/View interface was refreshed through August 9, 2026 without changing the Gradle/Kotlin versions. The work intentionally prioritizes clarity over decoration:
 
-- The main screen now has a clear heading, an **Order by: Latest** control, card-based tappable rows, concise dates without seconds, status chips, a strong add-reminder action, and an empty state. The current ordering uses the scheduled reminder time in descending order, with the database ID used only as a deterministic tie-breaker when scheduled times match.
+- The main screen now has a clear heading, card-based tappable rows, up to four lines of task details, concise dates without seconds, status chips, a strong add-reminder action, and an empty state.
+- Its order control offers exactly **Latest created** and **Recently modified**. The choice is retained in app preferences. Both queries sort their timestamp descending and use database ID descending only as a deterministic tie-breaker.
 - New and edited reminders share a consistent form with clearer field grouping, larger touch targets, visible selection affordances, explicit action wording, and edit-only turn-off/delete controls.
 - The notification detail screen presents task information in one readable card and explains the difference between acknowledging the active notification and editing the reminder.
 - The theme now uses a restrained indigo/neutral palette, consistent surfaces, outlines, spacing, button hierarchy, and text contrast.
 - New XML resources retain compatibility with the existing API 16 minimum.
 
-Emulator QA covered the populated main list and both new/edit form states. Build, unit tests, and lint pass. Seven Android instrumentation tests also pass when invoked directly through ADB; the AGP 7.1 Gradle UTP wrapper can abort on the newer emulator runtime because of a protobuf tooling conflict, which is separate from application behavior.
+Emulator QA covered the populated main list, both order options, four-line task details, and both new/edit form states. Build, unit tests, and lint pass. Ten Android instrumentation tests also pass when invoked directly through ADB; the AGP 7.1 Gradle UTP wrapper can abort on the newer emulator runtime because of a protobuf tooling conflict, which is separate from application behavior.
+
+## Task date metadata and ordering
+
+Room schema version 2 adds non-null `dateCreated` and `dateModified` epoch-millisecond columns. New reminders initialize both values from one clock reading. User-driven content or scheduling changes preserve `dateCreated` and advance `dateModified`; alarm delivery and notification acknowledgement preserve both because they are system state transitions rather than user edits.
+
+The version 1 to 2 migration is non-destructive and retains every existing reminder. Legacy rows receive `0` for both timestamps because their true historical dates cannot be reconstructed reliably. Consequently, legacy-only rows retain a deterministic database-ID-descending order until the user edits them; no scheduled date or ID is misrepresented as a creation date.
+
+Schema export is enabled and both version 1 and version 2 schema JSON files are committed for migration validation. An instrumentation migration test creates a version 1 database, migrates it to version 2, verifies every legacy field, and confirms both new values use the documented zero sentinel. Destructive fallback is not enabled.
+
+Import/export remains intentionally unimplemented. A source TODO records that future serialized data must include both timestamps while treating absent values in legacy imports as unknown (`0`).
 
 ## Areas requiring changes before a target SDK upgrade
 
@@ -269,12 +280,7 @@ There is also an apparent channel configuration defect in `AppStartup`: properti
 
 ### Room schema management and backup
 
-The Room database uses version 1 with `exportSchema = false`. Before changing entities or updating Room:
-
-- Enable schema export.
-- Commit schema files.
-- Add migration tests.
-- Decide whether destructive fallback is acceptable; it normally is not for user reminder data.
+The database is now at schema version 2 with schema export, committed version 1/version 2 schemas, and a non-destructive migration test. Continue this pattern for every future entity change, and do not introduce destructive fallback for user reminder data.
 
 The manifest enables application backup. Modern backup/data-extraction rules should explicitly define whether reminder data is backed up, restored, or excluded.
 
@@ -308,4 +314,4 @@ When modernization work begins, verify at least:
 
 ## Analysis scope
 
-This report combines static source inspection with baseline build and emulator verification. The initial baseline verification changed only the minimal AGP 7.1.3 and Gradle 7.2 compatibility bridge required by Panda 4. Subsequent notification correctness work changed the notification manager, task-detail handling, manifest receiver/parent declarations, task deletion cleanup, and focused instrumentation tests; it did not change Gradle, Kotlin, SDK, or dependency versions.
+This report combines static source inspection with baseline build and emulator verification. The initial baseline verification changed only the minimal AGP 7.1.3 and Gradle 7.2 compatibility bridge required by Panda 4. Subsequent notification correctness, Room version 2, ordering, and UI work did not change Gradle, Kotlin, SDK, or dependency versions. The only build-script addition for the database work configures Room schema export and exposes those schemas to migration tests.

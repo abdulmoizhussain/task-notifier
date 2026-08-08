@@ -15,8 +15,9 @@ Task Notifier is a native Android reminder app for creating one-time or repeatin
 - Restore scheduled tasks and active notifications after boot, time changes, or timezone changes.
 - Restore an ongoing task notification after it is swiped away while the task still awaits acknowledgement.
 - Open the exact task associated with each notification, including when another task detail screen is already open.
-- Use a card-based reminder list with clear status indicators, concise scheduling information, an empty state, an order control (currently **Latest**, by scheduled reminder time), and streamlined create/edit/detail forms.
-- Persist task data locally with Room.
+- Use a card-based reminder list with clear status indicators, up to four lines of task details, concise scheduling information, an empty state, and streamlined create/edit/detail forms.
+- Order reminders by **Latest created** or **Recently modified** and retain the selected order across app launches.
+- Persist task data and its creation/modification timestamps locally with Room.
 - Use separate default and silent notification channels on Android 8.0 and later.
 
 ## Current project configuration
@@ -71,6 +72,7 @@ The project is a single Android application module built with Kotlin and XML lay
 ## Known limitations
 
 - Export and import options are visible in the menu but are not implemented.
+- Import/export timestamp compatibility is intentionally deferred; a future implementation must preserve creation/modification dates and accept legacy data without them.
 - The current target SDK is API 30, so the project needs modernization before publishing an update under current Google Play target API requirements.
 - Newer Android versions impose notification, exact-alarm, and background-service requirements that the current implementation does not yet fully handle.
 - On Android 14 and later, ongoing notifications are system-dismissible. The app re-posts a swiped active task notification as a best-effort persistence mechanism, but users can still disable notifications or force-stop the app.
@@ -83,6 +85,5 @@ The project is a single Android application module built with Kotlin and XML lay
 ## TODO / future work
 
 - Test thoroughly for lifecycle-related leaks and retained activity/service references.
-- Prevent notification grouping for this app.
-- Add a 3-dots toggle option for: `Use 24-hour time`. 
+- Add a 3-dots toggle option for: `Use 24-hour time`.
 - Test alarm reliability under Android Doze, battery optimization, and manufacturer-specific background restrictions.

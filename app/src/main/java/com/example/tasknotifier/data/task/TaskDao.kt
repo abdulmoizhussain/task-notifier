@@ -26,8 +26,11 @@ interface TaskDao {
     @Query("SELECT * FROM task_table where id=:id")
     suspend fun getOneByIdAsync(id: Int): Task?
 
-    @Query("SELECT * FROM task_table ORDER BY dateTime DESC, id DESC")
-    fun readAllData(): LiveData<List<Task>>
+    @Query("SELECT * FROM task_table ORDER BY dateCreated DESC, id DESC")
+    fun readAllByDateCreated(): LiveData<List<Task>>
+
+    @Query("SELECT * FROM task_table ORDER BY dateModified DESC, id DESC")
+    fun readAllByDateModified(): LiveData<List<Task>>
 
     @Query("SELECT * FROM task_table ORDER BY id ASC")
     suspend fun readAllAsync(): List<Task>

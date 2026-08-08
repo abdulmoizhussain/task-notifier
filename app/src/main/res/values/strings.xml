@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Task Notifier</string>
     <string name="label_null">null</string>
-    <string name="label_remove_this_notification">Acknowledge &amp; remove</string>
+    <string name="label_remove_this_notification">Mark complete &amp; remove</string>
     <string name="label_edit_task">Edit Task</string>
     <string name="label_button_on">Save &amp; schedule</string>
     <string name="label_button_off">Turn off scheduling</string>
@@ -28,8 +28,9 @@
     <string name="error_task_description">Oops!\nTask description is empty. Please write a description.</string>
     <string name="error_empty_msg">Oops!\nThe message is empty. Please write a message.</string>
     <string name="label_your_reminders">Your reminders</string>
-    <string name="label_order_latest_button">Order by: Latest</string>
-    <string name="label_order_latest">Latest</string>
+    <string name="label_order_by_value">Order by: %1$s</string>
+    <string name="label_order_latest_created">Latest created</string>
+    <string name="label_order_recently_modified">Recently modified</string>
     <string name="label_no_tasks">No reminders yet</string>
     <string name="message_no_tasks">Add your first reminder to get started.</string>
     <string name="label_schedule">Schedule</string>
@@ -38,7 +39,7 @@
     <string name="title_edit_reminder">Edit reminder</string>
     <string name="title_reminder_details">Reminder details</string>
     <string name="content_description_open_task">Open task details</string>
-    <string name="message_acknowledge">Stops the active notification. The reminder stays in your task list.</string>
+    <string name="message_acknowledge">Removes the active notification. The reminder entry stays in your task list.</string>
     <string name="navigation_chevron">›</string>
     <string-array name="repeat_values">
         <item>None</item>

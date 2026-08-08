@@ -8,6 +8,8 @@ import android.view.View
 import android.widget.Button
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
@@ -31,6 +33,8 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class NotificationBehaviorInstrumentedTest {
@@ -134,6 +138,8 @@ class NotificationBehaviorInstrumentedTest {
     fun turningOffSchedulingCancelsAlarmButKeepsActiveNotification() {
         val task = createTask("Turn off scheduling test").apply {
             dateTime = System.currentTimeMillis() + 10 * 60_000
+            dateCreated = 123
+            dateModified = 456
             status = TaskStatusEnum.On
             inProgress = true
         }
@@ -157,6 +163,8 @@ class NotificationBehaviorInstrumentedTest {
         val persistedTask = runBlocking { taskDao.getOneByIdAsync(task.id) }
         assertNotNull(persistedTask)
         assertEquals(TaskStatusEnum.Off, persistedTask?.status)
+        assertEquals(123L, persistedTask?.dateCreated)
+        assertTrue("Turning off scheduling did not update dateModified", (persistedTask?.dateModified ?: 0) > 456)
         assertTrue("Turning off scheduling changed in-progress state", persistedTask?.inProgress == true)
         assertTrue("The future alarm still exists", MyAlarmManager.isAlarmOff(context, task.id))
         assertTrue(
@@ -233,6 +241,57 @@ class NotificationBehaviorInstrumentedTest {
         )
     }
 
+    @Test
+    fun taskOrderingUsesCreatedAndModifiedTimestamps() {
+        val firstTask = createTask("Ordering metadata test A").apply {
+            dateCreated = 100
+            dateModified = 300
+        }
+        val secondTask = createTask("Ordering metadata test B").apply {
+            dateCreated = 200
+            dateModified = 150
+        }
+        runBlocking {
+            taskDao.updateOneAsync(firstTask)
+            taskDao.updateOneAsync(secondTask)
+        }
+
+        val relevantIds = setOf(firstTask.id, secondTask.id)
+        val createdOrder = liveDataValue(taskDao.readAllByDateCreated())
+            .filter { it.id in relevantIds }
+            .map { it.id }
+        val modifiedOrder = liveDataValue(taskDao.readAllByDateModified())
+            .filter { it.id in relevantIds }
+            .map { it.id }
+
+        assertEquals(listOf(secondTask.id, firstTask.id), createdOrder)
+        assertEquals(listOf(firstTask.id, secondTask.id), modifiedOrder)
+    }
+
+    @Test
+    fun alarmDrivenUpdatePreservesCreationAndModificationDates() {
+        val task = createTask("Alarm metadata preservation test").apply {
+            dateCreated = 111
+            dateModified = 222
+            dateTime = System.currentTimeMillis() + 60_000
+            status = TaskStatusEnum.On
+        }
+        runBlocking {
+            taskDao.updateOneAsync(task)
+            taskDao.updateAfterAlarmIfStatusAsync(
+                task.id,
+                task.dateTime + 60_000,
+                task.sentCount + 1,
+                TaskStatusEnum.On,
+            )
+        }
+
+        val updatedTask = runBlocking { taskDao.getOneByIdAsync(task.id) }
+        assertNotNull(updatedTask)
+        assertEquals(111L, updatedTask?.dateCreated)
+        assertEquals(222L, updatedTask?.dateModified)
+    }
+
     private fun createTask(description: String): Task {
         val task = Task(description).apply {
             dateTime = System.currentTimeMillis()
@@ -297,6 +356,21 @@ class NotificationBehaviorInstrumentedTest {
                 .firstOrNull()
         }
         return resumedActivity
+    }
+
+    private fun <T> liveDataValue(liveData: LiveData<T>): T {
+        val latch = CountDownLatch(1)
+        var value: T? = null
+        val observer = Observer<T> { emittedValue ->
+            value = emittedValue
+            latch.countDown()
+        }
+
+        instrumentation.runOnMainSync { liveData.observeForever(observer) }
+        assertTrue("LiveData did not emit", latch.await(3, TimeUnit.SECONDS))
+        instrumentation.runOnMainSync { liveData.removeObserver(observer) }
+
+        return checkNotNull(value)
     }
 
     private fun waitUntil(timeoutMillis: Long = 3000, condition: () -> Boolean): Boolean {

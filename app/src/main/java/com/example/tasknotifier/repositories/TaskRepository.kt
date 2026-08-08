@@ -4,10 +4,16 @@ import androidx.lifecycle.LiveData
 import com.example.tasknotifier.common.TaskStatusEnum
 import com.example.tasknotifier.data.task.Task
 import com.example.tasknotifier.data.task.TaskDao
+import com.example.tasknotifier.data.task.TaskOrder
 
 class TaskRepository(private val taskDao: TaskDao) {
 
-    val readAllData: LiveData<List<Task>> = taskDao.readAllData()
+    fun readAllData(order: TaskOrder): LiveData<List<Task>> {
+        return when (order) {
+            TaskOrder.LATEST_CREATED -> taskDao.readAllByDateCreated()
+            TaskOrder.RECENTLY_MODIFIED -> taskDao.readAllByDateModified()
+        }
+    }
 
     suspend fun getAllAsync(): List<Task> {
         return taskDao.readAllAsync()
