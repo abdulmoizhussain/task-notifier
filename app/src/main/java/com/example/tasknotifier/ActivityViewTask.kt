@@ -18,6 +18,7 @@ class ActivityViewTask : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_task)
+        title = getString(R.string.title_reminder_details)
 
         findViewById<Button>(R.id.buttonEditThisTask).setOnClickListener { onClickEditThisTask() }
         findViewById<Button>(R.id.buttonRemoveThisNotification).setOnClickListener { onClickRemoveThisNotification() }

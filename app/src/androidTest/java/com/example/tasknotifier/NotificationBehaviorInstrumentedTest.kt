@@ -2,6 +2,8 @@ package com.example.tasknotifier
 
 import android.app.NotificationManager
 import android.content.Context
+import android.view.View
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -51,9 +53,14 @@ class NotificationBehaviorInstrumentedTest {
 
         val firstContentIntent = activeNotification(firstTask.id).notification.contentIntent
         val secondContentIntent = activeNotification(secondTask.id).notification.contentIntent
+        val firstGroup = activeNotification(firstTask.id).notification.group
+        val secondGroup = activeNotification(secondTask.id).notification.group
         assertNotNull(firstContentIntent)
         assertNotNull(secondContentIntent)
         assertNotEquals(firstContentIntent, secondContentIntent)
+        assertEquals("${Constants.NOTIFICATION_GROUP_TASK_PREFIX}.${firstTask.id}", firstGroup)
+        assertEquals("${Constants.NOTIFICATION_GROUP_TASK_PREFIX}.${secondTask.id}", secondGroup)
+        assertNotEquals(firstGroup, secondGroup)
 
         firstContentIntent.send()
         assertDisplayedTask(firstTask)
@@ -77,6 +84,35 @@ class NotificationBehaviorInstrumentedTest {
             "The active task notification was not restored after dismissal",
             waitUntil { notificationManager.activeNotifications.any { it.id == task.id } }
         )
+    }
+
+    @Test
+    fun longTaskDetailsCanScroll() {
+        val longDescription = List(80) {
+            "This is a long reminder description used to verify detail-screen scrolling."
+        }.joinToString(" ")
+        val task = createTask(longDescription)
+        postSilently(task)
+
+        activeNotification(task.id).notification.contentIntent.send()
+        assertDisplayedTask(task)
+
+        val activity = checkNotNull(resumedTaskActivity())
+        var canScrollDown = false
+        instrumentation.runOnMainSync {
+            val scrollView = activity.findViewById<ScrollView>(R.id.scrollViewTaskDetails)
+            canScrollDown = scrollView.canScrollVertically(1)
+            scrollView.fullScroll(View.FOCUS_DOWN)
+        }
+        instrumentation.waitForIdleSync()
+
+        var scrollPosition = 0
+        instrumentation.runOnMainSync {
+            scrollPosition = activity.findViewById<ScrollView>(R.id.scrollViewTaskDetails).scrollY
+        }
+
+        assertTrue("Long task details did not create scrollable overflow", canScrollDown)
+        assertTrue("Task details did not scroll downward", scrollPosition > 0)
     }
 
     private fun createTask(description: String): Task {

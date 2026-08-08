@@ -5,10 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -122,9 +124,28 @@ class MainActivity : AppCompatActivity() {
 
         // ViewModel
         taskViewModel = ViewModelProvider(this)[TaskViewModel::class.java]
-        taskViewModel.readAllData.observe(this) { tasks -> recyclerViewListAdapter.setData(tasks) }
+        taskViewModel.readAllData.observe(this) { tasks ->
+            recyclerViewListAdapter.setData(tasks)
+            findViewById<View>(R.id.emptyState).visibility = if (tasks.isEmpty()) View.VISIBLE else View.GONE
+        }
 
         findViewById<Button>(R.id.buttonAddNewTask).setOnClickListener { onCliCkGoToAddUser() }
+        findViewById<Button>(R.id.buttonOrderBy).setOnClickListener { showOrderByMenu(it) }
+    }
+
+    private fun showOrderByMenu(anchor: View) {
+        PopupMenu(this, anchor).apply {
+            menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.label_order_latest).apply {
+                isCheckable = true
+                isChecked = true
+            }
+            menu.setGroupCheckable(Menu.NONE, true, true)
+            setOnMenuItemClickListener { menuItem ->
+                menuItem.isChecked = true
+                true
+            }
+            show()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

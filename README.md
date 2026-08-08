@@ -15,6 +15,7 @@ Task Notifier is a native Android reminder app for creating one-time or repeatin
 - Restore scheduled tasks and active notifications after boot, time changes, or timezone changes.
 - Restore an ongoing task notification after it is swiped away while the task still awaits acknowledgement.
 - Open the exact task associated with each notification, including when another task detail screen is already open.
+- Use a card-based reminder list with clear status indicators, concise scheduling information, an empty state, an order control (currently **Latest**, by scheduled reminder time), and streamlined create/edit/detail forms.
 - Persist task data locally with Room.
 - Use separate default and silent notification channels on Android 8.0 and later.
 
@@ -83,4 +84,5 @@ The project is a single Android application module built with Kotlin and XML lay
 
 - Test thoroughly for lifecycle-related leaks and retained activity/service references.
 - Prevent notification grouping for this app.
+- Add a 3-dots toggle option for: `Use 24-hour time`. 
 - Test alarm reliability under Android Doze, battery optimization, and manufacturer-specific background restrictions.

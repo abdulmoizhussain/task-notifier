@@ -96,6 +96,26 @@ Each task notification now uses:
 
 Regression tests now create temporary Room tasks and verify that two notifications open their respective task rows and that the dismissal callback restores only an active task notification.
 
+### Separate notification presentation
+
+Each task notification now receives its own stable app-defined group key derived from its database ID. This prevents the normal Android auto-grouping path used when an app posts several notifications without group identities. Regression tests verify that different task notifications have different group keys, and emulator notification-manager inspection confirmed the posted keys remain separate without an app-generated summary.
+
+This is a best-effort presentation request rather than an absolute guarantee. Android 16 can auto-group notifications on the app's behalf, including notifications with no summary or only a small number of children, and manufacturer System UI implementations such as One UI can make additional presentation decisions. Android exposes no public “never group” flag that can override those system-level choices.
+
+Reference: [Android notification behavior and grouping](https://developer.android.com/develop/ui/compose/notifications#notification-behavior)
+
+## UI and UX refresh implemented
+
+The existing XML/View interface was refreshed on August 8, 2026 without changing task storage, scheduling, or Gradle/Kotlin versions. The work intentionally prioritizes clarity over decoration:
+
+- The main screen now has a clear heading, an **Order by: Latest** control, card-based tappable rows, concise dates without seconds, status chips, a strong add-reminder action, and an empty state. The current ordering uses the scheduled reminder time in descending order, with the database ID used only as a deterministic tie-breaker when scheduled times match.
+- New and edited reminders share a consistent form with clearer field grouping, larger touch targets, visible selection affordances, explicit action wording, and edit-only turn-off/delete controls.
+- The notification detail screen presents task information in one readable card and explains the difference between acknowledging the active notification and editing the reminder.
+- The theme now uses a restrained indigo/neutral palette, consistent surfaces, outlines, spacing, button hierarchy, and text contrast.
+- New XML resources retain compatibility with the existing API 16 minimum.
+
+Emulator QA covered the populated main list and both new/edit form states. Build, unit tests, and lint pass. The three Android instrumentation tests also pass when invoked directly through ADB; the AGP 7.1 Gradle UTP wrapper can abort on the newer emulator runtime because of a protobuf tooling conflict, which is separate from application behavior.
+
 ## Areas requiring changes before a target SDK upgrade
 
 ### Background service starts

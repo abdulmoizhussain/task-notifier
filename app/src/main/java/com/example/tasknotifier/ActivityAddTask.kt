@@ -71,8 +71,10 @@ class ActivityAddTask : AppCompatActivity() {
         applySoftKeyboardVirtualKeyboardListener()
 
         taskDbId = intent.getIntExtra(Constants.INTENT_EXTRA_TASK_ID, 0)
+        title = getString(if (taskDbId > 0) R.string.title_edit_reminder else R.string.title_new_reminder)
 
         if (taskDbId > 0) {
+            findViewById<View>(R.id.editActions).visibility = View.VISIBLE
             runBlocking {
                 // GlobalScope.launch will prevent us to make UI changes
                 launch {
@@ -298,6 +300,7 @@ class ActivityAddTask : AppCompatActivity() {
         findViewById<TextView>(R.id.textViewSelectStopAfterLabel).isEnabled = enable
         findViewById<TextView>(R.id.textViewStopAfter).isEnabled = enable
         findViewById<View>(R.id.linearLayoutStopAfter).isClickable = enable
+        findViewById<View>(R.id.linearLayoutStopAfter).alpha = if (enable) 1f else 0.5f
     }
 
     private fun setSelectedDate() {

@@ -63,6 +63,14 @@ class MyNotificationManager {
             }
         }
 
+        private fun keepTaskNotificationSeparate(
+            builder: NotificationCompat.Builder,
+            notificationId: Int
+        ) {
+            builder.setGroup("${Constants.NOTIFICATION_GROUP_TASK_PREFIX}.$notificationId")
+            builder.setGroupSummary(false)
+        }
+
         fun notifyWithUnClickable(
             context: Context,
             notificationId: Int,
@@ -83,6 +91,7 @@ class MyNotificationManager {
             builder.setDefaults(0)
 
             makePersistentUntilAcknowledged(builder, context, notificationId, onGoing)
+            keepTaskNotificationSeparate(builder, notificationId)
 
             builder.setWhen(setWhen)
             builder.setShowWhen(true)
@@ -120,6 +129,7 @@ class MyNotificationManager {
 //            builder.setTimeoutAfter(10000)
 
             makePersistentUntilAcknowledged(builder, context, notificationId, onGoing)
+            keepTaskNotificationSeparate(builder, notificationId)
 
             builder.setWhen(setWhen)
             builder.setShowWhen(true)
@@ -160,6 +170,7 @@ class MyNotificationManager {
 //            builder.setTimeoutAfter(10000)
 
             makePersistentUntilAcknowledged(builder, context, notificationId, onGoing)
+            keepTaskNotificationSeparate(builder, notificationId)
 
             builder.setWhen(setWhen)
             builder.setShowWhen(true)

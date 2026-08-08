@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tasknotifier.ActivityAddTask
 import com.example.tasknotifier.R
@@ -36,14 +37,31 @@ class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 
         // TODO:
         //  remove :ss when all the testing is complete
-        itemView.findViewById<TextView>(R.id.textViewDateTime).text = MyDateFormat.EEE_MMM_dd_yyyy_HH_mm_ss.format(currentTaskItem.dateTime)
+        itemView.findViewById<TextView>(R.id.textViewDateTime).text = MyDateFormat.EEE_MMM_dd_yyyy_HH_mm.format(currentTaskItem.dateTime)
 
-        itemView.findViewById<TextView>(R.id.textViewStatus).text = TaskStatusEnum.getReadableStatus(
+        val statusText = TaskStatusEnum.getReadableStatus(
             holder.itemView.context,
             currentTaskItem.id,
             currentTaskItem.status,
             currentTaskItem.dateTime
         )
+        itemView.findViewById<TextView>(R.id.textViewStatus).apply {
+            text = statusText
+            when (statusText) {
+                TaskStatusEnum.On.toString() -> {
+                    setBackgroundResource(R.drawable.status_on_background)
+                    setTextColor(ContextCompat.getColor(context, R.color.success))
+                }
+                "Expired" -> {
+                    setBackgroundResource(R.drawable.status_expired_background)
+                    setTextColor(ContextCompat.getColor(context, R.color.danger))
+                }
+                else -> {
+                    setBackgroundResource(R.drawable.status_off_background)
+                    setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
+                }
+            }
+        }
 
         itemView.setOnClickListener { onClickItemView ->
             val context = onClickItemView.context
