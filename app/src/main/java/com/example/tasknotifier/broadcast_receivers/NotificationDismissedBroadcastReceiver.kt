@@ -3,6 +3,9 @@ package com.example.tasknotifier.broadcast_receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.common.Globals
 import com.example.tasknotifier.services.TaskService
@@ -37,6 +40,14 @@ class NotificationDismissedBroadcastReceiver : BroadcastReceiver() {
                         task.dateTime,
                         true,
                     )
+                }
+            } catch (exception: Exception) {
+                Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(
+                        applicationContext,
+                        exception.localizedMessage ?: exception.toString(),
+                        Toast.LENGTH_LONG,
+                    ).show()
                 }
             } finally {
                 pendingResult.finish()

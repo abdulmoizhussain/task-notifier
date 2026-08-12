@@ -48,6 +48,7 @@ class ActivityAddTask : AppCompatActivity() {
     private var selectedStopAfter: Int = 0
     private var taskDbId: Int = 0
     private var taskDateCreated: Long = 0
+    private var taskInProgress: Boolean = false
     private lateinit var taskViewModel: TaskViewModel
     private lateinit var editTextDescription: EditText
 
@@ -100,6 +101,7 @@ class ActivityAddTask : AppCompatActivity() {
                     } else {
                         editTextDescription.setText(task.description)
                         taskDateCreated = task.dateCreated
+                        taskInProgress = task.inProgress
 
                         val calendar = Calendar.getInstance().apply { timeInMillis = task.dateTime }
 
@@ -175,6 +177,9 @@ class ActivityAddTask : AppCompatActivity() {
             task.repeat = selectedRepeat
             task.stopAfter = selectedStopAfter
             task.dateCreated = if (taskDbId > 0) taskDateCreated else modifiedAt
+            if (taskDbId > 0) {
+                task.inProgress = taskInProgress
+            }
             task.dateModified = modifiedAt
             task
         }
@@ -536,6 +541,7 @@ class ActivityAddTask : AppCompatActivity() {
                 task.repeat = selectedRepeat
                 task.stopAfter = selectedStopAfter
                 task.inProgress = true
+                taskInProgress = true
                 task.sentCount += 1
                 task.dateModified = modifiedAt
 

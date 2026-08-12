@@ -4,9 +4,9 @@
     <string name="label_remove_this_notification">Mark complete &amp; remove</string>
     <string name="label_edit_task">Edit Task</string>
     <string name="label_button_on">Save &amp; schedule</string>
+    <string name="label_button_update">Save changes &amp; schedule</string>
     <string name="label_button_off">Turn off scheduling</string>
     <string name="label_button_delete">Delete</string>
-    <string name="label_button_update">Save changes &amp; schedule</string>
     <string name="label_date">Date</string>
     <string name="msg_task_deleted">The task has been deleted.</string>
     <string name="show_date_with_label">Date: %1$s</string>

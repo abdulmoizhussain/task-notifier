@@ -199,7 +199,12 @@ class MainActivity : AppCompatActivity() {
             .getString(TASK_ORDER_KEY, null)
         return try {
             if (savedOrder == null) TaskOrder.LATEST_CREATED else TaskOrder.valueOf(savedOrder)
-        } catch (_: IllegalArgumentException) {
+        } catch (exception: IllegalArgumentException) {
+            Toast.makeText(
+                this,
+                exception.localizedMessage ?: exception.toString(),
+                Toast.LENGTH_LONG,
+            ).show()
             TaskOrder.LATEST_CREATED
         }
     }

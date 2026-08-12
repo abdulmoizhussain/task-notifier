@@ -3,6 +3,7 @@ package com.example.tasknotifier.android_services
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import android.widget.Toast
 import com.example.tasknotifier.common.Constants
 import com.example.tasknotifier.common.Globals
 import com.example.tasknotifier.services.TaskService
@@ -77,6 +78,12 @@ class TaskNotifierAndroidService : Service() {
             )
         }
 
+        } catch (exception: Exception) {
+            Toast.makeText(
+                applicationContext,
+                exception.localizedMessage ?: exception.toString(),
+                Toast.LENGTH_LONG,
+            ).show()
         } finally {
             stopSelfResult(startId)
         }
