@@ -48,11 +48,7 @@ class TaskService(context: Context) {
     fun turnOffInProgressByTaskId(taskId: Int) {
         runBlocking {
             launch {
-                val task = taskRepository.getOneByIdAsync(taskId)
-                if (task != null) {
-                    task.inProgress = false
-                    taskRepository.updateOneAsync(task)
-                }
+                taskRepository.updateInProgressAsync(taskId, false)
             }
         }
     }

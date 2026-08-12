@@ -548,6 +548,14 @@ class ActivityAddTask : AppCompatActivity() {
                 if (taskDbId > 0) {
                     task.id = taskDbId
                     taskViewModel.updateOneAsync(task)
+                    if (!taskViewModel.updateInProgressAsync(taskDbId, true)) {
+                        Toast.makeText(
+                            this@ActivityAddTask,
+                            "Could not restore notification state for task ID $taskDbId.",
+                            Toast.LENGTH_LONG,
+                        ).show()
+                        return@launch
+                    }
                 } else {
                     task.status = TaskStatusEnum.Off
                     taskDbId = taskViewModel.addOneAsync(task).toInt()

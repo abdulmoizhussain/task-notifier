@@ -35,6 +35,10 @@ class TaskRepository(private val taskDao: TaskDao) {
         taskDao.updateOneAsync(task)
     }
 
+    suspend fun updateInProgressAsync(id: Int, inProgress: Boolean): Boolean {
+        return taskDao.updateInProgressAsync(id, inProgress) == 1
+    }
+
     suspend fun updateAfterAlarmIfStillOnAsync(id: Int, dateTime: Long, sentCount: Int): Boolean {
         return taskDao.updateAfterAlarmIfStatusAsync(
             id,

@@ -51,6 +51,10 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
     suspend fun updateOneAsync(task: Task) {
         taskRepository.updateOneAsync(task)
     }
+
+    suspend fun updateInProgressAsync(id: Int, inProgress: Boolean): Boolean {
+        return taskRepository.updateInProgressAsync(id, inProgress)
+    }
     
     suspend fun getOneByIdAsync(id: Int): Task? {
         return taskRepository.getOneByIdAsync(id)
