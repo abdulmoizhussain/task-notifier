@@ -11,6 +11,8 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
@@ -32,6 +34,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -72,6 +75,9 @@ class NotificationBehaviorInstrumentedTest {
             instrumentation.runOnMainSync { activity.finish() }
         }
         resumedEditActivity()?.let { activity ->
+            instrumentation.runOnMainSync { activity.finish() }
+        }
+        resumedMainActivity()?.let { activity ->
             instrumentation.runOnMainSync { activity.finish() }
         }
     }
@@ -282,6 +288,64 @@ class NotificationBehaviorInstrumentedTest {
     }
 
     @Test
+    fun returningFromEditKeepsMainListScrollPosition() {
+        val tasks = List(25) { index -> createTask("Scroll position test $index") }
+        context.startActivity(
+            Intent(context, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            }
+        )
+        assertTrue("Main activity did not resume", waitUntil { resumedMainActivity() != null })
+
+        val originalMainActivity = checkNotNull(resumedMainActivity())
+        val recyclerView = originalMainActivity.findViewById<RecyclerView>(R.id.recyclerViewAllTasks)
+        assertTrue(
+            "Main list did not display the test tasks",
+            waitUntil { (recyclerView.adapter?.itemCount ?: 0) >= tasks.size }
+        )
+
+        instrumentation.runOnMainSync {
+            (recyclerView.layoutManager as LinearLayoutManager)
+                .scrollToPositionWithOffset(10, 0)
+        }
+        assertTrue(
+            "Main list did not scroll to the test position",
+            waitUntil {
+                (recyclerView.layoutManager as LinearLayoutManager)
+                    .findFirstVisibleItemPosition() == 10
+            }
+        )
+        val positionBeforeEdit = (recyclerView.layoutManager as LinearLayoutManager)
+            .findFirstVisibleItemPosition()
+
+        instrumentation.runOnMainSync {
+            originalMainActivity.startActivity(
+                Intent(originalMainActivity, ActivityAddTask::class.java).apply {
+                    putExtra(Constants.INTENT_EXTRA_TASK_ID, tasks.first().id)
+                }
+            )
+        }
+        assertTrue("Edit activity did not resume", waitUntil { resumedEditActivity() != null })
+
+        val editActivity = checkNotNull(resumedEditActivity())
+        instrumentation.runOnMainSync { editActivity.onBackPressed() }
+        assertTrue("Main activity did not resume after Back", waitUntil { resumedMainActivity() != null })
+
+        val resumedMainActivity = checkNotNull(resumedMainActivity())
+        assertSame(
+            "Back created a new MainActivity instead of revealing the existing one",
+            originalMainActivity,
+            resumedMainActivity,
+        )
+        assertEquals(
+            "Main list lost its scroll position",
+            positionBeforeEdit,
+            (resumedMainActivity.findViewById<RecyclerView>(R.id.recyclerViewAllTasks)
+                .layoutManager as LinearLayoutManager).findFirstVisibleItemPosition(),
+        )
+    }
+
+    @Test
     fun alarmDrivenUpdatePreservesCreationAndModificationDates() {
         val task = createTask("Alarm metadata preservation test").apply {
             dateCreated = 111
@@ -366,6 +430,17 @@ class NotificationBehaviorInstrumentedTest {
             resumedActivity = ActivityLifecycleMonitorRegistry.getInstance()
                 .getActivitiesInStage(Stage.RESUMED)
                 .filterIsInstance<ActivityAddTask>()
+                .firstOrNull()
+        }
+        return resumedActivity
+    }
+
+    private fun resumedMainActivity(): MainActivity? {
+        var resumedActivity: MainActivity? = null
+        instrumentation.runOnMainSync {
+            resumedActivity = ActivityLifecycleMonitorRegistry.getInstance()
+                .getActivitiesInStage(Stage.RESUMED)
+                .filterIsInstance<MainActivity>()
                 .firstOrNull()
         }
         return resumedActivity
