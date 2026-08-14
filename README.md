@@ -27,7 +27,7 @@ Task Notifier is a native Android reminder app for creating one-time or repeatin
 | Application ID | `io.github.abdulmoizhussain.tasknotifier` |
 | Version | `0.0.3` (`versionCode` 3) |
 | Minimum Android version | Android 4.1 / API 16 |
-| Compile SDK | API 31 |
+| Compile SDK | API 33 |
 | Target SDK | API 30 |
 | Android Gradle Plugin | 7.1.3 |
 | Gradle | 7.2 |
@@ -39,7 +39,7 @@ This is the verified legacy baseline. Android Studio Panda 4 can sync and run it
 
 ## Build from source
 
-1. Install JDK 11 and an Android SDK containing API 31.
+1. Install JDK 11 and an Android SDK containing API 33.
 2. Clone the repository and open it in Android Studio.
 3. In Android Studio's Gradle settings, select **Wrapper** and JDK 11.
 4. Let Android Studio complete the Gradle sync without applying further AGP, Gradle, or Kotlin upgrades.
@@ -84,6 +84,7 @@ The project is a single Android application module built with Kotlin and XML lay
 
 ## TODO / future work
 
+- If the minimum supported Android version is raised from API 16 to API 26 or later, remove the density-specific legacy launcher PNGs. Modern Android uses the adaptive vector icon; the PNGs are retained only for pre-Android 8.0 launcher compatibility.
 - Test thoroughly for lifecycle-related leaks and retained activity/service references.
 - Add a 3-dots toggle option for: `Use 24-hour time`.
 - Test alarm reliability under Android Doze, battery optimization, and manufacturer-specific background restrictions.

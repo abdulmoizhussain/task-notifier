@@ -83,7 +83,7 @@ class MyNotificationManager {
             val builder = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_SILENT)
             builder.setContentTitle(contentTitle)
             builder.setContentText(contentText)
-            builder.setSmallIcon(R.drawable.ic_launcher_background)
+            builder.setSmallIcon(R.drawable.ic_stat_notification)
             builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
 
             builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -122,7 +122,7 @@ class MyNotificationManager {
             val builder = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_SILENT)
             builder.setContentTitle(contentTitle)
             builder.setContentText(contentText)
-            builder.setSmallIcon(R.drawable.ic_launcher_background)
+            builder.setSmallIcon(R.drawable.ic_stat_notification)
             builder.setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher))
             builder.setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             builder.setContentIntent(pendingIntent)
@@ -166,7 +166,7 @@ class MyNotificationManager {
             val builder = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_DEFAULT)
             builder.setContentTitle(contentTitle)
             builder.setContentText(contentText)
-            builder.setSmallIcon(R.drawable.ic_launcher_background)
+            builder.setSmallIcon(R.drawable.ic_stat_notification)
 
             // source: https://stackoverflow.com/a/11756312/8075004
             builder.setLargeIcon(BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher))
