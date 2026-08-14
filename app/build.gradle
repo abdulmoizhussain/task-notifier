@@ -7,12 +7,14 @@ plugins {
 android {
     compileSdkVersion 33
 
+    def releaseApkAppName = rootProject.name.toLowerCase().replaceAll('\\s+', '-')
+
     defaultConfig {
         applicationId "io.github.abdulmoizhussain.tasknotifier"
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 6
-        versionName "1.0.0-beta.6"
+        versionCode 7
+        versionName "1.0.0-beta.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -33,6 +35,15 @@ android {
     }
     sourceSets {
         androidTest.assets.srcDirs += files("$projectDir/schemas")
+    }
+
+    applicationVariants.all { variant ->
+        if (variant.buildType.name == 'release') {
+            variant.outputs.all {
+                //outputFileName = "${releaseApkAppName}-v${variant.versionName}-(${variant.versionCode}).apk"
+                outputFileName = "${releaseApkAppName}-v${variant.versionName}.apk"
+            }
+        }
     }
 }
 
