@@ -1,4 +1,4 @@
-package com.example.tasknotifier.data
+package io.github.abdulmoizhussain.tasknotifier.data
 
 import android.content.Context
 import androidx.room.testing.MigrationTestHelper

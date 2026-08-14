@@ -1,4 +1,4 @@
-package com.example.tasknotifier.common
+package io.github.abdulmoizhussain.tasknotifier.common
 
 import android.content.Context
 

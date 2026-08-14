@@ -1,10 +1,10 @@
-package com.example.tasknotifier.repositories
+package io.github.abdulmoizhussain.tasknotifier.repositories
 
 import androidx.lifecycle.LiveData
-import com.example.tasknotifier.common.TaskStatusEnum
-import com.example.tasknotifier.data.task.Task
-import com.example.tasknotifier.data.task.TaskDao
-import com.example.tasknotifier.data.task.TaskOrder
+import io.github.abdulmoizhussain.tasknotifier.common.TaskStatusEnum
+import io.github.abdulmoizhussain.tasknotifier.data.task.Task
+import io.github.abdulmoizhussain.tasknotifier.data.task.TaskDao
+import io.github.abdulmoizhussain.tasknotifier.data.task.TaskOrder
 
 class TaskRepository(private val taskDao: TaskDao) {
 
@@ -31,8 +31,8 @@ class TaskRepository(private val taskDao: TaskDao) {
         taskDao.deleteOneByIdAsync(id)
     }
 
-    suspend fun updateOneAsync(task: Task) {
-        taskDao.updateOneAsync(task)
+    suspend fun updateOneAsync(task: Task): Int {
+        return taskDao.updateOneAsync(task)
     }
 
     suspend fun updateInProgressAsync(id: Int, inProgress: Boolean): Boolean {

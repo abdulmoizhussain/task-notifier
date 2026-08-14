@@ -1,9 +1,9 @@
-package com.example.tasknotifier.data.task
+package io.github.abdulmoizhussain.tasknotifier.data.task
 
 import androidx.room.Entity
 import androidx.room.ColumnInfo
 import androidx.room.PrimaryKey
-import com.example.tasknotifier.common.TaskStatusEnum
+import io.github.abdulmoizhussain.tasknotifier.common.TaskStatusEnum
 import org.json.JSONObject
 
 //@Entity(tableName = "task_table", indices = [Index(value = ["task_id"], unique = true)])

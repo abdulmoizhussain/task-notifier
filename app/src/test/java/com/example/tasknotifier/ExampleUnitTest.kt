@@ -1,4 +1,4 @@
-package com.example.tasknotifier
+package io.github.abdulmoizhussain.tasknotifier
 
 import org.junit.Test
 

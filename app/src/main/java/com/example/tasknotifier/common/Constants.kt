@@ -1,10 +1,10 @@
-package com.example.tasknotifier.common
+package io.github.abdulmoizhussain.tasknotifier.common
 
 import android.content.Intent
 import java.util.*
 
 object Constants {
-    const val INTENT_ACTION_NOTIFICATION_DISMISSED = "com.example.tasknotifier.NOTIFICATION_DISMISSED"
+    const val INTENT_ACTION_NOTIFICATION_DISMISSED = "io.github.abdulmoizhussain.tasknotifier.NOTIFICATION_DISMISSED"
     const val INTENT_EXTRA_TASK_ID = "INTENT_EXTRA_TASK_ID"
     const val INTENT_EXTRA_CONTENT_TITLE = "INTENT_EXTRA_CONTENT_TITLE"
     const val INTENT_EXTRA_DESCRIPTION = "INTENT_EXTRA_DESCRIPTION"
@@ -14,7 +14,7 @@ object Constants {
     const val INTENT_EXTRA_TASK_SCHEDULER_SERVICE = "INTENT_EXTRA_TASK_SCHEDULER_SERVICE"
     const val NOTIFICATION_CHANNEL_DEFAULT = "NOTIFICATION_CHANNEL_DEFAULT"
     const val NOTIFICATION_CHANNEL_SILENT = "NOTIFICATION_CHANNEL_SILENT"
-    const val NOTIFICATION_GROUP_TASK_PREFIX = "com.example.tasknotifier.TASK"
+    const val NOTIFICATION_GROUP_TASK_PREFIX = "io.github.abdulmoizhussain.tasknotifier.TASK"
     const val KEY_FIRST_TIME_LAUNCH = "KEY_FIRST_TIME_LAUNCH"
     const val KEY_TASK_ID = "KEY_TASK_ID"
 

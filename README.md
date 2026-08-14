@@ -24,7 +24,7 @@ Task Notifier is a native Android reminder app for creating one-time or repeatin
 
 | Setting | Value |
 | --- | --- |
-| Application ID | `com.example.tasknotifier` |
+| Application ID | `io.github.abdulmoizhussain.tasknotifier` |
 | Version | `0.0.3` (`versionCode` 3) |
 | Minimum Android version | Android 4.1 / API 16 |
 | Compile SDK | API 31 |

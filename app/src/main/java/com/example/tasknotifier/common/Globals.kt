@@ -1,6 +1,6 @@
-package com.example.tasknotifier.common
+package io.github.abdulmoizhussain.tasknotifier.common
 
-import com.example.tasknotifier.utils.MyDateFormat
+import io.github.abdulmoizhussain.tasknotifier.utils.MyDateFormat
 
 object Globals {
     fun createTitleForTask(setWhen: Long, sentCount: Int): String {

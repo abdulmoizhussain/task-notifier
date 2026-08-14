@@ -1,4 +1,4 @@
-package com.example.tasknotifier
+package io.github.abdulmoizhussain.tasknotifier
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
@@ -13,15 +13,16 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.tasknotifier.android_services.TaskNotifierAndroidService
-import com.example.tasknotifier.common.Constants
-import com.example.tasknotifier.common.Globals
-import com.example.tasknotifier.common.TaskStatusEnum
-import com.example.tasknotifier.data.task.Task
-import com.example.tasknotifier.utils.MyAlarmManager
-import com.example.tasknotifier.utils.MyDateFormat
-import com.example.tasknotifier.utils.MyNotificationManager
-import com.example.tasknotifier.viewmodels.TaskViewModel
+import io.github.abdulmoizhussain.tasknotifier.android_services.TaskNotifierAndroidService
+import io.github.abdulmoizhussain.tasknotifier.common.Constants
+import io.github.abdulmoizhussain.tasknotifier.common.Globals
+import io.github.abdulmoizhussain.tasknotifier.common.TaskStatusEnum
+import io.github.abdulmoizhussain.tasknotifier.data.task.Task
+import io.github.abdulmoizhussain.tasknotifier.diagnostics.DiagnosticLog
+import io.github.abdulmoizhussain.tasknotifier.utils.MyAlarmManager
+import io.github.abdulmoizhussain.tasknotifier.utils.MyDateFormat
+import io.github.abdulmoizhussain.tasknotifier.utils.MyNotificationManager
+import io.github.abdulmoizhussain.tasknotifier.viewmodels.TaskViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
@@ -483,6 +484,7 @@ class ActivityAddTask : AppCompatActivity() {
     }
 
     private fun onClickTurnOffTask() {
+        DiagnosticLog.record(this, "TURN_OFF_SCHEDULING_CLICKED", taskDbId)
         runBlocking {
             launch {
                 val task = taskViewModel.getOneByIdAsync(taskDbId)
@@ -494,6 +496,16 @@ class ActivityAddTask : AppCompatActivity() {
                     task.dateModified = System.currentTimeMillis()
 
                     taskViewModel.updateOneAsync(task)
+                    DiagnosticLog.record(
+                        this@ActivityAddTask,
+                        "TURN_OFF_SCHEDULING_DATABASE_UPDATED",
+                        taskDbId,
+                        mapOf(
+                            "status" to task.status.name,
+                            "inProgress" to task.inProgress,
+                            "dateTime" to task.dateTime,
+                        ),
+                    )
 
                     MyAlarmManager.cancel(this@ActivityAddTask, taskDbId)
 
@@ -527,6 +539,7 @@ class ActivityAddTask : AppCompatActivity() {
 
         runBlocking {
             launch {
+                DiagnosticLog.record(this@ActivityAddTask, "NOTIFY_NOW_CLICKED", taskDbId)
                 val description = editTextDescription.text.toString()
                 val modifiedAt = System.currentTimeMillis()
 
@@ -548,6 +561,17 @@ class ActivityAddTask : AppCompatActivity() {
                 if (taskDbId > 0) {
                     task.id = taskDbId
                     taskViewModel.updateOneAsync(task)
+                    DiagnosticLog.record(
+                        this@ActivityAddTask,
+                        "NOTIFY_NOW_FULL_UPDATE_COMPLETED",
+                        taskDbId,
+                        mapOf(
+                            "status" to task.status.name,
+                            "inProgress" to task.inProgress,
+                            "dateTime" to task.dateTime,
+                            "sentCount" to task.sentCount,
+                        ),
+                    )
                     if (!taskViewModel.updateInProgressAsync(taskDbId, true)) {
                         Toast.makeText(
                             this@ActivityAddTask,
@@ -556,9 +580,21 @@ class ActivityAddTask : AppCompatActivity() {
                         ).show()
                         return@launch
                     }
+                    DiagnosticLog.record(
+                        this@ActivityAddTask,
+                        "IN_PROGRESS_CHANGED",
+                        taskDbId,
+                        mapOf("newValue" to true, "source" to "NOTIFY_NOW"),
+                    )
                 } else {
                     task.status = TaskStatusEnum.Off
                     taskDbId = taskViewModel.addOneAsync(task).toInt()
+                    DiagnosticLog.record(
+                        this@ActivityAddTask,
+                        "NOTIFY_NOW_TASK_INSERTED",
+                        taskDbId,
+                        mapOf("inProgress" to true),
+                    )
                 }
 
                 val contentTitle = Globals.createTitleForTask(task.dateTime, task.sentCount)
@@ -572,6 +608,11 @@ class ActivityAddTask : AppCompatActivity() {
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_ON_GOING, true)
 
                     startService(serviceIntent)
+                    DiagnosticLog.record(
+                        this@ActivityAddTask,
+                        "NOTIFY_NOW_SERVICE_REQUESTED",
+                        taskDbId,
+                    )
                 }
             }
         }

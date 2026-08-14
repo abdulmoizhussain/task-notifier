@@ -1,4 +1,4 @@
-package com.example.tasknotifier.data
+package io.github.abdulmoizhussain.tasknotifier.data
 
 import android.content.Context
 import androidx.room.Database
@@ -6,14 +6,16 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.tasknotifier.data.task.Task
-import com.example.tasknotifier.data.task.TaskDao
+import io.github.abdulmoizhussain.tasknotifier.data.task.Task
+import io.github.abdulmoizhussain.tasknotifier.data.task.TaskDao
 
 @Database(entities = [Task::class], version = 2, exportSchema = true)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
 
     companion object {
+        const val DATABASE_NAME = "task_notifier_database"
+
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
@@ -38,7 +40,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "task_notifier_database",
+                    DATABASE_NAME,
                 )
                     .addMigrations(MIGRATION_1_2)
                     .build()

@@ -1,9 +1,10 @@
-package com.example.tasknotifier
+package io.github.abdulmoizhussain.tasknotifier
 
 import android.app.ActivityManager
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.view.View
 import android.widget.Button
 import android.widget.ScrollView
@@ -14,18 +15,19 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
 import androidx.test.runner.lifecycle.Stage
-import com.example.tasknotifier.android_services.TaskNotifierAndroidService
-import com.example.tasknotifier.common.Constants
-import com.example.tasknotifier.common.Globals
-import com.example.tasknotifier.common.TaskStatusEnum
-import com.example.tasknotifier.broadcast_receivers.SendNotificationBroadcastReceiver
-import com.example.tasknotifier.data.AppDatabase
-import com.example.tasknotifier.data.task.Task
-import com.example.tasknotifier.services.TaskService
-import com.example.tasknotifier.utils.MyAlarmManager
-import com.example.tasknotifier.utils.MyNotificationManager
+import io.github.abdulmoizhussain.tasknotifier.android_services.TaskNotifierAndroidService
+import io.github.abdulmoizhussain.tasknotifier.common.Constants
+import io.github.abdulmoizhussain.tasknotifier.common.Globals
+import io.github.abdulmoizhussain.tasknotifier.common.TaskStatusEnum
+import io.github.abdulmoizhussain.tasknotifier.broadcast_receivers.SendNotificationBroadcastReceiver
+import io.github.abdulmoizhussain.tasknotifier.data.AppDatabase
+import io.github.abdulmoizhussain.tasknotifier.data.task.Task
+import io.github.abdulmoizhussain.tasknotifier.services.TaskService
+import io.github.abdulmoizhussain.tasknotifier.utils.MyAlarmManager
+import io.github.abdulmoizhussain.tasknotifier.utils.MyNotificationManager
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Before
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -44,6 +46,17 @@ class NotificationBehaviorInstrumentedTest {
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     private val taskDao = AppDatabase.getDatabase(context).taskDao()
     private val createdTaskIds = mutableListOf<Int>()
+
+    @Before
+    fun grantNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            instrumentation.uiAutomation
+                .executeShellCommand(
+                    "pm grant ${context.packageName} android.permission.POST_NOTIFICATIONS"
+                )
+                .close()
+        }
+    }
 
     @After
     fun cleanUp() {

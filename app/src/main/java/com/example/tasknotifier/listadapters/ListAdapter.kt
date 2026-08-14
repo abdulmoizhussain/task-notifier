@@ -1,4 +1,4 @@
-package com.example.tasknotifier.listadapters
+package io.github.abdulmoizhussain.tasknotifier.listadapters
 
 import android.content.Intent
 import android.view.LayoutInflater
@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tasknotifier.ActivityAddTask
-import com.example.tasknotifier.R
-import com.example.tasknotifier.common.Constants
-import com.example.tasknotifier.common.TaskStatusEnum
-import com.example.tasknotifier.data.task.Task
-import com.example.tasknotifier.utils.MyDateFormat
+import io.github.abdulmoizhussain.tasknotifier.ActivityAddTask
+import io.github.abdulmoizhussain.tasknotifier.R
+import io.github.abdulmoizhussain.tasknotifier.common.Constants
+import io.github.abdulmoizhussain.tasknotifier.common.TaskStatusEnum
+import io.github.abdulmoizhussain.tasknotifier.data.task.Task
+import io.github.abdulmoizhussain.tasknotifier.utils.MyDateFormat
 
 class ListAdapter : RecyclerView.Adapter<ListAdapter.MyViewHolder>() {
 

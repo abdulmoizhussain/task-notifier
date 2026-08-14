@@ -1,4 +1,4 @@
-package com.example.tasknotifier.utils
+package io.github.abdulmoizhussain.tasknotifier.utils
 
 import android.app.Notification
 import android.app.NotificationManager
@@ -10,10 +10,11 @@ import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
-import com.example.tasknotifier.ActivityViewTask
-import com.example.tasknotifier.R
-import com.example.tasknotifier.broadcast_receivers.NotificationDismissedBroadcastReceiver
-import com.example.tasknotifier.common.Constants
+import io.github.abdulmoizhussain.tasknotifier.ActivityViewTask
+import io.github.abdulmoizhussain.tasknotifier.R
+import io.github.abdulmoizhussain.tasknotifier.broadcast_receivers.NotificationDismissedBroadcastReceiver
+import io.github.abdulmoizhussain.tasknotifier.common.Constants
+import io.github.abdulmoizhussain.tasknotifier.diagnostics.DiagnosticLog
 
 class MyNotificationManager {
     companion object {
@@ -98,8 +99,14 @@ class MyNotificationManager {
 
             val notification = builder.build()
 
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.notify(notificationId, notification)
+            postAndRecord(
+                context,
+                notificationId,
+                Constants.NOTIFICATION_CHANNEL_SILENT,
+                "UNCHECKABLE_SILENT",
+                onGoing,
+                notification,
+            )
         }
 
         fun notifySilently(
@@ -136,8 +143,14 @@ class MyNotificationManager {
 
             val notification = builder.build()
 
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.notify(notificationId, notification)
+            postAndRecord(
+                context,
+                notificationId,
+                Constants.NOTIFICATION_CHANNEL_SILENT,
+                "SILENT",
+                onGoing,
+                notification,
+            )
         }
 
         fun notify(
@@ -177,13 +190,87 @@ class MyNotificationManager {
 
             val notification = builder.build()
 
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.notify(notificationId, notification)
+            postAndRecord(
+                context,
+                notificationId,
+                Constants.NOTIFICATION_CHANNEL_DEFAULT,
+                "DEFAULT",
+                onGoing,
+                notification,
+            )
         }
 
         fun cancelById(context: Context, notificationId: Int) {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            DiagnosticLog.record(context, "NOTIFICATION_CANCEL_REQUESTED", notificationId)
             notificationManager.cancel(notificationId)
+            DiagnosticLog.record(
+                context,
+                "NOTIFICATION_CANCEL_RESULT",
+                notificationId,
+                mapOf("active" to isNotificationActive(notificationManager, notificationId)),
+            )
+        }
+
+        private fun postAndRecord(
+            context: Context,
+            notificationId: Int,
+            channelId: String,
+            mode: String,
+            onGoing: Boolean,
+            notification: Notification,
+        ) {
+            val notificationManager = context
+                .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            DiagnosticLog.record(
+                context,
+                "NOTIFICATION_POST_REQUESTED",
+                notificationId,
+                mapOf(
+                    "channelId" to channelId,
+                    "mode" to mode,
+                    "ongoing" to onGoing,
+                ),
+            )
+            try {
+                notificationManager.notify(notificationId, notification)
+                DiagnosticLog.record(
+                    context,
+                    "NOTIFICATION_POST_RESULT",
+                    notificationId,
+                    mapOf(
+                        "active" to isNotificationActive(notificationManager, notificationId),
+                        "activeNotificationIds" to activeNotificationIds(notificationManager),
+                    ),
+                )
+            } catch (exception: Exception) {
+                DiagnosticLog.record(
+                    context,
+                    "NOTIFICATION_POST_FAILED",
+                    notificationId,
+                    throwable = exception,
+                )
+                throw exception
+            }
+        }
+
+        private fun isNotificationActive(
+            notificationManager: NotificationManager,
+            notificationId: Int,
+        ): Any {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                notificationManager.activeNotifications.any { it.id == notificationId }
+            } else {
+                "unavailable_below_api_23"
+            }
+        }
+
+        private fun activeNotificationIds(notificationManager: NotificationManager): Any {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                notificationManager.activeNotifications.map { it.id }
+            } else {
+                "unavailable_below_api_23"
+            }
         }
     }
 

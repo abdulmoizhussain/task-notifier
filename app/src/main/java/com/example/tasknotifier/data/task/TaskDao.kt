@@ -1,8 +1,8 @@
-package com.example.tasknotifier.data.task
+package io.github.abdulmoizhussain.tasknotifier.data.task
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.example.tasknotifier.common.TaskStatusEnum
+import io.github.abdulmoizhussain.tasknotifier.common.TaskStatusEnum
 
 @Dao
 interface TaskDao {
@@ -13,7 +13,7 @@ interface TaskDao {
     suspend fun deleteOneByIdAsync(id: Int)
 
     @Update
-    suspend fun updateOneAsync(task: Task)
+    suspend fun updateOneAsync(task: Task): Int
 
     @Query("UPDATE task_table SET inProgress=:inProgress WHERE id=:id")
     suspend fun updateInProgressAsync(id: Int, inProgress: Boolean): Int

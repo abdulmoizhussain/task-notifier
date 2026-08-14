@@ -1,4 +1,4 @@
-package com.example.tasknotifier.utils
+package io.github.abdulmoizhussain.tasknotifier.utils
 
 import java.text.SimpleDateFormat
 import java.util.*

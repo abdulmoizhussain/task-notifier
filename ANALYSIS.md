@@ -51,7 +51,7 @@ The implementation uses classic Android Views rather than Jetpack Compose. It ha
 
 | Setting | Current value |
 | --- | --- |
-| Application ID | `com.example.tasknotifier` |
+| Application ID | `io.github.abdulmoizhussain.tasknotifier` |
 | Version | `0.0.3` (`versionCode` 3) |
 | Android Gradle Plugin | 7.1.3 |
 | Gradle wrapper | 7.2 |

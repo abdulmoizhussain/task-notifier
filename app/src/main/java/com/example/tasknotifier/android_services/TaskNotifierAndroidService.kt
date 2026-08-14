@@ -1,13 +1,14 @@
-package com.example.tasknotifier.android_services
+package io.github.abdulmoizhussain.tasknotifier.android_services
 
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.widget.Toast
-import com.example.tasknotifier.common.Constants
-import com.example.tasknotifier.common.Globals
-import com.example.tasknotifier.services.TaskService
-import com.example.tasknotifier.utils.MyNotificationManager
+import io.github.abdulmoizhussain.tasknotifier.common.Constants
+import io.github.abdulmoizhussain.tasknotifier.common.Globals
+import io.github.abdulmoizhussain.tasknotifier.diagnostics.DiagnosticLog
+import io.github.abdulmoizhussain.tasknotifier.services.TaskService
+import io.github.abdulmoizhussain.tasknotifier.utils.MyNotificationManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -15,6 +16,16 @@ class TaskNotifierAndroidService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         try {
+
+        DiagnosticLog.record(
+            this,
+            "SERVICE_ON_START",
+            attributes = mapOf(
+                "startId" to startId,
+                "flags" to flags,
+                "intentWasNull" to (intent == null),
+            ),
+        )
 
 //        MyNotificationManager.notifyWithUnClickable(
 //            this,
@@ -34,11 +45,43 @@ class TaskNotifierAndroidService : Service() {
             taskScheduler = intent.getBooleanExtra(Constants.INTENT_EXTRA_TASK_SCHEDULER_SERVICE, false)
             taskId = intent.getIntExtra(Constants.INTENT_EXTRA_TASK_ID, -1)
         }
+        DiagnosticLog.record(
+            this,
+            "SERVICE_COMMAND_PARSED",
+            if (taskId > -1) taskId else null,
+            mapOf(
+                "notificationReviver" to notificationReviver,
+                "taskScheduler" to taskScheduler,
+            ),
+        )
 
         if (intent == null || notificationReviver) {
             runBlocking {
                 launch {
-                    TaskService(this@TaskNotifierAndroidService).fetchAllTheInProgressAsync().forEach { task ->
+                    val tasks = TaskService(this@TaskNotifierAndroidService).fetchAllTheInProgressAsync()
+                    DiagnosticLog.record(
+                        this@TaskNotifierAndroidService,
+                        "REVIVER_QUERY_RESULT",
+                        attributes = mapOf(
+                            "count" to tasks.size,
+                            "taskIds" to tasks.map { it.id },
+                            "taskStates" to tasks.map {
+                                "${it.id}:${it.status.name}:${it.inProgress}:${it.dateTime}:${it.sentCount}"
+                            },
+                        ),
+                    )
+                    tasks.forEach { task ->
+                        DiagnosticLog.record(
+                            this@TaskNotifierAndroidService,
+                            "REVIVING_NOTIFICATION",
+                            task.id,
+                            mapOf(
+                                "status" to task.status.name,
+                                "inProgress" to task.inProgress,
+                                "dateTime" to task.dateTime,
+                                "sentCount" to task.sentCount,
+                            ),
+                        )
                         MyNotificationManager.notifySilently(
                             this@TaskNotifierAndroidService,
                             task.id,
@@ -55,7 +98,16 @@ class TaskNotifierAndroidService : Service() {
         if (intent == null || taskScheduler) {
             runBlocking {
                 launch {
-                    TaskService(this@TaskNotifierAndroidService).fetchAllWhichAreDueAndOnAsync().forEach { task ->
+                    val tasks = TaskService(this@TaskNotifierAndroidService).fetchAllWhichAreDueAndOnAsync()
+                    DiagnosticLog.record(
+                        this@TaskNotifierAndroidService,
+                        "SCHEDULER_QUERY_RESULT",
+                        attributes = mapOf(
+                            "count" to tasks.size,
+                            "taskIds" to tasks.map { it.id },
+                        ),
+                    )
+                    tasks.forEach { task ->
                         TaskService.createIntentAndSetExactAlarm(this@TaskNotifierAndroidService, task.id, task.dateTime)
                     }
                 }
@@ -79,12 +131,18 @@ class TaskNotifierAndroidService : Service() {
         }
 
         } catch (exception: Exception) {
+            DiagnosticLog.record(this, "SERVICE_FAILED", throwable = exception)
             Toast.makeText(
                 applicationContext,
                 exception.localizedMessage ?: exception.toString(),
                 Toast.LENGTH_LONG,
             ).show()
         } finally {
+            DiagnosticLog.record(
+                this,
+                "SERVICE_FINISHED",
+                attributes = mapOf("startId" to startId),
+            )
             stopSelfResult(startId)
         }
 

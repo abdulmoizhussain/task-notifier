@@ -1,10 +1,10 @@
-package com.example.tasknotifier.broadcast_receivers
+package io.github.abdulmoizhussain.tasknotifier.broadcast_receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.example.tasknotifier.android_services.TaskNotifierAndroidService
-import com.example.tasknotifier.common.Constants
+import io.github.abdulmoizhussain.tasknotifier.android_services.TaskNotifierAndroidService
+import io.github.abdulmoizhussain.tasknotifier.common.Constants
 
 class OnBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

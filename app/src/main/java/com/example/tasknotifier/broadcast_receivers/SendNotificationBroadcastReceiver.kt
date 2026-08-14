@@ -1,13 +1,14 @@
-package com.example.tasknotifier.broadcast_receivers
+package io.github.abdulmoizhussain.tasknotifier.broadcast_receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.example.tasknotifier.android_services.TaskNotifierAndroidService
-import com.example.tasknotifier.common.Constants
-import com.example.tasknotifier.common.Globals
-import com.example.tasknotifier.common.TaskStatusEnum
-import com.example.tasknotifier.services.TaskService
+import io.github.abdulmoizhussain.tasknotifier.android_services.TaskNotifierAndroidService
+import io.github.abdulmoizhussain.tasknotifier.common.Constants
+import io.github.abdulmoizhussain.tasknotifier.common.Globals
+import io.github.abdulmoizhussain.tasknotifier.common.TaskStatusEnum
+import io.github.abdulmoizhussain.tasknotifier.diagnostics.DiagnosticLog
+import io.github.abdulmoizhussain.tasknotifier.services.TaskService
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -21,9 +22,16 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
             launch {
 
                 val taskId = intent.getIntExtra(Constants.INTENT_EXTRA_TASK_ID, 0)
+                DiagnosticLog.record(context, "ALARM_BROADCAST_RECEIVED", taskId)
 
                 val task = taskService.getOneByIdAsync(taskId)
                 if (task == null || task.status != TaskStatusEnum.On) {
+                    DiagnosticLog.record(
+                        context,
+                        "ALARM_BROADCAST_IGNORED",
+                        taskId,
+                        mapOf("taskFound" to (task != null), "status" to task?.status?.name),
+                    )
                     return@launch
                 }
 
@@ -36,6 +44,12 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
                 // Making sure task.repeat && task.stopAfter have the valid indices.
                 if (task.repeat < 0 || task.stopAfter < 0 || task.repeat >= Constants.repeatArray.size || task.stopAfter >= Constants.stopAfterArray.size) {
                     // fail safe (overkill). just ignore for now..
+                    DiagnosticLog.record(
+                        context,
+                        "ALARM_BROADCAST_INVALID_REPEAT_CONFIGURATION",
+                        taskId,
+                        mapOf("repeat" to task.repeat, "stopAfter" to task.stopAfter),
+                    )
                     return@launch
                 }
                 // When "Repeat: None" is selected.
@@ -59,8 +73,24 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
                 }
 
                 if (!taskService.updateAfterAlarmIfStillOnAsync(taskId, triggerAtMillis, sentCount)) {
+                    DiagnosticLog.record(
+                        context,
+                        "ALARM_DATABASE_UPDATE_SKIPPED",
+                        taskId,
+                        mapOf("triggerAtMillis" to triggerAtMillis, "sentCount" to sentCount),
+                    )
                     return@launch
                 }
+                DiagnosticLog.record(
+                    context,
+                    "ALARM_DATABASE_UPDATED",
+                    taskId,
+                    mapOf(
+                        "inProgress" to true,
+                        "triggerAtMillis" to triggerAtMillis,
+                        "sentCount" to sentCount,
+                    ),
+                )
 
                 val contentTitle = Globals.createTitleForTask(setWhen, sentCount)
 
@@ -72,11 +102,13 @@ class SendNotificationBroadcastReceiver : BroadcastReceiver() {
                     serviceIntent.putExtra(Constants.INTENT_EXTRA_ON_GOING, true)
 
                     context.startService(serviceIntent)
+                    DiagnosticLog.record(context, "ALARM_NOTIFICATION_SERVICE_REQUESTED", taskId)
                 }
 
                 Intent(context, TaskNotifierAndroidService::class.java).let { mIntent ->
                     mIntent.putExtra(Constants.INTENT_EXTRA_TASK_SCHEDULER_SERVICE, true)
                     context.startService(mIntent)
+                    DiagnosticLog.record(context, "ALARM_SCHEDULER_SERVICE_REQUESTED", taskId)
                 }
             }
         }

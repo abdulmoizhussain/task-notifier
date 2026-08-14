@@ -1,11 +1,11 @@
-package com.example.tasknotifier
+package io.github.abdulmoizhussain.tasknotifier
 
 import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
-import com.example.tasknotifier.common.Constants
+import io.github.abdulmoizhussain.tasknotifier.common.Constants
 
 class AppStartup : Application() {
     override fun onCreate() {

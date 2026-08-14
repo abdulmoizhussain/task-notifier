@@ -1,9 +1,9 @@
-package com.example.tasknotifier.utils
+package io.github.abdulmoizhussain.tasknotifier.utils
 
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
-import com.example.tasknotifier.common.Constants
+import io.github.abdulmoizhussain.tasknotifier.common.Constants
 
 // SharedPreferencesManager
 class SPManager(context: Context) {

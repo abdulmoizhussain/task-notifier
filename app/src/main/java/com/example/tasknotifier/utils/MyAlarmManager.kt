@@ -1,4 +1,4 @@
-package com.example.tasknotifier.utils
+package io.github.abdulmoizhussain.tasknotifier.utils
 
 import android.app.AlarmManager
 import android.app.AlarmManager.AlarmClockInfo
@@ -6,13 +6,20 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.example.tasknotifier.MainActivity
-import com.example.tasknotifier.broadcast_receivers.SendNotificationBroadcastReceiver
+import io.github.abdulmoizhussain.tasknotifier.MainActivity
+import io.github.abdulmoizhussain.tasknotifier.broadcast_receivers.SendNotificationBroadcastReceiver
+import io.github.abdulmoizhussain.tasknotifier.diagnostics.DiagnosticLog
 
 class MyAlarmManager {
     companion object {
 
         fun setExact(context: Context, requestCode: Int, mIntent: Intent, triggerAtMillis: Long) {
+            DiagnosticLog.record(
+                context,
+                "ALARM_SCHEDULE_REQUESTED",
+                requestCode,
+                mapOf("triggerAtMillis" to triggerAtMillis),
+            )
             val pendingIntent = PendingIntent.getBroadcast(context, requestCode, mIntent, getFlagUpdateCurrent())
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
@@ -27,10 +34,17 @@ class MyAlarmManager {
                     alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
                 }
             }
+            DiagnosticLog.record(
+                context,
+                "ALARM_SCHEDULE_COMPLETED",
+                requestCode,
+                mapOf("triggerAtMillis" to triggerAtMillis),
+            )
         }
 
         // TODO check all of its usages that if the intent & context being passed are always identical or not.
         fun cancel(context: Context, requestCode: Int) {
+            DiagnosticLog.record(context, "ALARM_CANCEL_REQUESTED", requestCode)
             // helpful sources: also check the comments
             // https://stackoverflow.com/a/9575569/8075004
 
@@ -40,6 +54,7 @@ class MyAlarmManager {
 
             alarmManager.cancel(pendingIntent)
             pendingIntent.cancel()
+            DiagnosticLog.record(context, "ALARM_CANCEL_COMPLETED", requestCode)
         }
 
         @Suppress("unused")

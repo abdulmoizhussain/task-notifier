@@ -19,6 +19,10 @@
     <string name="label_stop_after">Stop After</string>
     <string name="label_add_new_task">Add reminder</string>
     <string name="label_restart_service">Restart Service</string>
+    <string name="label_export_diagnostics">Export diagnostics</string>
+    <string name="message_diagnostics_exported">Diagnostics exported successfully.</string>
+    <string name="message_diagnostics_export_failed">Could not export diagnostics: %1$s</string>
+    <string name="message_diagnostics_export_requires_android_kitkat">Diagnostics export requires Android 4.4 or newer.</string>
     <string name="hint_description">What should I remind you about?</string>
     <string name="label_drag_to_resize">↕ Drag to resize</string>
     <string name="content_description_resize_description">Drag vertically to resize the description field</string>

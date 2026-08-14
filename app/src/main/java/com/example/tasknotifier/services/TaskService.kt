@@ -1,13 +1,14 @@
-package com.example.tasknotifier.services
+package io.github.abdulmoizhussain.tasknotifier.services
 
 import android.content.Context
 import android.content.Intent
-import com.example.tasknotifier.broadcast_receivers.SendNotificationBroadcastReceiver
-import com.example.tasknotifier.common.Constants
-import com.example.tasknotifier.data.AppDatabase
-import com.example.tasknotifier.data.task.Task
-import com.example.tasknotifier.repositories.TaskRepository
-import com.example.tasknotifier.utils.MyAlarmManager
+import io.github.abdulmoizhussain.tasknotifier.broadcast_receivers.SendNotificationBroadcastReceiver
+import io.github.abdulmoizhussain.tasknotifier.common.Constants
+import io.github.abdulmoizhussain.tasknotifier.data.AppDatabase
+import io.github.abdulmoizhussain.tasknotifier.data.task.Task
+import io.github.abdulmoizhussain.tasknotifier.diagnostics.DiagnosticLog
+import io.github.abdulmoizhussain.tasknotifier.repositories.TaskRepository
+import io.github.abdulmoizhussain.tasknotifier.utils.MyAlarmManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -23,6 +24,7 @@ class TaskService(context: Context) {
     }
 
     private val taskRepository: TaskRepository
+    private val applicationContext = context.applicationContext
 
     init {
         val taskDao = AppDatabase.getDatabase(context).taskDao()
@@ -37,8 +39,22 @@ class TaskService(context: Context) {
         return taskRepository.getOneByIdAsync(id)
     }
 
-    suspend fun updateOneAsync(task: Task) {
-        taskRepository.updateOneAsync(task)
+    suspend fun updateOneAsync(task: Task): Int {
+        val updatedRows = taskRepository.updateOneAsync(task)
+        DiagnosticLog.record(
+            applicationContext,
+            "FULL_TASK_UPDATE_RESULT",
+            task.id,
+            mapOf(
+                "updatedRows" to updatedRows,
+                "source" to "TASK_SERVICE",
+                "status" to task.status.name,
+                "inProgress" to task.inProgress,
+                "dateTime" to task.dateTime,
+                "sentCount" to task.sentCount,
+            ),
+        )
+        return updatedRows
     }
 
     suspend fun updateAfterAlarmIfStillOnAsync(id: Int, dateTime: Long, sentCount: Int): Boolean {
@@ -48,7 +64,17 @@ class TaskService(context: Context) {
     fun turnOffInProgressByTaskId(taskId: Int) {
         runBlocking {
             launch {
-                taskRepository.updateInProgressAsync(taskId, false)
+                val updated = taskRepository.updateInProgressAsync(taskId, false)
+                DiagnosticLog.record(
+                    applicationContext,
+                    "IN_PROGRESS_UPDATE_RESULT",
+                    taskId,
+                    mapOf(
+                        "newValue" to false,
+                        "updated" to updated,
+                        "source" to "REMOVE_NOTIFICATION",
+                    ),
+                )
             }
         }
     }

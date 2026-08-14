@@ -1,14 +1,15 @@
-package com.example.tasknotifier
+package io.github.abdulmoizhussain.tasknotifier
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.tasknotifier.common.Constants
-import com.example.tasknotifier.services.TaskService
-import com.example.tasknotifier.utils.MyDateFormat
-import com.example.tasknotifier.utils.MyNotificationManager
+import io.github.abdulmoizhussain.tasknotifier.common.Constants
+import io.github.abdulmoizhussain.tasknotifier.diagnostics.DiagnosticLog
+import io.github.abdulmoizhussain.tasknotifier.services.TaskService
+import io.github.abdulmoizhussain.tasknotifier.utils.MyDateFormat
+import io.github.abdulmoizhussain.tasknotifier.utils.MyNotificationManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -82,6 +83,12 @@ class ActivityViewTask : AppCompatActivity() {
     }
 
     private fun onClickRemoveThisNotification() {
+        DiagnosticLog.record(
+            this,
+            "REMOVE_NOTIFICATION_CLICKED",
+            taskDbId,
+            mapOf("inProgressTarget" to false),
+        )
         TaskService(this).turnOffInProgressByTaskId(taskDbId)
         MyNotificationManager.cancelById(this, taskDbId)
     }

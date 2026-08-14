@@ -1,4 +1,4 @@
-package com.example.tasknotifier.broadcast_receivers
+package io.github.abdulmoizhussain.tasknotifier.broadcast_receivers
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -6,10 +6,11 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
-import com.example.tasknotifier.common.Constants
-import com.example.tasknotifier.common.Globals
-import com.example.tasknotifier.services.TaskService
-import com.example.tasknotifier.utils.MyNotificationManager
+import io.github.abdulmoizhussain.tasknotifier.common.Constants
+import io.github.abdulmoizhussain.tasknotifier.common.Globals
+import io.github.abdulmoizhussain.tasknotifier.diagnostics.DiagnosticLog
+import io.github.abdulmoizhussain.tasknotifier.services.TaskService
+import io.github.abdulmoizhussain.tasknotifier.utils.MyNotificationManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,11 +28,18 @@ class NotificationDismissedBroadcastReceiver : BroadcastReceiver() {
 
         val pendingResult = goAsync()
         val applicationContext = context.applicationContext
+        DiagnosticLog.record(applicationContext, "NOTIFICATION_DISMISSED_RECEIVED", taskId)
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val task = TaskService(applicationContext).getOneByIdAsync(taskId)
                 if (task != null && task.inProgress) {
+                    DiagnosticLog.record(
+                        applicationContext,
+                        "DISMISSED_NOTIFICATION_RESTORING",
+                        taskId,
+                        mapOf("status" to task.status.name, "inProgress" to task.inProgress),
+                    )
                     MyNotificationManager.notifySilently(
                         applicationContext,
                         task.id,
@@ -40,8 +48,24 @@ class NotificationDismissedBroadcastReceiver : BroadcastReceiver() {
                         task.dateTime,
                         true,
                     )
+                } else {
+                    DiagnosticLog.record(
+                        applicationContext,
+                        "DISMISSED_NOTIFICATION_NOT_RESTORED",
+                        taskId,
+                        mapOf(
+                            "taskFound" to (task != null),
+                            "inProgress" to task?.inProgress,
+                        ),
+                    )
                 }
             } catch (exception: Exception) {
+                DiagnosticLog.record(
+                    applicationContext,
+                    "NOTIFICATION_DISMISS_HANDLER_FAILED",
+                    taskId,
+                    throwable = exception,
+                )
                 Handler(Looper.getMainLooper()).post {
                     Toast.makeText(
                         applicationContext,

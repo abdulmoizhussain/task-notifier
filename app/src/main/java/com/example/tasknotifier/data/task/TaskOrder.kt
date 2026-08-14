@@ -1,4 +1,4 @@
-package com.example.tasknotifier.data.task
+package io.github.abdulmoizhussain.tasknotifier.data.task
 
 enum class TaskOrder {
     LATEST_CREATED,

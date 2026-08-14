@@ -1,8 +1,12 @@
-package com.example.tasknotifier
+package io.github.abdulmoizhussain.tasknotifier
 
 import android.app.AlertDialog
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -14,13 +18,21 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tasknotifier.android_services.TaskNotifierAndroidService
-import com.example.tasknotifier.common.Constants
-import com.example.tasknotifier.data.task.TaskOrder
-import com.example.tasknotifier.listadapters.ListAdapter
-import com.example.tasknotifier.services.TaskService
-import com.example.tasknotifier.viewmodels.TaskViewModel
+import io.github.abdulmoizhussain.tasknotifier.android_services.TaskNotifierAndroidService
+import io.github.abdulmoizhussain.tasknotifier.common.Constants
+import io.github.abdulmoizhussain.tasknotifier.data.task.TaskOrder
+import io.github.abdulmoizhussain.tasknotifier.diagnostics.DiagnosticLog
+import io.github.abdulmoizhussain.tasknotifier.diagnostics.DiagnosticsExporter
+import io.github.abdulmoizhussain.tasknotifier.listadapters.ListAdapter
+import io.github.abdulmoizhussain.tasknotifier.services.TaskService
+import io.github.abdulmoizhussain.tasknotifier.viewmodels.TaskViewModel
 import org.json.JSONArray
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 class MainActivity : AppCompatActivity() {
@@ -30,6 +42,7 @@ class MainActivity : AppCompatActivity() {
         private const val ORDER_MENU_GROUP = 1
         private const val ORDER_LATEST_CREATED_ID = 101
         private const val ORDER_RECENTLY_MODIFIED_ID = 102
+        private const val REQUEST_CREATE_DIAGNOSTICS = 201
     }
 
     private lateinit var taskViewModel: TaskViewModel
@@ -229,6 +242,11 @@ class MainActivity : AppCompatActivity() {
                 true
             }
 
+            R.id.option_export_diagnostics -> {
+                onClickExportDiagnostics()
+                true
+            }
+
             R.id.option_export_data -> {
                 Toast.makeText(this, "Not implemented yet!", Toast.LENGTH_SHORT).show()
                 false
@@ -279,12 +297,84 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onClickRestartService() {
+        DiagnosticLog.record(this, "RESTART_CLICKED")
         val mIntent = Intent(this, TaskNotifierAndroidService::class.java)
         mIntent.putExtra(Constants.INTENT_EXTRA_NOTIFICATION_REVIVER_SERVICE, true)
         mIntent.putExtra(Constants.INTENT_EXTRA_TASK_SCHEDULER_SERVICE, true)
 
-        stopService(mIntent)
-        startService(mIntent)
+        val serviceWasRunning = stopService(mIntent)
+        try {
+            val component = startService(mIntent)
+            DiagnosticLog.record(
+                this,
+                "RESTART_SERVICE_REQUESTED",
+                attributes = mapOf(
+                    "serviceWasRunning" to serviceWasRunning,
+                    "component" to component?.flattenToShortString(),
+                ),
+            )
+        } catch (exception: Exception) {
+            DiagnosticLog.record(
+                this,
+                "RESTART_SERVICE_REQUEST_FAILED",
+                attributes = mapOf("serviceWasRunning" to serviceWasRunning),
+                throwable = exception,
+            )
+            throw exception
+        }
+    }
+
+    private fun onClickExportDiagnostics() {
+        DiagnosticLog.record(this, "DIAGNOSTICS_EXPORT_REQUESTED")
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            Toast.makeText(
+                this,
+                R.string.message_diagnostics_export_requires_android_kitkat,
+                Toast.LENGTH_LONG,
+            ).show()
+            return
+        }
+
+        val timestamp = SimpleDateFormat("yyyy-MM-dd-HHmmss", Locale.US).format(Date())
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/zip"
+            putExtra(Intent.EXTRA_TITLE, "task-notifier-diagnostics-$timestamp.zip")
+        }
+        startActivityForResult(intent, REQUEST_CREATE_DIAGNOSTICS)
+    }
+
+    @Deprecated("Deprecated in Android; retained for the app's current activity API level.")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != REQUEST_CREATE_DIAGNOSTICS || resultCode != Activity.RESULT_OK) {
+            return
+        }
+
+        val destination = data?.data ?: return
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                DiagnosticsExporter(applicationContext).exportTo(destination)
+                Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(
+                        this@MainActivity,
+                        R.string.message_diagnostics_exported,
+                        Toast.LENGTH_LONG,
+                    ).show()
+                }
+            } catch (exception: Exception) {
+                Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(
+                        this@MainActivity,
+                        getString(
+                            R.string.message_diagnostics_export_failed,
+                            exception.localizedMessage ?: exception.toString(),
+                        ),
+                        Toast.LENGTH_LONG,
+                    ).show()
+                }
+            }
+        }
     }
 
     private fun onClickSettingsButton() {

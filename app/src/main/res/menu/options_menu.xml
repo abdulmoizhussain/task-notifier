@@ -7,6 +7,10 @@
         android:title="Restart Service" />
 
     <item
+        android:id="@+id/option_export_diagnostics"
+        android:title="@string/label_export_diagnostics" />
+
+    <item
         android:id="@+id/option_export_data"
         android:title="Export to Backup File" />
 
