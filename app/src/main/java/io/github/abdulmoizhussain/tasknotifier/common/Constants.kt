@@ -10,6 +10,13 @@ object Constants {
     const val INTENT_EXTRA_DESCRIPTION = "INTENT_EXTRA_DESCRIPTION"
     const val INTENT_EXTRA_SET_WHEN = "INTENT_EXTRA_SET_WHEN"
     const val INTENT_EXTRA_ON_GOING = "INTENT_EXTRA_ON_GOING"
+
+    /**
+     * Time the notification carrying this delete intent was posted. Lets the dismiss
+     * receiver log the notification's age directly, which is what makes a system reap
+     * (a long age) distinguishable from a user swipe (usually a short one).
+     */
+    const val INTENT_EXTRA_POSTED_AT_MILLIS = "INTENT_EXTRA_POSTED_AT_MILLIS"
     const val INTENT_EXTRA_NOTIFICATION_REVIVER_SERVICE = "INTENT_EXTRA_NOTIFICATION_REVIVER_SERVICE"
     const val INTENT_EXTRA_TASK_SCHEDULER_SERVICE = "INTENT_EXTRA_TASK_SCHEDULER_SERVICE"
     const val NOTIFICATION_CHANNEL_DEFAULT = "NOTIFICATION_CHANNEL_DEFAULT"

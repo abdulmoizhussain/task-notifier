@@ -16,6 +16,7 @@ import org.json.JSONObject
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.OutputStream
+import java.security.MessageDigest
 import java.util.TimeZone
 import java.util.UUID
 import java.util.zip.ZipEntry
@@ -141,12 +142,40 @@ class DiagnosticsExporter(context: Context) {
         }
     }
 
+    /**
+     * Reminder text is deliberately not exported. Everything needed to debug the
+     * notification pipeline is structural, so the description is reduced to a shape
+     * and a stable fingerprint: length and line count keep the notification layout
+     * debuggable, and the hash shows whether the text changed between two exports
+     * without revealing what it says.
+     */
+    private fun redactDescription(description: String): JSONObject {
+        return JSONObject().apply {
+            put("redacted", true)
+            put("length", description.length)
+            put("lineCount", description.lines().size)
+            put("isBlank", description.isBlank())
+            put("sha256Prefix", sha256Prefix(description))
+        }
+    }
+
+    private fun sha256Prefix(value: String): String {
+        return try {
+            MessageDigest.getInstance("SHA-256")
+                .digest(value.toByteArray(Charsets.UTF_8))
+                .take(6)
+                .joinToString("") { "%02x".format(it) }
+        } catch (_: Exception) {
+            "unavailable"
+        }
+    }
+
     private fun createTasksJson(tasks: List<Task>): JSONArray {
         return JSONArray().apply {
             tasks.forEach { task ->
                 put(JSONObject().apply {
                     put("id", task.id)
-                    put("description", task.description)
+                    put("description", redactDescription(task.description))
                     put("dateTime", task.dateTime)
                     put("repeat", task.repeat)
                     put("stopAfter", task.stopAfter)
@@ -166,11 +195,13 @@ class DiagnosticsExporter(context: Context) {
             .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val packageInfo = applicationContext.packageManager
             .getPackageInfo(applicationContext.packageName, 0)
-        val activeNotificationIds = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            notificationManager.activeNotifications.map { it.id }
-        } else {
-            emptyList()
-        }
+        val activeSnapshot = NotificationTelemetry.activeSnapshot(notificationManager)
+        val activeNotificationIds = NotificationTelemetry.activeIds(activeSnapshot)
+
+        // The check that matters most: tasks the app believes are showing a
+        // notification, but which are not actually in the shade.
+        val inProgressTaskIds = tasks.filter { it.inProgress }.map { it.id }
+        val missingNotificationIds = inProgressTaskIds.filterNot { activeNotificationIds.contains(it) }
 
         return JSONObject().apply {
             put("capturedAtMillis", System.currentTimeMillis())
@@ -196,6 +227,28 @@ class DiagnosticsExporter(context: Context) {
                 NotificationManagerCompat.from(applicationContext).areNotificationsEnabled(),
             )
             put("activeNotificationIds", JSONArray(activeNotificationIds))
+            put("activeNotificationDetail", JSONArray(NotificationTelemetry.describeActive(activeSnapshot)))
+            put("inProgressTaskIds", JSONArray(inProgressTaskIds))
+            put("missingNotificationIds", JSONArray(missingNotificationIds))
+            put("missingNotificationCount", missingNotificationIds.size)
+
+            put("buildDisplay", Build.DISPLAY)
+            put("buildFingerprint", Build.FINGERPRINT)
+            put("deviceDevice", Build.DEVICE)
+            put("timezoneOffsetMillis", TimeZone.getDefault().getOffset(System.currentTimeMillis()))
+            put("targetSdk", applicationContext.applicationInfo.targetSdkVersion)
+
+            NotificationTelemetry.environment(applicationContext).forEach { (key, value) ->
+                put(key, value ?: JSONObject.NULL)
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                put(
+                    "canScheduleExactAlarms",
+                    (applicationContext.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager)
+                        .canScheduleExactAlarms(),
+                )
+            }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 put(
@@ -218,14 +271,36 @@ class DiagnosticsExporter(context: Context) {
         return """
             Task Notifier diagnostics
 
-            task_notifier_snapshot.db is a standalone SQLite copy of every task captured by one
-            Room query. Open it directly in DB Browser for SQLite.
+            PRIVACY
+            app-state.json and tasks.json do NOT contain reminder text. Each description is
+            replaced by its length, line count and a short SHA-256 prefix, which is enough to
+            tell whether the text changed between exports without revealing what it says.
+
+            WARNING: database/task_notifier_snapshot.db and database/raw/ still contain the
+            full reminder text, because they are verbatim database snapshots. Delete those
+            files before sharing this bundle if the reminder text is sensitive.
+
+            Event logs have never contained reminder descriptions.
+
+            WHAT TO LOOK AT FIRST
+            app-state.json -> missingNotificationIds. Non-empty means the app believes a task
+            is showing a notification that is not actually in the shade.
+
+            events/*.jsonl, per notification post:
+              NOTIFICATION_POST_REQUESTED  burst context (millisSincePreviousPost,
+                                           postsInLastSecond, postsOfThisIdInProcess) plus
+                                           device power and channel state at post time
+              NOTIFICATION_POST_RESULT     immediate read-back, from a single snapshot
+              NOTIFICATION_POST_VERIFIED   the post was still alive a few seconds later
+              NOTIFICATION_POST_LOST       it was not - the post was silently dropped
+              NOTIFICATION_RECONCILE       expected vs actual notification ids on wake-up
+              NOTIFICATION_DISMISSED_RECEIVED  carries ageHours, so a system reap is
+                                           distinguishable from a user swipe
+
+            NOTIFICATION_POST_LOST is the event to search for first.
 
             database/raw contains the original database and any WAL/SHM sidecar files found at
             export time. Keep those files together when inspecting the raw database.
-
-            Event logs intentionally omit reminder descriptions. tasks.json and the database
-            contain reminder text because they are full user-requested data snapshots.
         """.trimIndent()
     }
 

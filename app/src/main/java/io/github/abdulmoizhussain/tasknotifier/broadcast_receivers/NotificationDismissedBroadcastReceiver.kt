@@ -9,6 +9,7 @@ import android.widget.Toast
 import io.github.abdulmoizhussain.tasknotifier.common.Constants
 import io.github.abdulmoizhussain.tasknotifier.common.Globals
 import io.github.abdulmoizhussain.tasknotifier.diagnostics.DiagnosticLog
+import io.github.abdulmoizhussain.tasknotifier.diagnostics.NotificationTelemetry
 import io.github.abdulmoizhussain.tasknotifier.services.TaskService
 import io.github.abdulmoizhussain.tasknotifier.utils.MyNotificationManager
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +29,22 @@ class NotificationDismissedBroadcastReceiver : BroadcastReceiver() {
 
         val pendingResult = goAsync()
         val applicationContext = context.applicationContext
-        DiagnosticLog.record(applicationContext, "NOTIFICATION_DISMISSED_RECEIVED", taskId)
+        val postedAtMillis = intent.getLongExtra(Constants.INTENT_EXTRA_POSTED_AT_MILLIS, 0L)
+        val ageMillis = if (postedAtMillis > 0L) System.currentTimeMillis() - postedAtMillis else null
+        DiagnosticLog.record(
+            applicationContext,
+            "NOTIFICATION_DISMISSED_RECEIVED",
+            taskId,
+            LinkedHashMap<String, Any?>().apply {
+                put("postedAtMillis", if (postedAtMillis > 0L) postedAtMillis else null)
+                put("ageMillis", ageMillis)
+                put("ageHours", ageMillis?.let { "%.4f".format(it / 3_600_000.0) })
+                // A system reap lands very close to a whole number of hours; a user
+                // swipe does not. See docs/NOTIFICATION_LOSS_INVESTIGATION.md.
+                put("looksLikeSystemReap", ageMillis?.let { it > 60 * 60 * 1000L })
+                putAll(NotificationTelemetry.environment(applicationContext))
+            },
+        )
 
         CoroutineScope(Dispatchers.IO).launch {
             try {

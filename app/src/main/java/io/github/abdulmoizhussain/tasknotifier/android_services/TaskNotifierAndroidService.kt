@@ -7,6 +7,7 @@ import android.widget.Toast
 import io.github.abdulmoizhussain.tasknotifier.common.Constants
 import io.github.abdulmoizhussain.tasknotifier.common.Globals
 import io.github.abdulmoizhussain.tasknotifier.diagnostics.DiagnosticLog
+import io.github.abdulmoizhussain.tasknotifier.diagnostics.NotificationTelemetry
 import io.github.abdulmoizhussain.tasknotifier.services.TaskService
 import io.github.abdulmoizhussain.tasknotifier.utils.MyNotificationManager
 import kotlinx.coroutines.launch
@@ -20,11 +21,12 @@ class TaskNotifierAndroidService : Service() {
         DiagnosticLog.record(
             this,
             "SERVICE_ON_START",
-            attributes = mapOf(
-                "startId" to startId,
-                "flags" to flags,
-                "intentWasNull" to (intent == null),
-            ),
+            attributes = LinkedHashMap<String, Any?>().apply {
+                put("startId", startId)
+                put("flags", flags)
+                put("intentWasNull", intent == null)
+                putAll(NotificationTelemetry.environment(this@TaskNotifierAndroidService))
+            },
         )
 
 //        MyNotificationManager.notifyWithUnClickable(
@@ -70,6 +72,15 @@ class TaskNotifierAndroidService : Service() {
                             },
                         ),
                     )
+                    // What the shade actually looked like when we woke up, versus what
+                    // the database believes is showing. A non-empty missingIds here is a
+                    // notification that was silently lost some time before this run.
+                    NotificationTelemetry.reconcile(
+                        this@TaskNotifierAndroidService,
+                        "reviver_before_posting",
+                        tasks.map { it.id },
+                    )
+
                     tasks.forEach { task ->
                         DiagnosticLog.record(
                             this@TaskNotifierAndroidService,

@@ -8,6 +8,8 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import io.github.abdulmoizhussain.tasknotifier.ActivityViewTask
@@ -15,6 +17,7 @@ import io.github.abdulmoizhussain.tasknotifier.R
 import io.github.abdulmoizhussain.tasknotifier.broadcast_receivers.NotificationDismissedBroadcastReceiver
 import io.github.abdulmoizhussain.tasknotifier.common.Constants
 import io.github.abdulmoizhussain.tasknotifier.diagnostics.DiagnosticLog
+import io.github.abdulmoizhussain.tasknotifier.diagnostics.NotificationTelemetry
 
 class MyNotificationManager {
     companion object {
@@ -46,8 +49,11 @@ class MyNotificationManager {
                 action = Constants.INTENT_ACTION_NOTIFICATION_DISMISSED
                 data = Uri.parse("task-notifier://notification/$taskId/dismissed")
                 putExtra(Constants.INTENT_EXTRA_TASK_ID, taskId)
+                putExtra(Constants.INTENT_EXTRA_POSTED_AT_MILLIS, System.currentTimeMillis())
             }
 
+            // FLAG_UPDATE_CURRENT refreshes the extras, so the timestamp always
+            // belongs to the most recent post of this notification id.
             return PendingIntent.getBroadcast(context, taskId, dismissIntent, pendingIntentFlags())
         }
 
@@ -204,11 +210,15 @@ class MyNotificationManager {
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             DiagnosticLog.record(context, "NOTIFICATION_CANCEL_REQUESTED", notificationId)
             notificationManager.cancel(notificationId)
+            val snapshot = NotificationTelemetry.activeSnapshot(notificationManager)
             DiagnosticLog.record(
                 context,
                 "NOTIFICATION_CANCEL_RESULT",
                 notificationId,
-                mapOf("active" to isNotificationActive(notificationManager, notificationId)),
+                mapOf(
+                    "active" to NotificationTelemetry.activeIds(snapshot).contains(notificationId),
+                    "activeNotificationIds" to NotificationTelemetry.activeIds(snapshot),
+                ),
             )
         }
 
@@ -222,27 +232,37 @@ class MyNotificationManager {
         ) {
             val notificationManager = context
                 .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            DiagnosticLog.record(
-                context,
-                "NOTIFICATION_POST_REQUESTED",
-                notificationId,
-                mapOf(
-                    "channelId" to channelId,
-                    "mode" to mode,
-                    "ongoing" to onGoing,
-                ),
-            )
+
+            val attributes = LinkedHashMap<String, Any?>()
+            attributes["channelId"] = channelId
+            attributes["mode"] = mode
+            attributes["ongoing"] = onGoing
+            // NotificationCompat.getGroup handles the API 20 floor; Notification.getGroup
+            // itself is above this module's minSdk of 16.
+            attributes["group"] = NotificationCompat.getGroup(notification)
+            attributes["whenMillis"] = notification.`when`
+            attributes.putAll(NotificationTelemetry.onPostRequested(notificationId))
+            attributes.putAll(NotificationTelemetry.environment(context))
+
+            DiagnosticLog.record(context, "NOTIFICATION_POST_REQUESTED", notificationId, attributes)
+
             try {
                 notificationManager.notify(notificationId, notification)
+
+                // One snapshot for both fields. Reading getActiveNotifications() twice
+                // produced self-contradicting events in the 2026-09 export.
+                val snapshot = NotificationTelemetry.activeSnapshot(notificationManager)
                 DiagnosticLog.record(
                     context,
                     "NOTIFICATION_POST_RESULT",
                     notificationId,
                     mapOf(
-                        "active" to isNotificationActive(notificationManager, notificationId),
-                        "activeNotificationIds" to activeNotificationIds(notificationManager),
+                        "active" to NotificationTelemetry.activeIds(snapshot).contains(notificationId),
+                        "activeNotificationIds" to NotificationTelemetry.activeIds(snapshot),
                     ),
                 )
+
+                schedulePostVerification(context, notificationId, mode)
             } catch (exception: Exception) {
                 DiagnosticLog.record(
                     context,
@@ -254,24 +274,41 @@ class MyNotificationManager {
             }
         }
 
-        private fun isNotificationActive(
-            notificationManager: NotificationManager,
-            notificationId: Int,
-        ): Any {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                notificationManager.activeNotifications.any { it.id == notificationId }
-            } else {
-                "unavailable_below_api_23"
-            }
+        /**
+         * Re-checks the notification a few seconds after posting.
+         *
+         * The immediate read-back cannot distinguish "the post was dropped" from
+         * "the post has not surfaced yet", which is exactly the ambiguity that
+         * blocked the 2026-09 investigation. This delayed check can.
+         *
+         * Best effort: the posting process may already be gone when it is due, in
+         * which case the event is simply absent from the log.
+         */
+        private fun schedulePostVerification(context: Context, notificationId: Int, mode: String) {
+            val applicationContext = context.applicationContext
+            Handler(Looper.getMainLooper()).postDelayed({
+                try {
+                    val notificationManager = applicationContext
+                        .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    val snapshot = NotificationTelemetry.activeSnapshot(notificationManager)
+                    val active = NotificationTelemetry.activeIds(snapshot).contains(notificationId)
+                    DiagnosticLog.record(
+                        applicationContext,
+                        if (active) "NOTIFICATION_POST_VERIFIED" else "NOTIFICATION_POST_LOST",
+                        notificationId,
+                        mapOf(
+                            "mode" to mode,
+                            "delayMillis" to NotificationTelemetry.VERIFY_DELAY_MILLIS,
+                            "activeNotificationIds" to NotificationTelemetry.activeIds(snapshot),
+                            "activeDetail" to NotificationTelemetry.describeActive(snapshot),
+                        ),
+                    )
+                } catch (_: Exception) {
+                    // Diagnostics must never interfere with reminder delivery.
+                }
+            }, NotificationTelemetry.VERIFY_DELAY_MILLIS)
         }
 
-        private fun activeNotificationIds(notificationManager: NotificationManager): Any {
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                notificationManager.activeNotifications.map { it.id }
-            } else {
-                "unavailable_below_api_23"
-            }
-        }
     }
 
 }

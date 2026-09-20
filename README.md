@@ -25,7 +25,7 @@ Task Notifier is a native Android reminder app for creating one-time or repeatin
 | Setting | Value |
 | --- | --- |
 | Application ID | `io.github.abdulmoizhussain.tasknotifier` |
-| Version | `0.0.3` (`versionCode` 3) |
+| Version | `1.0.0-beta.7` (`versionCode` 7) |
 | Minimum Android version | Android 4.1 / API 16 |
 | Compile SDK | API 33 |
 | Target SDK | API 30 |
@@ -79,8 +79,11 @@ The project is a single Android application module built with Kotlin and XML lay
 
 ## Modernization documents
 
-- [Project and target SDK analysis](ANALYSIS.md)
-- [Gradle and Kotlin upgrade plan](GRADLE_KOTLIN_UPGRADE_PLAN.md)
+- [Project and target SDK analysis](docs/ANALYSIS.md)
+- [Gradle and Kotlin upgrade plan](docs/GRADLE_KOTLIN_UPGRADE_PLAN.md)
+- [AlarmManager reliability analysis](docs/ALARM_MANAGER_RELIABILITY_ANALYSIS.md)
+- [Notification loss investigation (open)](docs/NOTIFICATION_LOSS_INVESTIGATION.md)
+- [Release notes v1.0.0-beta.7](docs/RELEASE_NOTES_v1.0.0-beta.7.md)
 
 ## TODO / future work
 
